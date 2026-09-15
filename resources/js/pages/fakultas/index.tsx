@@ -1,4 +1,5 @@
-import { Head } from "@inertiajs/react";
+import { Form, Head, router } from "@inertiajs/react";
+import { route } from "ziggy-js";
 import {
     Table,
     TableBody,
@@ -9,12 +10,23 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { useMediaQuery } from "@/hooks/use-media-query";
-import { Drawer, DrawerTrigger } from "@/components/ui/drawer";
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Field, FieldGroup } from "@/components/ui/field";
 
 interface Fakultas {
     id: number;
-    kode_fakultas: number;
+    kode_fakultas: string;
     nama_fakultas: string;
 }
 
@@ -22,7 +34,8 @@ interface PaginatedData<T> {
     data: T[];
     current_page: number;
     last_page: number;
-    total: number;
+    length: number;
+    map: any;
 }
 
 interface FakultasPageProps {
@@ -31,17 +44,105 @@ interface FakultasPageProps {
 
 export default function Fakultas({ data }: FakultasPageProps) {
     const [open, setOpen] = useState(false);
-    const isDesktop = useMediaQuery("(min-width: 768px)");
+
+    const [editingId, setEditingId] = useState<number | null>(null);
+
+    function handleDelete(id: number) {
+        if (confirm("Yakin ingin menghapus data ini?")) {
+            router.delete(route("fakultas.destroy", id), {
+                preserveScroll: true, // supaya posisi scroll tabel tidak reset ke atas
+            });
+        }
+    }
 
     return (
         <>
             <Head title="Fakultas" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <Drawer open={open} onOpenChange={setOpen}>
-                    <DrawerTrigger render={<Button />}>
-                        Tambah Fakultas
-                    </DrawerTrigger>
-                </Drawer>
+                <Dialog open={open} onOpenChange={setOpen}>
+                    <DialogTrigger asChild>
+                        <Button type="button" className="w-[200px]">
+                            Tambah Fakultas
+                        </Button>
+                    </DialogTrigger>
+
+                    <DialogContent>
+                        <Form
+                            action={route("fakultas.store")}
+                            method="post"
+                            onSuccess={() => setOpen(false)}
+                            resetOnSuccess
+                        >
+                            {({ errors, processing }) => (
+                                <>
+                                    <DialogHeader className="mb-[25px]">
+                                        <DialogTitle>
+                                            Tambah Data Fakultas
+                                        </DialogTitle>
+                                    </DialogHeader>
+                                    <FieldGroup>
+                                        <Field>
+                                            <Label htmlFor="kode_fakultas">
+                                                Kode Fakultas{" "}
+                                                <span className="text-destructive">
+                                                    *
+                                                </span>
+                                            </Label>
+                                            <Input
+                                                name="kode_fakultas"
+                                                id="kode_fakultas"
+                                                placeholder="Kode Fakultas"
+                                                required
+                                            />
+                                            {errors.kode_fakultas && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.kode_fakultas}
+                                                </p>
+                                            )}
+                                        </Field>
+                                        <Field>
+                                            <Label htmlFor="nama_fakultas">
+                                                Nama Fakultas{" "}
+                                                <span className="text-destructive">
+                                                    *
+                                                </span>
+                                            </Label>
+                                            <Input
+                                                name="nama_fakultas"
+                                                id="nama_fakultas"
+                                                placeholder="Nama Fakultas"
+                                                required
+                                            />
+                                            {errors.nama_fakultas && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.nama_fakultas}
+                                                </p>
+                                            )}
+                                        </Field>
+                                    </FieldGroup>
+                                    <DialogFooter>
+                                        <DialogClose asChild>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                            >
+                                                Kembali
+                                            </Button>
+                                        </DialogClose>
+                                        <Button
+                                            type="submit"
+                                            disabled={processing}
+                                        >
+                                            {processing
+                                                ? "Menyimpan..."
+                                                : "Simpan"}
+                                        </Button>
+                                    </DialogFooter>
+                                </>
+                            )}
+                        </Form>
+                    </DialogContent>
+                </Dialog>
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -52,17 +153,152 @@ export default function Fakultas({ data }: FakultasPageProps) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data.map((item: any, index: number) => (
-                            <TableRow key={item.id}>
-                                <TableCell>{index + 1}</TableCell>
-                                <TableCell>{item.kode_fakultas}</TableCell>
-                                <TableCell>{item.nama_fakultas}</TableCell>
-                                <TableCell className="flex gap-[20px]">
-                                    <Button>Edit</Button>
-                                    <Button>Hapus</Button>
+                        {data.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={4} className="text-center">
+                                    Data Fakultas Belum Diisi.
                                 </TableCell>
                             </TableRow>
-                        ))}
+                        ) : (
+                            data.map((item: any, index: number) => (
+                                <TableRow key={item.id}>
+                                    <TableCell>{index + 1}</TableCell>
+                                    <TableCell>{item.kode_fakultas}</TableCell>
+                                    <TableCell>{item.nama_fakultas}</TableCell>
+                                    <TableCell className="flex gap-[20px]">
+                                        <Dialog
+                                            open={editingId === item.id}
+                                            onOpenChange={(isOpen) => {
+                                                setEditingId(
+                                                    isOpen ? item.id : null,
+                                                );
+                                            }}
+                                        >
+                                            <DialogTrigger asChild>
+                                                <Button type="button">
+                                                    Edit
+                                                </Button>
+                                            </DialogTrigger>
+
+                                            <DialogContent>
+                                                <Form
+                                                    action={route(
+                                                        "fakultas.update",
+                                                        item.id,
+                                                    )}
+                                                    method="PUT"
+                                                    onSuccess={() =>
+                                                        setEditingId(null)
+                                                    }
+                                                    resetOnSuccess
+                                                >
+                                                    {({
+                                                        errors,
+                                                        processing,
+                                                    }) => (
+                                                        <>
+                                                            <DialogHeader className="mb-[25px]">
+                                                                <DialogTitle>
+                                                                    Edit Data
+                                                                    Fakultas
+                                                                </DialogTitle>
+                                                            </DialogHeader>
+                                                            <FieldGroup>
+                                                                <Field>
+                                                                    <Label htmlFor="kode_fakultas-${item.id}">
+                                                                        Kode
+                                                                        Fakultas{" "}
+                                                                        <span className="text-destructive">
+                                                                            *
+                                                                        </span>
+                                                                    </Label>
+                                                                    <Input
+                                                                        name="kode_fakultas"
+                                                                        placeholder="Kode Fakultas"
+                                                                        id={
+                                                                            "kode_fakultas-${item.id}"
+                                                                        }
+                                                                        defaultValue={
+                                                                            item.kode_fakultas
+                                                                        }
+                                                                        required
+                                                                    />
+                                                                    {errors.kode_fakultas && (
+                                                                        <p className="text-sm text-danger">
+                                                                            {
+                                                                                errors.kode_fakultas
+                                                                            }
+                                                                        </p>
+                                                                    )}
+                                                                </Field>
+                                                                <Field>
+                                                                    <Label htmlFor="nama_fakultas-${item.id}">
+                                                                        Nama
+                                                                        Fakultas
+                                                                        <span className="text-destructive">
+                                                                            *
+                                                                        </span>
+                                                                    </Label>
+                                                                    <Input
+                                                                        name="nama_fakultas"
+                                                                        placeholder="Nama Fakultas"
+                                                                        id={
+                                                                            "nama_fakultas-${item.id}"
+                                                                        }
+                                                                        defaultValue={
+                                                                            item.nama_fakultas
+                                                                        }
+                                                                        required
+                                                                    />
+                                                                    {errors.nama_fakultas && (
+                                                                        <p className="text-sm text-danger">
+                                                                            {
+                                                                                errors.nama_fakultas
+                                                                            }
+                                                                        </p>
+                                                                    )}
+                                                                </Field>
+                                                            </FieldGroup>
+                                                            <DialogFooter>
+                                                                <DialogClose>
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant={
+                                                                            "outline"
+                                                                        }
+                                                                    >
+                                                                        Kembali
+                                                                    </Button>
+                                                                </DialogClose>
+                                                                <Button
+                                                                    type="submit"
+                                                                    disabled={
+                                                                        processing
+                                                                    }
+                                                                >
+                                                                    {processing
+                                                                        ? "Menyimpan"
+                                                                        : "Simpan"}
+                                                                </Button>
+                                                            </DialogFooter>
+                                                        </>
+                                                    )}
+                                                </Form>
+                                            </DialogContent>
+                                        </Dialog>
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            onClick={() => {
+                                                handleDelete(item.id);
+                                            }}
+                                        >
+                                            Hapus
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
                     </TableBody>
                 </Table>
             </div>
