@@ -47,13 +47,7 @@ export default function Fakultas({ data }: FakultasPageProps) {
 
     const [editingId, setEditingId] = useState<number | null>(null);
 
-    function handleDelete(id: number) {
-        if (confirm("Yakin ingin menghapus data ini?")) {
-            router.delete(route("fakultas.destroy", id), {
-                preserveScroll: true, // supaya posisi scroll tabel tidak reset ke atas
-            });
-        }
-    }
+    const [deleteId, setDeleteId] = useState<number | null>(null);
 
     return (
         <>
@@ -92,6 +86,7 @@ export default function Fakultas({ data }: FakultasPageProps) {
                                                 name="kode_fakultas"
                                                 id="kode_fakultas"
                                                 placeholder="Kode Fakultas"
+                                                autoComplete="off"
                                                 required
                                             />
                                             {errors.kode_fakultas && (
@@ -111,6 +106,7 @@ export default function Fakultas({ data }: FakultasPageProps) {
                                                 name="nama_fakultas"
                                                 id="nama_fakultas"
                                                 placeholder="Nama Fakultas"
+                                                autoComplete="off"
                                                 required
                                             />
                                             {errors.nama_fakultas && (
@@ -153,14 +149,14 @@ export default function Fakultas({ data }: FakultasPageProps) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data.length === 0 ? (
+                        {data.data.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={4} className="text-center">
                                     Data Fakultas Belum Diisi.
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            data.map((item: any, index: number) => (
+                            data.data.map((item: any, index: number) => (
                                 <TableRow key={item.id}>
                                     <TableCell>{index + 1}</TableCell>
                                     <TableCell>{item.kode_fakultas}</TableCell>
@@ -286,15 +282,82 @@ export default function Fakultas({ data }: FakultasPageProps) {
                                                 </Form>
                                             </DialogContent>
                                         </Dialog>
-                                        <Button
-                                            type="button"
-                                            variant="destructive"
-                                            onClick={() => {
-                                                handleDelete(item.id);
+                                        <Dialog
+                                            open={deleteId === item.id}
+                                            onOpenChange={(isOpen) => {
+                                                setDeleteId(
+                                                    isOpen ? item.id : null,
+                                                );
                                             }}
                                         >
-                                            Hapus
-                                        </Button>
+                                            <DialogTrigger asChild>
+                                                <Button
+                                                    type="button"
+                                                    variant="destructive"
+                                                >
+                                                    Hapus
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent>
+                                                <Form
+                                                    action={route(
+                                                        "fakultas.destroy",
+                                                        item.id,
+                                                    )}
+                                                    method="DELETE"
+                                                    onSuccess={() =>
+                                                        setDeleteId(null)
+                                                    }
+                                                    resetOnSuccess
+                                                >
+                                                    {({ processing }) => (
+                                                        <>
+                                                            <DialogHeader>
+                                                                <DialogTitle>
+                                                                    Hapus
+                                                                    Fakultas
+                                                                </DialogTitle>
+                                                                <DialogDescription>
+                                                                    Apakah anda
+                                                                    yakin ingin
+                                                                    menghapus
+                                                                    fakultas{" "}
+                                                                    {
+                                                                        item.nama_fakultas
+                                                                    }
+                                                                    ?
+                                                                </DialogDescription>
+                                                            </DialogHeader>
+                                                            <DialogFooter>
+                                                                <DialogClose>
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant={
+                                                                            "outline"
+                                                                        }
+                                                                    >
+                                                                        Kembali
+                                                                    </Button>
+                                                                </DialogClose>
+                                                                <Button
+                                                                    type="submit"
+                                                                    disabled={
+                                                                        processing
+                                                                    }
+                                                                    variant={
+                                                                        "destructive"
+                                                                    }
+                                                                >
+                                                                    {processing
+                                                                        ? "...Menghapus"
+                                                                        : "Hapus"}
+                                                                </Button>
+                                                            </DialogFooter>
+                                                        </>
+                                                    )}
+                                                </Form>
+                                            </DialogContent>
+                                        </Dialog>
                                     </TableCell>
                                 </TableRow>
                             ))

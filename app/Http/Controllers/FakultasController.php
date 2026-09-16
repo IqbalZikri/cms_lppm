@@ -11,7 +11,7 @@ class FakultasController extends Controller
 {
     public function index()
     {
-        $fakultas = Fakultas::get();
+        $fakultas = Fakultas::paginate(10);
 
         return Inertia::render('fakultas/index', [
             'data' => $fakultas
@@ -72,7 +72,7 @@ class FakultasController extends Controller
 
         try {
             $data->delete();
-            return back()->with('error', 'Berhasil menghapus fakultas');
+            return back()->with('success', 'Berhasil menghapus fakultas');
         } catch (\Throwable $th) {
             return back()->with('error', 'Terjadi kesalahan');
         }
