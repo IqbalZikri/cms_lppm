@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('tempat_lahir');
             $table->text('alamat');
             $table->string('hp');
+            $table->string('email');
             $table->string('id_penelitian')->nullable();
             $table->string('id_fakultas')->nullable();
             $table->string('id_users')->nullable();

@@ -1,9 +1,19 @@
-import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
-import AppLogo from '@/components/app-logo';
-import { NavFooter } from '@/components/nav-footer';
-import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
+import { Link } from "@inertiajs/react";
+import {
+    BookOpen,
+    BookOpenIcon,
+    Building2,
+    ChevronRight,
+    CircleArrowRight,
+    FolderGit2,
+    GraduationCap,
+    LayoutGrid,
+    User,
+} from "lucide-react";
+import AppLogo from "@/components/app-logo";
+import { NavFooter } from "@/components/nav-footer";
+import { NavMain } from "@/components/nav-main";
+import { NavUser } from "@/components/nav-user";
 import {
     Sidebar,
     SidebarContent,
@@ -12,32 +22,64 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-} from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
-import type { NavItem } from '@/types';
+} from "@/components/ui/sidebar";
+import type { NavItem } from "@/types";
+import { route } from "ziggy-js";
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
-        href: dashboard(),
+        title: "Dashboard",
+        href: route("dashboard"),
         icon: LayoutGrid,
     },
     {
-        title: 'Fakultas',
-        href: '/fakultas',
+        title: "Master Data",
         icon: LayoutGrid,
+        items: [
+            {
+                title: "Fakultas",
+                href: route("fakultas.index"),
+                icon: Building2,
+            },
+            {
+                title: "Prodi",
+                href: route("prodi.index"),
+                icon: BookOpenIcon,
+            },
+            {
+                title: "Users",
+                href: route("user.index"),
+                icon: User,
+            },
+        ],
+    },
+    {
+        title: "Dosen",
+        icon: GraduationCap,
+        items: [
+            {
+                title: "Data Dosen",
+                href: route("dosen.index"),
+                icon: ChevronRight,
+            },
+            {
+                title: "Tambah Dosen",
+                href: route("dosen.create"),
+                icon: ChevronRight,
+            },
+        ],
     },
 ];
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
+        title: "Repository",
+        href: "https://github.com/laravel/react-starter-kit",
         icon: FolderGit2,
     },
     {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
+        title: "Documentation",
+        href: "https://laravel.com/docs/starter-kits#react",
         icon: BookOpen,
     },
 ];
@@ -49,7 +91,11 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={dashboard()} prefetch>
+                            <Link
+                                href={route("dashboard")}
+                                prefetch
+                                viewTransition
+                            >
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

@@ -15,8 +15,13 @@ class Dosen extends Model
         'tempat_lahir',
         'alamat',
         'hp',
+        'email',
         'id_penelitian',
         'id_fakultas',
         'id_users',
     ];
+
+    // public function penelitian(){
+    //     return $this->belongsTo(Penelit)
+    // }
 }
