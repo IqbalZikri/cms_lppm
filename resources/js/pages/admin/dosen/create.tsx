@@ -28,12 +28,34 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Fakultas } from "@/types/fakultas";
+import DialogFormCreate from "@/components/dialog-form";
+import { useEffect, useState } from "react";
+import { Prodi } from "@/interface/prodi";
 
 interface CreateDosenProps {
-    fakultas: Fakultas[]
+    fakultas: Fakultas[];
 }
 
 export default function CreateDosen({ fakultas }: CreateDosenProps) {
+    const [fakultasId, setFakultasId] = useState<string>("");
+    const [prodi, setProdi] = useState<Prodi[]>([]);
+
+    useEffect(() => {
+        if (!fakultasId) {
+            setProdi([]);
+            return;
+        }
+
+        fetch(route("admin.prodi.getProdi", fakultasId))
+            .then((response) => response.json())
+            .then((data: Prodi[]) => {
+                setProdi(data);
+            })
+            .catch((error) => {
+                console.error("Gagal mengambil data prodi", error);
+            });
+    }, [fakultasId]);
+
     return (
         <>
             <Head title="Tambah Dosen" />
@@ -58,7 +80,9 @@ export default function CreateDosen({ fakultas }: CreateDosenProps) {
                     <Breadcrumb>
                         <BreadcrumbList>
                             <BreadcrumbItem>
-                                <BreadcrumbLink href={route("dosen.index")}>
+                                <BreadcrumbLink
+                                    href={route("admin.dosen.index")}
+                                >
                                     Dosen
                                 </BreadcrumbLink>
                             </BreadcrumbItem>
@@ -69,10 +93,10 @@ export default function CreateDosen({ fakultas }: CreateDosenProps) {
                 </div>
 
                 <Form
-                    action={route("dosen.store")}
+                    action={route("admin.dosen.store")}
                     method="POST"
                     className="mx-auto w-full max-w-5xl space-y-6"
-                    onSuccess={() => route("dosen.index")}
+                    onSuccess={() => route("admin.dosen.index")}
                     resetOnSuccess
                 >
                     {({ errors, processing }) => (
@@ -89,26 +113,109 @@ export default function CreateDosen({ fakultas }: CreateDosenProps) {
                                     <FieldGroup>
                                         <Field>
                                             <FieldLabel>Fakultas</FieldLabel>
-                                            <Select name="fakultas_id">
-                                                <SelectTrigger
-                                                    id="fakultas_id"
-                                                    aria-invalid={
-                                                        !!errors.fakultas_id
-                                                    }
-                                                >
-                                                    <SelectValue placeholder="Pilih salah satu fakultas" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {fakultas.map((f) => (
-                                                        <SelectItem
-                                                            key={f.id}
-                                                            value={String(f.id)}
+
+                                            <Select
+                                                name="fakultas_id"
+                                                value={fakultasId}
+                                                onValueChange={setFakultasId}
+                                            >
+                                                {fakultas.length === 0 ? (
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Data fakultas belum ada" />
+                                                    </SelectTrigger>
+                                                ) : (
+                                                    <>
+                                                        <SelectTrigger
+                                                            id="fakultas_id"
+                                                            aria-invalid={
+                                                                !!errors.fakultas_id
+                                                            }
                                                         >
-                                                            {f.nama_fakultas}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
+                                                            <SelectValue placeholder="Pilih salah satu fakultas" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {fakultas.map(
+                                                                (f) => (
+                                                                    <SelectItem
+                                                                        key={
+                                                                            f.id
+                                                                        }
+                                                                        value={String(
+                                                                            f.id,
+                                                                        )}
+                                                                    >
+                                                                        {
+                                                                            f.nama_fakultas
+                                                                        }
+                                                                    </SelectItem>
+                                                                ),
+                                                            )}
+                                                        </SelectContent>
+                                                    </>
+                                                )}
                                             </Select>
+                                            <small>
+                                                Pastikan data fakultas sudah
+                                                masuk di halaman{" "}
+                                                <Link
+                                                    href={route(
+                                                        "admin.fakultas.index",
+                                                    )}
+                                                    className="underline"
+                                                    viewTransition
+                                                >
+                                                    Fakultas
+                                                </Link>
+                                            </small>
+                                        </Field>
+                                        <Field>
+                                            <FieldLabel>Prodi</FieldLabel>
+
+                                            <Select name="prodi_id">
+                                                {prodi.length === 0 ? (
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Data prodi belum ada" />
+                                                    </SelectTrigger>
+                                                ) : (
+                                                    <>
+                                                        <SelectTrigger
+                                                            id="prodi_id"
+                                                            aria-invalid={
+                                                                !!errors.prodi_id
+                                                            }
+                                                        >
+                                                            <SelectValue placeholder="Pilih salah satu prodi" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {prodi.map((p) => (
+                                                                <SelectItem
+                                                                    key={p.id}
+                                                                    value={String(
+                                                                        p.id,
+                                                                    )}
+                                                                >
+                                                                    {
+                                                                        p.nama_prodi
+                                                                    }
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </>
+                                                )}
+                                            </Select>
+                                            <small>
+                                                Pastikan data prodi sudah
+                                                masuk di halaman{" "}
+                                                <Link
+                                                    href={route(
+                                                        "admin.prodi.index",
+                                                    )}
+                                                    className="underline"
+                                                    viewTransition
+                                                >
+                                                    Prodi
+                                                </Link>
+                                            </small>
                                         </Field>
                                     </FieldGroup>
                                 </CardContent>
@@ -362,7 +469,7 @@ export default function CreateDosen({ fakultas }: CreateDosenProps) {
                             {/* Action */}
                             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                                 <Link
-                                    href={route("dosen.index")}
+                                    href={route("admin.dosen.index")}
                                     viewTransition
                                 >
                                     <Button type="button" variant="outline">
@@ -373,7 +480,9 @@ export default function CreateDosen({ fakultas }: CreateDosenProps) {
 
                                 <Button type="submit" disabled={processing}>
                                     <Save className="size-4" />
-                                    {processing ? 'Menyimpan...' : 'Simpan Dosen'}
+                                    {processing
+                                        ? "Menyimpan..."
+                                        : "Simpan Dosen"}
                                 </Button>
                             </div>
                         </>
@@ -388,7 +497,7 @@ CreateDosen.layout = {
     breadcrumbs: [
         {
             title: "Form Tambah Dosen",
-            href: route("dosen.create"),
+            href: route("admin.dosen.create"),
         },
     ],
 };

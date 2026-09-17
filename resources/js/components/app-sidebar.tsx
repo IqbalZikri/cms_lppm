@@ -9,6 +9,8 @@ import {
     GraduationCap,
     LayoutGrid,
     Newspaper,
+    NewspaperIcon,
+    Plus,
     Tags,
     User,
 } from "lucide-react";
@@ -31,7 +33,7 @@ import { route } from "ziggy-js";
 const mainNavItems: NavItem[] = [
     {
         title: "Dashboard",
-        href: route("dashboard"),
+        href: route("admin.dashboard"),
         icon: LayoutGrid,
     },
     {
@@ -40,17 +42,17 @@ const mainNavItems: NavItem[] = [
         items: [
             {
                 title: "Fakultas",
-                href: route("fakultas.index"),
+                href: route("admin.fakultas.index"),
                 icon: Building2,
             },
             {
                 title: "Prodi",
-                href: route("prodi.index"),
+                href: route("admin.prodi.index"),
                 icon: BookOpenIcon,
             },
             {
                 title: "Users",
-                href: route("user.index"),
+                href: route("admin.user.index"),
                 icon: User,
             },
         ],
@@ -61,10 +63,20 @@ const mainNavItems: NavItem[] = [
         items: [
             {
                 title: "Kategori",
-                href: route('kategori.index'),
-                icon: Tags
-            }
-        ]
+                href: route("admin.kategori.index"),
+                icon: Tags,
+            },
+            {
+                title: "Berita",
+                href: route("admin.berita.index"),
+                icon: NewspaperIcon,
+            },
+                        {
+                title: "Buat Berita",
+                href: route("admin.berita.create"),
+                icon: Plus,
+            },
+        ],
     },
     {
         title: "Dosen",
@@ -72,12 +84,12 @@ const mainNavItems: NavItem[] = [
         items: [
             {
                 title: "Data Dosen",
-                href: route("dosen.index"),
+                href: route("admin.dosen.index"),
                 icon: ChevronRight,
             },
             {
                 title: "Tambah Dosen",
-                href: route("dosen.create"),
+                href: route("admin.dosen.create"),
                 icon: ChevronRight,
             },
         ],
@@ -105,7 +117,7 @@ export function AppSidebar() {
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <Link
-                                href={route("dashboard")}
+                                href={route("admin.dashboard")}
                                 prefetch
                                 viewTransition
                             >

@@ -67,19 +67,14 @@ export default function Dosen({ data, fakultas }: DosenPageProps) {
                         <Breadcrumb>
                             <BreadcrumbList>
                                 <BreadcrumbItem>
-                                    <BreadcrumbLink href={route("dosen.index")}>
+                                    <BreadcrumbLink
+                                        href={route("admin.dosen.index")}
+                                    >
                                         Dosen
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>
-
-                        <Link href={route("dosen.create")} viewTransition>
-                            <Button>
-                                <Plus className="mr-2 h-4 w-4" />
-                                Tambah Dosen
-                            </Button>
-                        </Link>
                     </div>
                 </div>
 
@@ -189,6 +184,12 @@ export default function Dosen({ data, fakultas }: DosenPageProps) {
                     </CardHeader>
 
                     <CardContent>
+                        <Link href={route("admin.dosen.create")} viewTransition>
+                            <Button className="mb-[20px]">
+                                <Plus className="mr-2 h-4 w-4" />
+                                Tambah Dosen
+                            </Button>
+                        </Link>
                         <TablePage<Dosen>
                             data={data}
                             columns={[
@@ -243,14 +244,14 @@ export default function Dosen({ data, fakultas }: DosenPageProps) {
                             ]}
                             renderActions={(item) => (
                                 <div className="flex items-center gap-2">
-                                    <Link href={route("dosen.edit", item.id)}>
+                                    <Link href={route("admin.dosen.edit", item.id)}>
                                         <Button variant="outline" size="sm">
                                             Edit
                                         </Button>
                                     </Link>
                                     <DialogDelete
                                         actionUrl={route(
-                                            "dosen.destroy",
+                                            "admin.dosen.destroy",
                                             item.id,
                                         )}
                                         page="dosen"
@@ -271,7 +272,7 @@ Dosen.layout = {
     breadcrumbs: [
         {
             title: "Dosen",
-            href: route("dosen.index"),
+            href: route("admin.dosen.index"),
         },
     ],
 };

@@ -69,7 +69,7 @@ export default function DialogFormCreate({
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button type="button" className="w-[200px]">
+                <Button type="button" className="w-[200px] mb-[20px]">
                     <Plus className=" h-4 w-4" />
                     Tambah {page}
                 </Button>
@@ -321,7 +321,11 @@ export function DialogDelete<T extends { id: number }>({
                     {({ processing }) => (
                         <>
                             <DialogHeader>
-                                <DialogTitle>Hapus Fakultas</DialogTitle>
+                                <DialogTitle>
+                                    Hapus{" "}
+                                    {page.charAt(0).toUpperCase() +
+                                        page.slice(1)}
+                                </DialogTitle>
                                 <DialogDescription>
                                     Apakah anda yakin ingin menghapus {page}{" "}
                                     {label}?

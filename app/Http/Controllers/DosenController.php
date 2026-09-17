@@ -20,7 +20,7 @@ class DosenController extends Controller
         $data = Dosen::paginate(10);
         $fakultas = Fakultas::with('dosen')->get();
 
-        return Inertia::render('dosen/index', [
+        return Inertia::render('admin/dosen/index', [
             'data' => $data,
             'fakultas' => $fakultas
         ]);
@@ -32,7 +32,7 @@ class DosenController extends Controller
     public function create()
     {
         $fakultas = Fakultas::get();
-        return Inertia::render('dosen/create', [
+        return Inertia::render('admin/dosen/create', [
             'fakultas' => $fakultas
         ]);
     }
@@ -89,7 +89,7 @@ class DosenController extends Controller
             ]);
 
             DB::commit();
-            return redirect()->route('dosen.index')->with('success', 'Berhasil menambahkan data dosen baru');
+            return redirect()->route('admin.dosen.index')->with('success', 'Berhasil menambahkan data dosen baru');
         } catch (\Throwable $th) {
             DB::rollback();
             Log::info($th->getMessage());

@@ -42,26 +42,13 @@ export default function KategoriPage({ data }: KategoriPageProps) {
                             <BreadcrumbList>
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("kategori.index")}
+                                        href={route("admin.kategori.index")}
                                     >
                                         Kategori
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>
-
-                        <DialogFormCreate
-                            actionUrl="kategori.store"
-                            kolomInput={[
-                                {
-                                    label: "Nama Kategori",
-                                    name: "nama_kategori",
-                                    placeholder: "Nama Kategori",
-                                    required: true,
-                                },
-                            ]}
-                            page="Kategori Berita"
-                        />
                     </div>
                 </div>
                 <Card>
@@ -83,6 +70,22 @@ export default function KategoriPage({ data }: KategoriPageProps) {
                     </CardHeader>
 
                     <CardContent>
+                        <div className="flex justify-between">
+                            <DialogFormCreate
+                                actionUrl="admin.kategori.store"
+                                kolomInput={[
+                                    {
+                                        label: "Nama Kategori",
+                                        name: "nama_kategori",
+                                        placeholder: "Nama Kategori",
+                                        required: true,
+                                    },
+                                ]}
+                                page="Kategori Berita"
+                            />
+                            
+                        </div>
+
                         <TablePage<Kategori>
                             data={data}
                             columns={[
@@ -95,7 +98,7 @@ export default function KategoriPage({ data }: KategoriPageProps) {
                                 <>
                                     <DialogFormEdit
                                         actionUrl={route(
-                                            "kategori.update",
+                                            "admin.kategori.update",
                                             item.id,
                                         )}
                                         page="Kategori Berita"
@@ -111,7 +114,7 @@ export default function KategoriPage({ data }: KategoriPageProps) {
                                     />
                                     <DialogDelete
                                         actionUrl={route(
-                                            "kategori.destroy",
+                                            "admin.kategori.destroy",
                                             item.id,
                                         )}
                                         page="kategori"
@@ -132,7 +135,7 @@ KategoriPage.layout = {
     breadcrumbs: [
         {
             title: "Kategori Berita",
-            href: route("kategori.index"),
+            href: route("admin.kategori.index"),
         },
     ],
 };

@@ -13,7 +13,7 @@ class FakultasController extends Controller
     {
         $fakultas = Fakultas::paginate(10);
 
-        return Inertia::render('fakultas/index', [
+        return Inertia::render('admin/fakultas/index', [
             'data' => $fakultas
         ]);
     }

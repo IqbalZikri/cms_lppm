@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import { dashboard } from '@/routes';
+import { route } from 'ziggy-js';
 
 export default function Dashboard() {
     return (
@@ -30,7 +30,7 @@ Dashboard.layout = {
     breadcrumbs: [
         {
             title: 'Dashboard',
-            href: dashboard(),
+            href: route('admin.dashboard'),
         },
     ],
 };

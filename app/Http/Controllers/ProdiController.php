@@ -7,6 +7,7 @@ use App\Models\Prodi;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Log;
+use function Pest\Laravel\json;
 
 class ProdiController extends Controller
 {
@@ -15,7 +16,7 @@ class ProdiController extends Controller
         $data = Prodi::paginate(10);
         $fakultas = Fakultas::get();
 
-        return Inertia::render('prodi/index', [
+        return Inertia::render('admin/prodi/index', [
             'data' => $data,
             'fakultas' => $fakultas
         ]);
@@ -89,9 +90,9 @@ class ProdiController extends Controller
         }
     }
 
-    public function getFakultas($id)
+    public function getProdi($id)
     {
         $prodi = Prodi::where('fakultas_id', $id)->get();
-        return $prodi;
+        return response()->json($prodi);
     }
 }
