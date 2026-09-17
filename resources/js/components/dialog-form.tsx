@@ -22,6 +22,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "./ui/select";
+import { Plus } from "lucide-react";
 
 type SelectOption = {
     value: string | number;
@@ -69,6 +70,7 @@ export default function DialogFormCreate({
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button type="button" className="w-[200px]">
+                    <Plus className=" h-4 w-4" />
                     Tambah {page}
                 </Button>
             </DialogTrigger>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Dosen;
+use App\Models\Fakultas;
 use App\Models\User;
 use DB;
 use Illuminate\Http\Request;
@@ -17,9 +18,11 @@ class DosenController extends Controller
     public function index()
     {
         $data = Dosen::paginate(10);
+        $fakultas = Fakultas::with('dosen')->get();
 
         return Inertia::render('dosen/index', [
-            'data' => $data
+            'data' => $data,
+            'fakultas' => $fakultas
         ]);
     }
 
@@ -28,7 +31,10 @@ class DosenController extends Controller
      */
     public function create()
     {
-        return Inertia::render('dosen/create');
+        $fakultas = Fakultas::get();
+        return Inertia::render('dosen/create', [
+            'fakultas' => $fakultas
+        ]);
     }
 
     /**
@@ -37,13 +43,26 @@ class DosenController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'fakultas_id' => 'required',
+            'prodi_id' => 'required',
+            'nidn' => 'required',
             'nama_dosen' => 'required',
             'jenis_kelamin' => 'required',
             'tanggal_lahir' => 'required',
             'tempat_lahir' => 'required',
             'alamat' => 'required',
             'hp' => 'required',
-            'email' => 'required',
+            'email' => 'required|unique:users,email',
+        ], [
+            'fakultas_id.required' => 'Pilih salah satu fakultas',
+            'nidn.required' => 'NIDN wajib diisi',
+            'nama_dosen.required' => 'Nama dosen wajib diisi',
+            'jenis_kelamin.required' => 'Jenis kelamin wajib diisi',
+            'tanggal_lahir.required' => 'Tanggal lahir wajib diisi',
+            'tempat_lahir.required' => 'Tempat lahir wajib diisi',
+            'alamat.required' => 'Alamat wajib diisi',
+            'hp.required' => 'No. Hp wajib diisi',
+            'email.required' => 'Email wajib diisi',
         ]);
 
         DB::beginTransaction();
@@ -56,6 +75,7 @@ class DosenController extends Controller
             ]);
 
             Dosen::create([
+                'fakultas_id' => $request->fakultas_id,
                 'nidn' => $request->nidn,
                 'nuptk' => $request->nuptk,
                 'nama_dosen' => $request->nama_dosen,
@@ -68,9 +88,10 @@ class DosenController extends Controller
                 'user_id' => $user->id,
             ]);
 
-            
-            return back()->with('success', 'Berhasil menambahkan data dosen baru');
+            DB::commit();
+            return redirect()->route('dosen.index')->with('success', 'Berhasil menambahkan data dosen baru');
         } catch (\Throwable $th) {
+            DB::rollback();
             Log::info($th->getMessage());
             return back()->with('error', 'Terjadi Kesalahan');
         }
@@ -81,7 +102,7 @@ class DosenController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $data = Dosen::findOrFail($id);
     }
 
     /**
@@ -105,6 +126,13 @@ class DosenController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $data = Dosen::findOrFail($id);
+        try {
+            $data->delete();
+            return back()->with('success', 'Berhasil menghapus data dosen');
+        } catch (\Throwable $th) {
+            Log::info($th->getMessage());
+            return back()->with('error', 'Terjadi Kesalahan');
+        }
     }
 }

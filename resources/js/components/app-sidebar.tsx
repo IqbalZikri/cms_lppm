@@ -8,6 +8,8 @@ import {
     FolderGit2,
     GraduationCap,
     LayoutGrid,
+    Newspaper,
+    Tags,
     User,
 } from "lucide-react";
 import AppLogo from "@/components/app-logo";
@@ -52,6 +54,17 @@ const mainNavItems: NavItem[] = [
                 icon: User,
             },
         ],
+    },
+    {
+        title: "Berita",
+        icon: Newspaper,
+        items: [
+            {
+                title: "Kategori",
+                href: route('kategori.index'),
+                icon: Tags
+            }
+        ]
     },
     {
         title: "Dosen",

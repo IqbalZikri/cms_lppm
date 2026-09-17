@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('dosens', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('fakultas_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('prodi_id')->nullable()->constrained()->nullOnDelete();
             $table->string('nidn')->nullable();
             $table->string('nuptk')->nullable();
             $table->string('nama_dosen');
@@ -23,7 +25,8 @@ return new class extends Migration
             $table->string('hp');
             $table->string('email');
             $table->string('id_penelitian')->nullable();
-            $table->string('id_fakultas')->nullable();
+            $table->string('id_pengabdian')->nullable();
+            $table->string('id_publikasi')->nullable();
             $table->string('id_users')->nullable();
             $table->timestamps();
         });

@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\BeritaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\FakultasController;
+use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -11,7 +13,7 @@ Route::inertia('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
+
     Route::get('fakultas', [FakultasController::class, 'index'])->name('fakultas.index');
     Route::post('fakultas/store', [FakultasController::class, 'store'])->name('fakultas.store');
     Route::put('fakultas/{id}', [FakultasController::class, 'update'])->name('fakultas.update');
@@ -27,13 +29,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('user/{id}', [UserController::class, 'update'])->name('user.update');
     Route::delete('user/{id}', [UserController::class, 'destroy'])->name('user.destroy');
 
-
     Route::get('dosen', [DosenController::class, 'index'])->name('dosen.index');
     Route::get('dosen/create', [DosenController::class, 'create'])->name('dosen.create');
     Route::post('dosen/create', [DosenController::class, 'store'])->name('dosen.store');
     Route::get('dosen/edit/{id}', [DosenController::class, 'edit'])->name('dosen.edit');
     Route::put('dosen/edit/{id}', [DosenController::class, 'update'])->name('dosen.update');
     Route::delete('dosen/{id}', [DosenController::class, 'destroy'])->name('dosen.destroy');
+
+    Route::get('kategori', [KategoriController::class, 'index'])->name('kategori.index');
+    Route::post('kategori', [KategoriController::class, 'store'])->name('kategori.store');
+    Route::put('kategori/{kategori}', [KategoriController::class, 'update'])->name('kategori.update');
+    Route::delete('kategori/{kategori}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
+
+    Route::get('berita', [BeritaController::class, 'index'])->name('berita.index');
 });
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';

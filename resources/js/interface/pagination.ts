@@ -4,5 +4,5 @@ export interface PaginatedData<T> {
     last_page: number;
     length: number;
     map: any;
+    total: number;
 }
-

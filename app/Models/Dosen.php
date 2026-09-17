@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Dosen extends Model
 {
     protected $fillable = [
+        'fakultas_id',
+        'prodi_id',
         'nidn',
         'nuptk',
         'nama_dosen',
@@ -17,11 +19,16 @@ class Dosen extends Model
         'hp',
         'email',
         'id_penelitian',
-        'id_fakultas',
         'id_users',
     ];
 
-    // public function penelitian(){
-    //     return $this->belongsTo(Penelit)
-    // }
+    public function fakultas()
+    {
+        return $this->belongsTo(Fakultas::class);
+    }
+
+    public function prodi()
+    {
+        return $this->belongsTo(Prodi::class);
+    }
 }

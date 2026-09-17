@@ -48,7 +48,8 @@ class ProdiController extends Controller
         }
     }
 
-    public function update(Request $request, $id){
+    public function update(Request $request, $id)
+    {
         $request->validate([
             'fakultas_id' => 'required',
             'kode_prodi' => 'required|unique:prodis,kode_prodi,' . $id,
@@ -76,7 +77,8 @@ class ProdiController extends Controller
         }
     }
 
-    public function destroy($id){
+    public function destroy($id)
+    {
         $data = Prodi::findOrFail($id);
         try {
             $data->delete();
@@ -85,5 +87,11 @@ class ProdiController extends Controller
             Log::info($th->getMessage());
             return back()->with('error', 'Terjadi Kesalahan');
         }
+    }
+
+    public function getFakultas($id)
+    {
+        $prodi = Prodi::where('fakultas_id', $id)->get();
+        return $prodi;
     }
 }

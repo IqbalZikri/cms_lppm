@@ -10,4 +10,8 @@ class Fakultas extends Model
         'kode_fakultas',
         'nama_fakultas'
     ];
+
+    public function dosen(){
+        return $this->hasMany(Dosen::class);
+    }
 }

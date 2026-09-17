@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('abstrak');
             $table->string('semester');
             $table->year('tahun');
-            $table->string('dama')->nullable();
+            $table->decimal('dana', 15, 2)->nullable();
             $table->string('sumber_dana')->nullable();
             $table->string('jumlah_dana')->nullable();
             $table->timestamps();
