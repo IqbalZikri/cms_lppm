@@ -24,10 +24,9 @@ return new class extends Migration
             $table->text('alamat');
             $table->string('hp');
             $table->string('email');
-            $table->string('id_penelitian')->nullable();
-            $table->string('id_pengabdian')->nullable();
-            $table->string('id_publikasi')->nullable();
-            $table->string('id_users')->nullable();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('foto')->nullable();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }
