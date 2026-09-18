@@ -18,8 +18,8 @@ class Dosen extends Model
         'alamat',
         'hp',
         'email',
-        'id_penelitian',
-        'id_users',
+        'foto',
+        'user_id',
     ];
 
     public function fakultas()

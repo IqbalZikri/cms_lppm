@@ -33,6 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('dosen', [DosenController::class, 'index'])->name('dosen.index');
         Route::get('dosen/create', [DosenController::class, 'create'])->name('dosen.create');
         Route::post('dosen/create', [DosenController::class, 'store'])->name('dosen.store');
+        Route::get('dosen/show/{id}', [DosenController::class, 'show'])->name('dosen.show');
         Route::get('dosen/edit/{id}', [DosenController::class, 'edit'])->name('dosen.edit');
         Route::put('dosen/edit/{id}', [DosenController::class, 'update'])->name('dosen.update');
         Route::delete('dosen/{id}', [DosenController::class, 'destroy'])->name('dosen.destroy');
@@ -55,4 +56,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
-require __DIR__ . '/settings.php';
+require __DIR__.'/settings.php';

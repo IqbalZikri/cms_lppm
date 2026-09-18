@@ -9,6 +9,7 @@ use DB;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Log;
+use Storage;
 
 class DosenController extends Controller
 {
@@ -22,7 +23,7 @@ class DosenController extends Controller
 
         return Inertia::render('admin/dosen/index', [
             'data' => $data,
-            'fakultas' => $fakultas
+            'fakultas' => $fakultas,
         ]);
     }
 
@@ -32,8 +33,9 @@ class DosenController extends Controller
     public function create()
     {
         $fakultas = Fakultas::get();
+
         return Inertia::render('admin/dosen/create', [
-            'fakultas' => $fakultas
+            'fakultas' => $fakultas,
         ]);
     }
 
@@ -52,9 +54,11 @@ class DosenController extends Controller
             'tempat_lahir' => 'required',
             'alamat' => 'required',
             'hp' => 'required',
+            'foto' => 'nullable|mimes:png,jpg,jpeg|max:2048',
             'email' => 'required|unique:users,email',
         ], [
             'fakultas_id.required' => 'Pilih salah satu fakultas',
+            'prodi_id.required' => 'Pilih salah satu prodi',
             'nidn.required' => 'NIDN wajib diisi',
             'nama_dosen.required' => 'Nama dosen wajib diisi',
             'jenis_kelamin.required' => 'Jenis kelamin wajib diisi',
@@ -62,16 +66,22 @@ class DosenController extends Controller
             'tempat_lahir.required' => 'Tempat lahir wajib diisi',
             'alamat.required' => 'Alamat wajib diisi',
             'hp.required' => 'No. Hp wajib diisi',
+            'foto.mimes' => 'Format yang didukung: png, jpg, jpeg',
+            'foto.max' => 'Maksimal ukuran file 2MB',
             'email.required' => 'Email wajib diisi',
         ]);
 
         DB::beginTransaction();
 
         try {
+            if ($request->hasFile('foto')) {
+                $foto = $request->file('foto')->store('dosen', 'public');
+            }
+
             $user = User::create([
                 'name' => $request->nama_dosen,
                 'email' => $request->email,
-                'password' => $request->nidn
+                'password' => $request->nidn,
             ]);
 
             Dosen::create([
@@ -84,15 +94,18 @@ class DosenController extends Controller
                 'tempat_lahir' => $request->tempat_lahir,
                 'alamat' => $request->alamat,
                 'hp' => $request->hp,
+                'foto' => $foto ?? null,
                 'email' => $request->email,
                 'user_id' => $user->id,
             ]);
 
             DB::commit();
+
             return redirect()->route('admin.dosen.index')->with('success', 'Berhasil menambahkan data dosen baru');
         } catch (\Throwable $th) {
             DB::rollback();
             Log::info($th->getMessage());
+
             return back()->with('error', 'Terjadi Kesalahan');
         }
     }
@@ -110,7 +123,20 @@ class DosenController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $dosen = Dosen::findOrFail($id);
+        $fakultas = Fakultas::get();
+        $user = User::findOrFail($dosen->user_id);
+
+        return Inertia::render('admin/dosen/edit', [
+            'dosen' => [
+                ...$dosen->toArray(),
+                'foto' => $dosen->foto
+                    ? Storage::url($dosen->foto)
+                    : null,
+            ],
+            'fakultas' => $fakultas,
+            'user' => $user,
+        ]);
     }
 
     /**
@@ -129,9 +155,11 @@ class DosenController extends Controller
         $data = Dosen::findOrFail($id);
         try {
             $data->delete();
+
             return back()->with('success', 'Berhasil menghapus data dosen');
         } catch (\Throwable $th) {
             Log::info($th->getMessage());
+
             return back()->with('error', 'Terjadi Kesalahan');
         }
     }

@@ -85,12 +85,12 @@ const mainNavItems: NavItem[] = [
             {
                 title: 'Data Dosen',
                 href: route('admin.dosen.index'),
-                icon: ChevronRight,
+                icon: GraduationCap,
             },
             {
                 title: 'Tambah Dosen',
                 href: route('admin.dosen.create'),
-                icon: ChevronRight,
+                icon: Plus,
             },
         ],
     },

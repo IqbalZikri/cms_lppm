@@ -23,7 +23,7 @@ export default function ToolbarButton({
             aria-label={label}
             className={cn(
                 'h-8 w-8 p-0',
-                isActive && 'bg-muted text-foreground ring-border ring-1',
+                isActive && 'text-foreground ring-border ring-1',
             )}
         >
             {children}

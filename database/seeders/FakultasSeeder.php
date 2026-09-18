@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Fakultas;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class FakultasSeeder extends Seeder
@@ -15,7 +14,7 @@ class FakultasSeeder extends Seeder
     {
         Fakultas::insert([
             'kode_fakultas' => 1,
-            'nama_fakultas' => "Teknik dan Ilmu Komputer"
+            'nama_fakultas' => 'Teknik dan Ilmu Komputer',
         ]);
     }
 }
