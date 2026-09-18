@@ -1,21 +1,10 @@
 import { Head } from "@inertiajs/react";
 import BeritaForm from "./form";
+import { Berita } from "@/interface/berita";
 
 interface Kategori {
     id: number;
     nama_kategori: string;
-}
-
-interface Berita {
-    id: number;
-    kategori_id: number;
-    judul_berita: string;
-    slug: string;
-    ringkasan_berita: string;
-    isi_berita: string;
-    status_published: boolean;
-    published_at: string | null;
-    gambar: string | null;
 }
 
 export default function Edit({
@@ -28,7 +17,7 @@ export default function Edit({
     return (
         <>
             <Head title="Edit Berita" />
-            <div className="max-w-3xl mx-auto py-8 px-4">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <BeritaForm kategoris={kategoris} berita={berita} />
             </div>
         </>

@@ -23,6 +23,7 @@ import {
     SelectValue,
 } from "./ui/select";
 import { Plus } from "lucide-react";
+import { Berita } from "@/interface/berita";
 
 type SelectOption = {
     value: string | number;
@@ -57,6 +58,14 @@ type DialogDeleteProps<T extends { id: number }> = {
     actionUrl: string;
     item: T;
     label: string;
+};
+
+type DialogUpdateStatusProps<T extends { id: number }> = {
+    page: string;
+    actionUrl: string;
+    item: T;
+    label: string;
+    status_published: string;
 };
 
 export default function DialogFormCreate({
@@ -343,6 +352,78 @@ export function DialogDelete<T extends { id: number }>({
                                     variant={"destructive"}
                                 >
                                     {processing ? "...Menghapus" : "Hapus"}
+                                </Button>
+                            </DialogFooter>
+                        </>
+                    )}
+                </Form>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+export function DialogUpdateStatus<T extends { id: number }>({
+    page,
+    actionUrl,
+    item,
+    label,
+    status_published
+}: DialogUpdateStatusProps<T>) {
+    const [statusId, setStatusId] = useState<number | null>(null);
+
+    return (
+        <Dialog
+            open={statusId === item.id}
+            onOpenChange={(isOpen) => {
+                setStatusId(isOpen ? item.id : null);
+            }}
+        >
+            <DialogTrigger asChild>
+                {status_published === "draft" ? (
+                    <Button
+                        type="submit"
+                        className="bg-green-500 text-white hover:bg-green-600"
+                    >
+                        Published
+                    </Button>
+                ) : (
+                    <Button type="submit" variant="default">
+                        Draft
+                    </Button>
+                )}
+            </DialogTrigger>
+            <DialogContent>
+                <Form
+                    action={actionUrl}
+                    method="PUT"
+                    onSuccess={() => setStatusId(null)}
+                    resetOnSuccess
+                >
+                    {({ processing }) => (
+                        <>
+                            <DialogHeader>
+                                <DialogTitle>
+                                    Update Status{" "}
+                                    {page.charAt(0).toUpperCase() +
+                                        page.slice(1)}
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Apakah anda yakin ingin mengupdate {page}{" "}
+                                    {label}?
+                                </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button type="button" variant={"outline"}>
+                                        Kembali
+                                    </Button>
+                                </DialogClose>
+                                <Button
+                                    type="submit"
+                                    disabled={processing}
+                                    variant={"default"}
+                                >
+                                    {processing ? "...Mengupdate" : "Update"}
                                 </Button>
                             </DialogFooter>
                         </>

@@ -36,7 +36,7 @@ class Berita extends Model
         'slug',
         'published_at',
         'deleted_at',
-        'user_id', 
+        'user_id',
     ];
 
     public function user()
@@ -44,7 +44,8 @@ class Berita extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function kategori(){
+    public function kategori()
+    {
         return $this->belongsTo(Kategori::class);
     }
 }

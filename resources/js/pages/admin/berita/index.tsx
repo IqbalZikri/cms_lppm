@@ -1,4 +1,4 @@
-import { DialogDelete } from "@/components/dialog-form";
+import { DialogDelete, DialogUpdateStatus } from "@/components/dialog-form";
 import Header from "@/components/header";
 import TablePage from "@/components/table-page";
 import { Badge } from "@/components/ui/badge";
@@ -158,7 +158,7 @@ export default function BeritaPage({
                                 {
                                     key: "status_published",
                                     label: "Status",
-                                    render: (value) => {
+                                    render: (value: any) => {
                                         return (
                                             <Badge
                                                 className={
@@ -176,29 +176,26 @@ export default function BeritaPage({
                             ]}
                             renderActions={(item) => (
                                 <div className="flex items-center gap-2">
-                                    <Form
-                                        action={route(
-                                            "admin.berita.updateStatus",
+                                    <DialogUpdateStatus
+                                        actionUrl={route(
+                                            "admin.berita.updateStatus", item.id
+                                        )}
+                                        page="Berita"
+                                        item={item}
+                                        label={item.judul_berita}
+                                        status_published={item.status_published}
+                                    />
+                                    <Link
+                                        href={route(
+                                            "admin.berita.show",
                                             item.id,
                                         )}
-                                        method="PUT"
+                                        viewTransition
                                     >
-                                        {item.status_published === "draft" ? (
-                                            <Button
-                                                type="submit"
-                                                className="bg-green-500 text-white hover:bg-green-600"
-                                            >
-                                                Published
-                                            </Button>
-                                        ) : (
-                                            <Button
-                                                type="submit"
-                                                variant="default"
-                                            >
-                                                Draft
-                                            </Button>
-                                        )}
-                                    </Form>
+                                        <Button variant="secondary">
+                                            Show
+                                        </Button>
+                                    </Link>
                                     <Link
                                         href={route(
                                             "admin.berita.edit",

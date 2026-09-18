@@ -24,6 +24,7 @@ import {
 import { ImagePlus, Loader2, X } from "lucide-react";
 import { route } from "ziggy-js";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import RichTextEditor from "@/components/rich-text-editor";
 
 interface Kategori {
     id: number;
@@ -80,7 +81,7 @@ export default function BeritaForm({ kategoris, berita }: Props) {
         setData((prevData) => ({
             ...prevData,
             judul_berita: value,
-            slug: slugManual ? prevData.slug : generateSlug(value),
+            slug: generateSlug(value),
         }));
     };
 
@@ -121,9 +122,6 @@ export default function BeritaForm({ kategoris, berita }: Props) {
             });
         }
     };
-
-    console.log(data);
-    
 
     return (
         <Card>
@@ -167,6 +165,16 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                                 ))}
                             </SelectContent>
                         </Select>
+                        <small>
+                            Pastikan data kategori sudah ada di{" "}
+                            <Link
+                                href={route("admin.kategori.index")}
+                                className="underline"
+                                viewTransition
+                            >
+                                Kategori
+                            </Link>
+                        </small>
                         {errors.kategori_id && (
                             <p className="text-sm text-destructive">
                                 {errors.kategori_id}
@@ -242,7 +250,7 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                             Isi Berita{" "}
                             <span className="text-destructive">*</span>
                         </Label>
-                        <Textarea
+                        {/* <Textarea
                             id="isi_berita"
                             rows={10}
                             value={data.isi_berita}
@@ -250,7 +258,12 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                                 setData("isi_berita", e.target.value)
                             }
                             placeholder="Tulis isi lengkap berita di sini"
+                        /> */}
+                        <RichTextEditor
+                            value={data.isi}
+                            onChange={(value) => setData("isi_berita", value)}
                         />
+
                         {errors.isi_berita && (
                             <p className="text-sm text-destructive">
                                 {errors.isi_berita}
@@ -339,7 +352,7 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                     </div>
 
                     {/* Tanggal Publish */}
-                    {data.status_published == 'published' && (
+                    {data.status_published == "published" && (
                         <div className="space-y-2">
                             <Label htmlFor="published_at">
                                 Tanggal Publish
@@ -366,7 +379,10 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                     {/* Actions */}
                     <div className="flex justify-end gap-2 pt-2">
                         <Button variant="outline" type="button" asChild>
-                            <Link href={route("admin.berita.index")} viewTransition>
+                            <Link
+                                href={route("admin.berita.index")}
+                                viewTransition
+                            >
                                 Batal
                             </Link>
                         </Button>

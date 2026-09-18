@@ -7,6 +7,7 @@ use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Log;
+use Storage;
 
 class BeritaController extends Controller
 {
@@ -55,13 +56,17 @@ class BeritaController extends Controller
         ]);
 
         try {
+            if ($request->hasFile('gambar')) {
+                $gambar = $request->file('gambar')->store('berita', 'public');
+            }
+
             Berita::create([
                 'kategori_id' => $request->kategori_id,
                 'judul_berita' => $request->judul_berita,
                 'ringkasan_berita' => $request->ringkasan_berita,
                 'isi_berita' => $request->isi_berita,
                 'views' => 0,
-                'gambar' => '-',
+                'gambar' => $gambar,
                 'status_published' => $request->status_published,
                 'slug' => $request->slug,
                 'user_id' => auth()->user()->id,
@@ -74,7 +79,7 @@ class BeritaController extends Controller
         }
     }
 
-    public function updateStatus( Berita $berita ) 
+    public function updateStatus(Berita $berita)
     {
         try {
             if ($berita->status_published === 'draft') {
@@ -96,17 +101,36 @@ class BeritaController extends Controller
         }
     }
 
-    public function edit(Berita $berita){
+    public function show(Berita $berita)
+    {
+        $berita->load('kategori', 'user');
+        return Inertia::render('admin/berita/show', [
+            'berita' => [
+                ...$berita->toArray(),
+                'gambar' => $berita->gambar
+                    ? Storage::url($berita->gambar)
+                    : null,
+            ],
+        ]);
+    }
+
+    public function edit(Berita $berita)
+    {
         $kategoris = Kategori::get();
         return Inertia::render('admin/berita/edit', [
-            'berita' => $berita,
+            'berita' => [
+                ...$berita->toArray(),
+                'gambar' => $berita->gambar
+                    ? Storage::url($berita->gambar)
+                    : null,
+            ],
             'kategoris' => $kategoris,
         ]);
     }
 
     public function update(Request $request, Berita $berita)
     {
-          $request->validate([
+        $request->validate([
             'kategori_id' => 'required',
             'judul_berita' => 'required',
             'ringkasan_berita' => 'required',
@@ -119,17 +143,26 @@ class BeritaController extends Controller
             'judul_berita.required' => 'Judul berita wajib diisi',
             'ringkasan_berita.required' => 'Ringkasan berita wajib diisi',
             'isi_berita.required' => 'Isi berita wajib diisi',
+            'gambar.max' => 'Maksimal ukuran file 2MB',
             'gambar.mimes' => 'Format yang didukung png, jpg, jpeg'
         ]);
-        
+
         try {
+            $gambarBaru = null;
+            if ($request->hasFile('gambar')) {
+                $gambar = $request->file('gambar')->store('berita', 'public');
+                $gambarBaru = $gambar;
+            } else {
+                $gambarBaru = $berita->gambar;
+            }
+
             $berita->update([
-                 'kategori_id' => $request->kategori_id,
+                'kategori_id' => $request->kategori_id,
                 'judul_berita' => $request->judul_berita,
                 'ringkasan_berita' => $request->ringkasan_berita,
                 'isi_berita' => $request->isi_berita,
                 'views' => 0,
-                'gambar' => '-',
+                'gambar' => $gambarBaru,
                 'status_published' => $request->status_published,
                 'slug' => $request->slug,
                 'user_id' => auth()->user()->id,
@@ -143,7 +176,8 @@ class BeritaController extends Controller
     }
 
 
-    public function destroy(Berita $berita){
+    public function destroy(Berita $berita)
+    {
         try {
             $berita->delete();
             return back()->with('success', 'Berhasil hapus berita');

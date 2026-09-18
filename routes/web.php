@@ -45,6 +45,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('berita', [BeritaController::class, 'index'])->name('berita.index');
         Route::get('berita/create', [BeritaController::class, 'create'])->name('berita.create');
         Route::post('berita/create', [BeritaController::class, 'store'])->name('berita.store');
+        Route::get('berita/show/{berita}', [BeritaController::class, 'show'])->name('berita.show');
         Route::get('berita/{berita}', [BeritaController::class, 'edit'])->name('berita.edit');
         Route::put('berita/ubah_status/{berita}', [BeritaController::class, 'updateStatus'])->name('berita.updateStatus');
         Route::put('berita/{berita}', [BeritaController::class, 'update'])->name('berita.update');
