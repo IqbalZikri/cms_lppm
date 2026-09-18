@@ -1,4 +1,4 @@
-import { Fakultas } from "./fakultas";
+import { Fakultas } from './fakultas';
 
 export interface Prodi {
     id: number;

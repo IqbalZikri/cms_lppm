@@ -1,19 +1,19 @@
 import DialogFormCreate, {
     DialogDelete,
     DialogFormEdit,
-} from "@/components/dialog-form";
-import TablePage from "@/components/table-page";
+} from '@/components/dialog-form';
+import TablePage from '@/components/table-page';
 import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbList,
-} from "@/components/ui/breadcrumb";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PaginatedData } from "@/interface/pagination";
-import { Head, Link } from "@inertiajs/react";
-import { BookOpenIcon } from "lucide-react";
-import { route } from "ziggy-js";
+} from '@/components/ui/breadcrumb';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PaginatedData } from '@/interface/pagination';
+import { Head, Link } from '@inertiajs/react';
+import { BookOpenIcon } from 'lucide-react';
+import { route } from 'ziggy-js';
 
 interface Prodi {
     id: number;
@@ -54,7 +54,9 @@ export default function Prodi({ data, fakultas }: ProdiPageProps) {
                         <Breadcrumb>
                             <BreadcrumbList>
                                 <BreadcrumbItem>
-                                    <BreadcrumbLink href={route("admin.prodi.index")}>
+                                    <BreadcrumbLink
+                                        href={route('admin.prodi.index')}
+                                    >
                                         Prodi
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
@@ -66,14 +68,14 @@ export default function Prodi({ data, fakultas }: ProdiPageProps) {
                 <Card>
                     <CardHeader>
                         <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                            <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-lg">
                                 <BookOpenIcon className="h-5 w-5" />
                             </div>
 
                             <div>
                                 <CardTitle>Daftar Prodi</CardTitle>
 
-                                <p className="mt-1 text-sm text-muted-foreground">
+                                <p className="text-muted-foreground mt-1 text-sm">
                                     Informasi prodi yang terdaftar dalam sistem.
                                 </p>
                             </div>
@@ -85,9 +87,9 @@ export default function Prodi({ data, fakultas }: ProdiPageProps) {
                             actionUrl="admin.prodi.store"
                             kolomInput={[
                                 {
-                                    name: "fakultas_id",
-                                    label: "Fakultas",
-                                    type: "select",
+                                    name: 'fakultas_id',
+                                    label: 'Fakultas',
+                                    type: 'select',
                                     // required: true,
                                     options: fakultas.map((f) => ({
                                         value: f.id,
@@ -95,18 +97,18 @@ export default function Prodi({ data, fakultas }: ProdiPageProps) {
                                     })),
                                 },
                                 {
-                                    name: "kode_prodi",
-                                    label: "Kode Prodi",
-                                    type: "text",
+                                    name: 'kode_prodi',
+                                    label: 'Kode Prodi',
+                                    type: 'text',
                                     required: true,
-                                    placeholder: "Kode Prodi",
-                                    autoComplete: "off",
+                                    placeholder: 'Kode Prodi',
+                                    autoComplete: 'off',
                                 },
                                 {
-                                    name: "nama_prodi",
-                                    label: "Nama Prodi",
+                                    name: 'nama_prodi',
+                                    label: 'Nama Prodi',
                                     // required: true,
-                                    placeholder: "Nama Prodi",
+                                    placeholder: 'Nama Prodi',
                                 },
                             ]}
                         />
@@ -114,29 +116,29 @@ export default function Prodi({ data, fakultas }: ProdiPageProps) {
                             data={data}
                             columns={[
                                 {
-                                    key: "fakultas_id",
-                                    label: "Fakultas",
+                                    key: 'fakultas_id',
+                                    label: 'Fakultas',
                                     render: (value) =>
                                         fakultas.find((f) => f.id === value)
-                                            ?.nama_fakultas ?? "-",
+                                            ?.nama_fakultas ?? '-',
                                 },
-                                { key: "kode_prodi", label: "Kode Prodi" },
-                                { key: "nama_prodi", label: "Nama Prodi" },
+                                { key: 'kode_prodi', label: 'Kode Prodi' },
+                                { key: 'nama_prodi', label: 'Nama Prodi' },
                             ]}
                             renderActions={(item) => (
                                 <>
                                     <DialogFormEdit
                                         page="Prodi"
                                         actionUrl={route(
-                                            "admin.prodi.update",
+                                            'admin.prodi.update',
                                             item.id,
                                         )}
                                         item={item}
                                         kolomInput={[
                                             {
-                                                name: "fakultas_id",
-                                                label: "Fakultas",
-                                                type: "select",
+                                                name: 'fakultas_id',
+                                                label: 'Fakultas',
+                                                type: 'select',
                                                 required: true,
                                                 options: fakultas.map((f) => ({
                                                     value: f.id,
@@ -144,13 +146,13 @@ export default function Prodi({ data, fakultas }: ProdiPageProps) {
                                                 })),
                                             },
                                             {
-                                                name: "kode_prodi",
-                                                label: "Kode Prodi",
+                                                name: 'kode_prodi',
+                                                label: 'Kode Prodi',
                                                 required: true,
                                             },
                                             {
-                                                name: "nama_prodi",
-                                                label: "Nama Prodi",
+                                                name: 'nama_prodi',
+                                                label: 'Nama Prodi',
                                                 required: true,
                                             },
                                         ]}
@@ -158,7 +160,7 @@ export default function Prodi({ data, fakultas }: ProdiPageProps) {
                                     <DialogDelete
                                         page="Prodi"
                                         actionUrl={route(
-                                            "admin.prodi.destroy",
+                                            'admin.prodi.destroy',
                                             item.id,
                                         )}
                                         item={item}
@@ -177,8 +179,8 @@ export default function Prodi({ data, fakultas }: ProdiPageProps) {
 Prodi.layout = {
     breadcrumbs: [
         {
-            title: "Prodi",
-            href: route("admin.prodi.index"),
+            title: 'Prodi',
+            href: route('admin.prodi.index'),
         },
     ],
 };

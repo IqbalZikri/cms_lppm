@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import { PaginatedData } from "@/interface/pagination";
+import { ReactNode } from 'react';
+import { PaginatedData } from '@/interface/pagination';
 import {
     Table,
     TableBody,
@@ -7,7 +7,7 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "./ui/table";
+} from './ui/table';
 
 type ColumnDef<T> = {
     key: keyof T;
@@ -37,9 +37,7 @@ export default function TablePage<T extends { id: number }>({
                     {columns.map((col) => (
                         <TableHead key={String(col.key)}>{col.label}</TableHead>
                     ))}
-                    {renderActions && (
-                        <TableHead>Aksi</TableHead>
-                    )}
+                    {renderActions && <TableHead>Aksi</TableHead>}
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -57,7 +55,7 @@ export default function TablePage<T extends { id: number }>({
                                 <TableCell key={String(col.key)}>
                                     {col.render
                                         ? col.render(item[col.key], item)
-                                        : String(item[col.key] ?? "-")}
+                                        : String(item[col.key] ?? '-')}
                                 </TableCell>
                             ))}
                             {renderActions && (

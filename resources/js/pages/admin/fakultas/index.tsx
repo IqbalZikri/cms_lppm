@@ -1,5 +1,5 @@
-import { Form, Head, Link, router } from "@inertiajs/react";
-import { route } from "ziggy-js";
+import { Form, Head, Link, router } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 import {
     Table,
     TableBody,
@@ -7,9 +7,9 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 import {
     Dialog,
     DialogClose,
@@ -19,18 +19,18 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Field, FieldGroup } from "@/components/ui/field";
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Field, FieldGroup } from '@/components/ui/field';
 import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbList,
-} from "@/components/ui/breadcrumb";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2 } from "lucide-react";
+} from '@/components/ui/breadcrumb';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Building2 } from 'lucide-react';
 
 interface Fakultas {
     id: number;
@@ -77,7 +77,9 @@ export default function Fakultas({ data }: FakultasPageProps) {
                         <Breadcrumb>
                             <BreadcrumbList>
                                 <BreadcrumbItem>
-                                    <BreadcrumbLink href={route("admin.fakultas.index")}>
+                                    <BreadcrumbLink
+                                        href={route('admin.fakultas.index')}
+                                    >
                                         Fakultas
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
@@ -89,14 +91,14 @@ export default function Fakultas({ data }: FakultasPageProps) {
                 <Card>
                     <CardHeader>
                         <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                            <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-lg">
                                 <Building2 className="h-5 w-5" />
                             </div>
 
                             <div>
                                 <CardTitle>Daftar Fakultas</CardTitle>
 
-                                <p className="mt-1 text-sm text-muted-foreground">
+                                <p className="text-muted-foreground mt-1 text-sm">
                                     Informasi fakultas yang terdaftar dalam
                                     sistem.
                                 </p>
@@ -107,14 +109,17 @@ export default function Fakultas({ data }: FakultasPageProps) {
                     <CardContent>
                         <Dialog open={open} onOpenChange={setOpen}>
                             <DialogTrigger asChild>
-                                <Button type="button" className="w-[200px] mb-[20px]">
+                                <Button
+                                    type="button"
+                                    className="mb-[20px] w-[200px]"
+                                >
                                     Tambah Fakultas
                                 </Button>
                             </DialogTrigger>
 
                             <DialogContent>
                                 <Form
-                                    action={route("admin.fakultas.store")}
+                                    action={route('admin.fakultas.store')}
                                     method="post"
                                     onSuccess={() => setOpen(false)}
                                     resetOnSuccess
@@ -129,7 +134,7 @@ export default function Fakultas({ data }: FakultasPageProps) {
                                             <FieldGroup>
                                                 <Field>
                                                     <Label htmlFor="kode_fakultas">
-                                                        Kode Fakultas{" "}
+                                                        Kode Fakultas{' '}
                                                         <span className="text-destructive">
                                                             *
                                                         </span>
@@ -151,7 +156,7 @@ export default function Fakultas({ data }: FakultasPageProps) {
                                                 </Field>
                                                 <Field>
                                                     <Label htmlFor="nama_fakultas">
-                                                        Nama Fakultas{" "}
+                                                        Nama Fakultas{' '}
                                                         <span className="text-destructive">
                                                             *
                                                         </span>
@@ -186,8 +191,8 @@ export default function Fakultas({ data }: FakultasPageProps) {
                                                     disabled={processing}
                                                 >
                                                     {processing
-                                                        ? "Menyimpan..."
-                                                        : "Simpan"}
+                                                        ? 'Menyimpan...'
+                                                        : 'Simpan'}
                                                 </Button>
                                             </DialogFooter>
                                         </>
@@ -254,7 +259,7 @@ export default function Fakultas({ data }: FakultasPageProps) {
                                                         <DialogContent>
                                                             <Form
                                                                 action={route(
-                                                                    "admin.fakultas.update",
+                                                                    'admin.fakultas.update',
                                                                     item.id,
                                                                 )}
                                                                 method="PUT"
@@ -281,7 +286,7 @@ export default function Fakultas({ data }: FakultasPageProps) {
                                                                             <Field>
                                                                                 <Label htmlFor="kode_fakultas-${item.id}">
                                                                                     Kode
-                                                                                    Fakultas{" "}
+                                                                                    Fakultas{' '}
                                                                                     <span className="text-destructive">
                                                                                         *
                                                                                     </span>
@@ -290,7 +295,7 @@ export default function Fakultas({ data }: FakultasPageProps) {
                                                                                     name="kode_fakultas"
                                                                                     placeholder="Kode Fakultas"
                                                                                     id={
-                                                                                        "kode_fakultas-${item.id}"
+                                                                                        'kode_fakultas-${item.id}'
                                                                                     }
                                                                                     defaultValue={
                                                                                         item.kode_fakultas
@@ -298,7 +303,7 @@ export default function Fakultas({ data }: FakultasPageProps) {
                                                                                     required
                                                                                 />
                                                                                 {errors.kode_fakultas && (
-                                                                                    <p className="text-sm text-danger">
+                                                                                    <p className="text-danger text-sm">
                                                                                         {
                                                                                             errors.kode_fakultas
                                                                                         }
@@ -317,7 +322,7 @@ export default function Fakultas({ data }: FakultasPageProps) {
                                                                                     name="nama_fakultas"
                                                                                     placeholder="Nama Fakultas"
                                                                                     id={
-                                                                                        "nama_fakultas-${item.id}"
+                                                                                        'nama_fakultas-${item.id}'
                                                                                     }
                                                                                     defaultValue={
                                                                                         item.nama_fakultas
@@ -325,7 +330,7 @@ export default function Fakultas({ data }: FakultasPageProps) {
                                                                                     required
                                                                                 />
                                                                                 {errors.nama_fakultas && (
-                                                                                    <p className="text-sm text-danger">
+                                                                                    <p className="text-danger text-sm">
                                                                                         {
                                                                                             errors.nama_fakultas
                                                                                         }
@@ -338,7 +343,7 @@ export default function Fakultas({ data }: FakultasPageProps) {
                                                                                 <Button
                                                                                     type="button"
                                                                                     variant={
-                                                                                        "outline"
+                                                                                        'outline'
                                                                                     }
                                                                                 >
                                                                                     Kembali
@@ -351,8 +356,8 @@ export default function Fakultas({ data }: FakultasPageProps) {
                                                                                 }
                                                                             >
                                                                                 {processing
-                                                                                    ? "Menyimpan"
-                                                                                    : "Simpan"}
+                                                                                    ? 'Menyimpan'
+                                                                                    : 'Simpan'}
                                                                             </Button>
                                                                         </DialogFooter>
                                                                     </>
@@ -385,7 +390,7 @@ export default function Fakultas({ data }: FakultasPageProps) {
                                                         <DialogContent>
                                                             <Form
                                                                 action={route(
-                                                                    "admin.fakultas.destroy",
+                                                                    'admin.fakultas.destroy',
                                                                     item.id,
                                                                 )}
                                                                 method="DELETE"
@@ -411,11 +416,10 @@ export default function Fakultas({ data }: FakultasPageProps) {
                                                                                 yakin
                                                                                 ingin
                                                                                 menghapus
-                                                                                fakultas{" "}
+                                                                                fakultas{' '}
                                                                                 {
                                                                                     item.nama_fakultas
                                                                                 }
-
                                                                                 ?
                                                                             </DialogDescription>
                                                                         </DialogHeader>
@@ -424,7 +428,7 @@ export default function Fakultas({ data }: FakultasPageProps) {
                                                                                 <Button
                                                                                     type="button"
                                                                                     variant={
-                                                                                        "outline"
+                                                                                        'outline'
                                                                                     }
                                                                                 >
                                                                                     Kembali
@@ -436,12 +440,12 @@ export default function Fakultas({ data }: FakultasPageProps) {
                                                                                     processing
                                                                                 }
                                                                                 variant={
-                                                                                    "destructive"
+                                                                                    'destructive'
                                                                                 }
                                                                             >
                                                                                 {processing
-                                                                                    ? "...Menghapus"
-                                                                                    : "Hapus"}
+                                                                                    ? '...Menghapus'
+                                                                                    : 'Hapus'}
                                                                             </Button>
                                                                         </DialogFooter>
                                                                     </>
@@ -466,8 +470,8 @@ export default function Fakultas({ data }: FakultasPageProps) {
 Fakultas.layout = {
     breadcrumbs: [
         {
-            title: "Fakultas",
-            href: "/fakultas",
+            title: 'Fakultas',
+            href: '/fakultas',
         },
     ],
 };

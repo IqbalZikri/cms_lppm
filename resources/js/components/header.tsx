@@ -1,11 +1,11 @@
-import { route } from "ziggy-js";
+import { route } from 'ziggy-js';
 import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbList,
     BreadcrumbSeparator,
-} from "./ui/breadcrumb";
+} from './ui/breadcrumb';
 
 interface BreadCrumbPage {
     label: string;

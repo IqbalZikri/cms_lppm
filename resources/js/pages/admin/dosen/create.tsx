@@ -1,43 +1,43 @@
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card";
-import { Form, Head, Link, useForm } from "@inertiajs/react";
-import { route } from "ziggy-js";
-import { UserRound, Contact, ArrowLeft, Save } from "lucide-react";
-import { Dosen } from "@/types/dosen";
+} from '@/components/ui/card';
+import { Form, Head, Link, useForm } from '@inertiajs/react';
+import { route } from 'ziggy-js';
+import { UserRound, Contact, ArrowLeft, Save } from 'lucide-react';
+import { Dosen } from '@/types/dosen';
 import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbList,
     BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Fakultas } from "@/types/fakultas";
-import DialogFormCreate from "@/components/dialog-form";
-import { useEffect, useState } from "react";
-import { Prodi } from "@/interface/prodi";
+} from '@/components/ui/breadcrumb';
+import { Fakultas } from '@/types/fakultas';
+import DialogFormCreate from '@/components/dialog-form';
+import { useEffect, useState } from 'react';
+import { Prodi } from '@/interface/prodi';
 
 interface CreateDosenProps {
     fakultas: Fakultas[];
 }
 
 export default function CreateDosen({ fakultas }: CreateDosenProps) {
-    const [fakultasId, setFakultasId] = useState<string>("");
+    const [fakultasId, setFakultasId] = useState<string>('');
     const [prodi, setProdi] = useState<Prodi[]>([]);
 
     useEffect(() => {
@@ -46,13 +46,13 @@ export default function CreateDosen({ fakultas }: CreateDosenProps) {
             return;
         }
 
-        fetch(route("admin.prodi.getProdi", fakultasId))
+        fetch(route('admin.prodi.getProdi', fakultasId))
             .then((response) => response.json())
             .then((data: Prodi[]) => {
                 setProdi(data);
             })
             .catch((error) => {
-                console.error("Gagal mengambil data prodi", error);
+                console.error('Gagal mengambil data prodi', error);
             });
     }, [fakultasId]);
 
@@ -62,17 +62,17 @@ export default function CreateDosen({ fakultas }: CreateDosenProps) {
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
                 {/* Header */}
-                <div className="flex flex-row gap-2 justify justify-between">
+                <div className="justify flex flex-row justify-between gap-2">
                     <div className="flex items-center gap-3">
-                        <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
-                            <UserRound className="size-5 text-primary" />
+                        <div className="bg-primary/10 flex size-10 items-center justify-center rounded-lg">
+                            <UserRound className="text-primary size-5" />
                         </div>
 
                         <div>
                             <h1 className="text-2xl font-semibold tracking-tight">
                                 Tambah Dosen
                             </h1>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-muted-foreground text-sm">
                                 Tambahkan data dosen baru ke dalam sistem.
                             </p>
                         </div>
@@ -81,7 +81,7 @@ export default function CreateDosen({ fakultas }: CreateDosenProps) {
                         <BreadcrumbList>
                             <BreadcrumbItem>
                                 <BreadcrumbLink
-                                    href={route("admin.dosen.index")}
+                                    href={route('admin.dosen.index')}
                                 >
                                     Dosen
                                 </BreadcrumbLink>
@@ -93,10 +93,10 @@ export default function CreateDosen({ fakultas }: CreateDosenProps) {
                 </div>
 
                 <Form
-                    action={route("admin.dosen.store")}
+                    action={route('admin.dosen.store')}
                     method="POST"
                     className="mx-auto w-full max-w-5xl space-y-6"
-                    onSuccess={() => route("admin.dosen.index")}
+                    onSuccess={() => route('admin.dosen.index')}
                     resetOnSuccess
                 >
                     {({ errors, processing }) => (
@@ -156,10 +156,10 @@ export default function CreateDosen({ fakultas }: CreateDosenProps) {
                                             </Select>
                                             <small>
                                                 Pastikan data fakultas sudah
-                                                masuk di halaman{" "}
+                                                masuk di halaman{' '}
                                                 <Link
                                                     href={route(
-                                                        "admin.fakultas.index",
+                                                        'admin.fakultas.index',
                                                     )}
                                                     className="underline"
                                                     viewTransition
@@ -204,11 +204,11 @@ export default function CreateDosen({ fakultas }: CreateDosenProps) {
                                                 )}
                                             </Select>
                                             <small>
-                                                Pastikan data prodi sudah
-                                                masuk di halaman{" "}
+                                                Pastikan data prodi sudah masuk
+                                                di halaman{' '}
                                                 <Link
                                                     href={route(
-                                                        "admin.prodi.index",
+                                                        'admin.prodi.index',
                                                     )}
                                                     className="underline"
                                                     viewTransition
@@ -228,7 +228,7 @@ export default function CreateDosen({ fakultas }: CreateDosenProps) {
                                         Identitas Dosen
                                     </CardTitle>
 
-                                    <p className="text-sm text-muted-foreground">
+                                    <p className="text-muted-foreground text-sm">
                                         Masukkan informasi identitas dan nomor
                                         registrasi dosen.
                                     </p>
@@ -248,7 +248,7 @@ export default function CreateDosen({ fakultas }: CreateDosenProps) {
                                                 placeholder="Contoh: 0123456789"
                                             />
 
-                                            <p className="text-xs text-muted-foreground">
+                                            <p className="text-muted-foreground text-xs">
                                                 Nomor Induk Dosen Nasional.
                                             </p>
                                         </Field>
@@ -265,7 +265,7 @@ export default function CreateDosen({ fakultas }: CreateDosenProps) {
                                                 placeholder="Contoh: 1234567890123456"
                                             />
 
-                                            <p className="text-xs text-muted-foreground">
+                                            <p className="text-muted-foreground text-xs">
                                                 Nomor Unik Pendidik dan Tenaga
                                                 Kependidikan.
                                             </p>
@@ -303,7 +303,7 @@ export default function CreateDosen({ fakultas }: CreateDosenProps) {
                                         Informasi Pribadi
                                     </CardTitle>
 
-                                    <p className="text-sm text-muted-foreground">
+                                    <p className="text-muted-foreground text-sm">
                                         Masukkan informasi pribadi dosen.
                                     </p>
                                 </CardHeader>
@@ -396,7 +396,7 @@ export default function CreateDosen({ fakultas }: CreateDosenProps) {
                                         Informasi Kontak
                                     </CardTitle>
 
-                                    <p className="text-sm text-muted-foreground">
+                                    <p className="text-muted-foreground text-sm">
                                         Masukkan informasi kontak dan alamat
                                         dosen.
                                     </p>
@@ -469,7 +469,7 @@ export default function CreateDosen({ fakultas }: CreateDosenProps) {
                             {/* Action */}
                             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                                 <Link
-                                    href={route("admin.dosen.index")}
+                                    href={route('admin.dosen.index')}
                                     viewTransition
                                 >
                                     <Button type="button" variant="outline">
@@ -481,8 +481,8 @@ export default function CreateDosen({ fakultas }: CreateDosenProps) {
                                 <Button type="submit" disabled={processing}>
                                     <Save className="size-4" />
                                     {processing
-                                        ? "Menyimpan..."
-                                        : "Simpan Dosen"}
+                                        ? 'Menyimpan...'
+                                        : 'Simpan Dosen'}
                                 </Button>
                             </div>
                         </>
@@ -496,8 +496,8 @@ export default function CreateDosen({ fakultas }: CreateDosenProps) {
 CreateDosen.layout = {
     breadcrumbs: [
         {
-            title: "Form Tambah Dosen",
-            href: route("admin.dosen.create"),
+            title: 'Form Tambah Dosen',
+            href: route('admin.dosen.create'),
         },
     ],
 };

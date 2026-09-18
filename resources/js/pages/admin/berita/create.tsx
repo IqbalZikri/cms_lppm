@@ -1,7 +1,7 @@
 // resources/js/Pages/Admin/Berita/Create.tsx
-import { Head } from "@inertiajs/react";
-import BeritaForm from "./form";
-import { route } from "ziggy-js";
+import { Head } from '@inertiajs/react';
+import BeritaForm from './form';
+import { route } from 'ziggy-js';
 
 interface Kategori {
     id: number;
@@ -22,8 +22,8 @@ export default function Create({ kategoris }: { kategoris: Kategori[] }) {
 Create.layout = {
     breadcrumbs: [
         {
-            title: "Buat Berita",
-            href: route("admin.berita.create"),
+            title: 'Buat Berita',
+            href: route('admin.berita.create'),
         },
     ],
 };

@@ -1,19 +1,19 @@
-import { Link } from "@inertiajs/react";
-import { ChevronRight } from "lucide-react";
+import { Link } from '@inertiajs/react';
+import { ChevronRight } from 'lucide-react';
 import {
     SidebarGroup,
     SidebarGroupLabel,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-} from "@/components/ui/sidebar";
-import { useCurrentUrl } from "@/hooks/use-current-url";
-import type { NavItem } from "@/types";
+} from '@/components/ui/sidebar';
+import { useCurrentUrl } from '@/hooks/use-current-url';
+import type { NavItem } from '@/types';
 import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+} from '@/components/ui/collapsible';
 
 export function NavMain({ items }: { items: NavItem[] }) {
     const { isCurrentUrl } = useCurrentUrl();
@@ -44,8 +44,8 @@ export function NavMain({ items }: { items: NavItem[] }) {
                                         </SidebarMenuButton>
                                     </CollapsibleTrigger>
 
-                                    <CollapsibleContent className="overflow-hidden data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up">
-                                        <SidebarMenu className="ml-4 border-l border-sidebar-border pl-2">
+                                    <CollapsibleContent className="data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up overflow-hidden">
+                                        <SidebarMenu className="border-sidebar-border ml-4 border-l pl-2">
                                             {item.items.map((child) => (
                                                 <SidebarMenuItem
                                                     key={child.title}

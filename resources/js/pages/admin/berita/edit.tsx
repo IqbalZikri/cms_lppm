@@ -1,6 +1,6 @@
-import { Head } from "@inertiajs/react";
-import BeritaForm from "./form";
-import { Berita } from "@/interface/berita";
+import { Head } from '@inertiajs/react';
+import BeritaForm from './form';
+import { Berita } from '@/interface/berita';
 
 interface Kategori {
     id: number;

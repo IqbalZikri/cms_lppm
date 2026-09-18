@@ -1,5 +1,5 @@
-import { Kategori } from "./kategori";
-import { User } from "./user";
+import { Kategori } from './kategori';
+import { User } from './user';
 
 export interface Berita {
     id: number;

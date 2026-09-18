@@ -1,5 +1,5 @@
-import { Head, Link } from "@inertiajs/react";
-import { ArrowLeft, CalendarDays, Eye, FileText, User } from "lucide-react";
+import { Head, Link } from '@inertiajs/react';
+import { ArrowLeft, CalendarDays, Eye, FileText, User } from 'lucide-react';
 
 import {
     Breadcrumb,
@@ -8,22 +8,22 @@ import {
     BreadcrumbList,
     BreadcrumbPage,
     BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+} from '@/components/ui/breadcrumb';
 
-import { Badge } from "@/components/ui/badge";
+import { Badge } from '@/components/ui/badge';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { Button } from "@/components/ui/button";
-import { route } from "ziggy-js";
-import { Berita } from "@/interface/berita";
+import { Button } from '@/components/ui/button';
+import { route } from 'ziggy-js';
+import { Berita } from '@/interface/berita';
 
 interface Props {
     berita: Berita;
 }
 
 export default function Show({ berita }: Props) {
-    const isPublished = berita.status_published === "published";
+    const isPublished = berita.status_published === 'published';
     console.log(berita);
 
     return (
@@ -36,7 +36,7 @@ export default function Show({ berita }: Props) {
                     <BreadcrumbList>
                         <BreadcrumbItem>
                             <BreadcrumbLink asChild>
-                                <Link href={route("admin.berita.index")}>
+                                <Link href={route('admin.berita.index')}>
                                     Berita
                                 </Link>
                             </BreadcrumbLink>
@@ -57,13 +57,13 @@ export default function Show({ berita }: Props) {
                             Detail Berita
                         </h1>
 
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-muted-foreground text-sm">
                             Informasi lengkap mengenai berita.
                         </p>
                     </div>
 
                     <Button variant="outline" asChild>
-                        <Link href={route("admin.berita.index")} viewTransition>
+                        <Link href={route('admin.berita.index')} viewTransition>
                             <ArrowLeft />
                             Kembali
                         </Link>
@@ -83,10 +83,10 @@ export default function Show({ berita }: Props) {
 
                                 <Badge
                                     variant={
-                                        isPublished ? "default" : "outline"
+                                        isPublished ? 'default' : 'outline'
                                     }
                                 >
-                                    {isPublished ? "Published" : "Draft"}
+                                    {isPublished ? 'Published' : 'Draft'}
                                 </Badge>
                             </div>
 
@@ -96,7 +96,7 @@ export default function Show({ berita }: Props) {
                             </h2>
 
                             {/* Metadata */}
-                            <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
+                            <div className="text-muted-foreground mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm">
                                 <div className="flex items-center gap-2">
                                     <User className="size-4" />
 
@@ -107,7 +107,7 @@ export default function Show({ berita }: Props) {
                                     <Eye className="size-4" />
 
                                     <span>
-                                        {berita.views.toLocaleString("id-ID")}{" "}
+                                        {berita.views.toLocaleString('id-ID')}{' '}
                                         views
                                     </span>
                                 </div>
@@ -119,10 +119,10 @@ export default function Show({ berita }: Props) {
                                         <span>
                                             {new Date(
                                                 berita.published_at,
-                                            ).toLocaleDateString("id-ID", {
-                                                day: "2-digit",
-                                                month: "long",
-                                                year: "numeric",
+                                            ).toLocaleDateString('id-ID', {
+                                                day: '2-digit',
+                                                month: 'long',
+                                                year: 'numeric',
                                             })}
                                         </span>
                                     </div>
@@ -142,13 +142,13 @@ export default function Show({ berita }: Props) {
 
                             {/* Summary */}
                             {berita.ringkasan_berita && (
-                                <div className="mt-6 rounded-lg bg-muted/50 p-5">
+                                <div className="bg-muted/50 mt-6 rounded-lg p-5">
                                     <div className="mb-2 flex items-center gap-2 font-medium">
                                         <FileText className="size-4" />
                                         Ringkasan
                                     </div>
 
-                                    <p className="text-sm leading-6 text-muted-foreground">
+                                    <p className="text-muted-foreground text-sm leading-6">
                                         {berita.ringkasan_berita}
                                     </p>
                                 </div>
@@ -156,7 +156,7 @@ export default function Show({ berita }: Props) {
 
                             {/* Article Content */}
                             <article
-                                className="prose prose-neutral mt-8 max-w-none dark:prose-invert"
+                                className="prose prose-neutral dark:prose-invert mt-8 max-w-none"
                                 dangerouslySetInnerHTML={{
                                     __html: berita.isi_berita,
                                 }}
@@ -176,7 +176,7 @@ export default function Show({ berita }: Props) {
 
                             <CardContent className="space-y-4">
                                 <div>
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="text-muted-foreground text-xs">
                                         Kategori
                                     </p>
 
@@ -186,7 +186,7 @@ export default function Show({ berita }: Props) {
                                 </div>
 
                                 <div>
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="text-muted-foreground text-xs">
                                         Status
                                     </p>
 
@@ -194,39 +194,39 @@ export default function Show({ berita }: Props) {
                                         <Badge
                                             variant={
                                                 isPublished
-                                                    ? "default"
-                                                    : "outline"
+                                                    ? 'default'
+                                                    : 'outline'
                                             }
                                         >
                                             {isPublished
-                                                ? "Published"
-                                                : "Draft"}
+                                                ? 'Published'
+                                                : 'Draft'}
                                         </Badge>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="text-muted-foreground text-xs">
                                         Views
                                     </p>
 
                                     <p className="mt-1 text-sm font-medium">
-                                        {berita.views.toLocaleString("id-ID")}
+                                        {berita.views.toLocaleString('id-ID')}
                                     </p>
                                 </div>
 
                                 <div>
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="text-muted-foreground text-xs">
                                         Slug
                                     </p>
 
-                                    <p className="mt-1 break-all text-sm">
+                                    <p className="mt-1 text-sm break-all">
                                         {berita.slug}
                                     </p>
                                 </div>
 
                                 <div>
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="text-muted-foreground text-xs">
                                         Penulis
                                     </p>
 
@@ -236,7 +236,7 @@ export default function Show({ berita }: Props) {
                                 </div>
 
                                 <div>
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="text-muted-foreground text-xs">
                                         Dipublikasikan
                                     </p>
 
@@ -244,12 +244,12 @@ export default function Show({ berita }: Props) {
                                         {berita.published_at
                                             ? new Date(
                                                   berita.published_at,
-                                              ).toLocaleDateString("id-ID", {
-                                                  day: "2-digit",
-                                                  month: "long",
-                                                  year: "numeric",
+                                              ).toLocaleDateString('id-ID', {
+                                                  day: '2-digit',
+                                                  month: 'long',
+                                                  year: 'numeric',
                                               })
-                                            : "-"}
+                                            : '-'}
                                     </p>
                                 </div>
                             </CardContent>
@@ -267,7 +267,7 @@ export default function Show({ berita }: Props) {
                                 <Button className="w-full" asChild>
                                     <Link
                                         href={route(
-                                            "admin.berita.edit",
+                                            'admin.berita.edit',
                                             berita.id,
                                         )}
                                     >
@@ -282,3 +282,7 @@ export default function Show({ berita }: Props) {
         </>
     );
 }
+
+Show.layout = {
+    breadcrumbs: [{ title: 'Detail Berita' }],
+};
