@@ -24,7 +24,7 @@ class BeritaController extends Controller
             'kategori' => $kategori,
             'beritaDraft' => $beritaDraft,
             'beritaPublished' => $beritaPublished,
-            'beritaArchived' => $beritaArchived
+            'beritaArchived' => $beritaArchived,
         ]);
     }
 
@@ -33,7 +33,7 @@ class BeritaController extends Controller
         $kategoris = Kategori::get();
 
         return Inertia::render('admin/berita/create', [
-            'kategoris' => $kategoris
+            'kategoris' => $kategoris,
         ]);
     }
 
@@ -52,7 +52,7 @@ class BeritaController extends Controller
             'judul_berita.required' => 'Judul berita wajib diisi',
             'ringkasan_berita.required' => 'Ringkasan berita wajib diisi',
             'isi_berita.required' => 'Isi berita wajib diisi',
-            'gambar.mimes' => 'Format yang didukung png, jpg, jpeg'
+            'gambar.mimes' => 'Format yang didukung png, jpg, jpeg',
         ]);
 
         try {
@@ -75,6 +75,7 @@ class BeritaController extends Controller
             return redirect()->route('admin.berita.index')->with('success', 'Berhasil membuat berita baru');
         } catch (\Throwable $th) {
             Log::info($th->getMessage());
+
             return back()->with('error', 'Terjadi Kesalahan');
         }
     }
@@ -85,18 +86,19 @@ class BeritaController extends Controller
             if ($berita->status_published === 'draft') {
                 $berita->update([
                     'status_published' => 'published',
-                    'published_at' => now()
+                    'published_at' => now(),
                 ]);
             } else {
                 $berita->update([
                     'status_published' => 'draft',
-                    'published_at' => null
+                    'published_at' => null,
                 ]);
             }
 
             return back()->with('success', 'Berhasil mengedit status berita');
         } catch (\Throwable $th) {
             Log::info($th->getMessage());
+
             return back()->with('error', 'Terjadi Kesalahan');
         }
     }
@@ -104,6 +106,7 @@ class BeritaController extends Controller
     public function show(Berita $berita)
     {
         $berita->load('kategori', 'user');
+
         return Inertia::render('admin/berita/show', [
             'berita' => [
                 ...$berita->toArray(),
@@ -117,6 +120,7 @@ class BeritaController extends Controller
     public function edit(Berita $berita)
     {
         $kategoris = Kategori::get();
+
         return Inertia::render('admin/berita/edit', [
             'berita' => [
                 ...$berita->toArray(),
@@ -144,7 +148,7 @@ class BeritaController extends Controller
             'ringkasan_berita.required' => 'Ringkasan berita wajib diisi',
             'isi_berita.required' => 'Isi berita wajib diisi',
             'gambar.max' => 'Maksimal ukuran file 2MB',
-            'gambar.mimes' => 'Format yang didukung png, jpg, jpeg'
+            'gambar.mimes' => 'Format yang didukung png, jpg, jpeg',
         ]);
 
         try {
@@ -171,18 +175,20 @@ class BeritaController extends Controller
             return redirect()->route('admin.berita.index')->with('success', 'Berhasil mengedit berita');
         } catch (\Throwable $th) {
             Log::info($th->getMessage());
+
             return back()->with('error', 'Terjadi Kesalahan');
         }
     }
-
 
     public function destroy(Berita $berita)
     {
         try {
             $berita->delete();
+
             return back()->with('success', 'Berhasil hapus berita');
         } catch (\Throwable $th) {
             Log::info($th->getMessage());
+
             return back()->with('error', 'Terjadi Kesalahan');
         }
     }

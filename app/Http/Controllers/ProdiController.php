@@ -7,7 +7,6 @@ use App\Models\Prodi;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Log;
-use function Pest\Laravel\json;
 
 class ProdiController extends Controller
 {
@@ -18,7 +17,7 @@ class ProdiController extends Controller
 
         return Inertia::render('admin/prodi/index', [
             'data' => $data,
-            'fakultas' => $fakultas
+            'fakultas' => $fakultas,
         ]);
     }
 
@@ -27,24 +26,25 @@ class ProdiController extends Controller
         $request->validate([
             'fakultas_id' => 'required',
             'kode_prodi' => 'required|unique:prodis,kode_prodi',
-            'nama_prodi' => 'required'
+            'nama_prodi' => 'required',
         ], [
             'fakultas_id.required' => 'Pilih salah satu fakultas',
             'kode_prodi.required' => 'Kode prodi wajib diisi',
             'kode_prodi.unique' => 'Kode prodi sudah digunakan',
-            'nama_prodi.required' => 'Nama prodi wajib diisi'
+            'nama_prodi.required' => 'Nama prodi wajib diisi',
         ]);
 
         try {
             Prodi::create([
                 'fakultas_id' => $request->fakultas_id,
                 'kode_prodi' => $request->kode_prodi,
-                'nama_prodi' => $request->nama_prodi
+                'nama_prodi' => $request->nama_prodi,
             ]);
 
             return back()->with('success', 'Berhasil menambahkan prodi baru');
         } catch (\Throwable $th) {
             Log::info($th->getMessage());
+
             return back()->with('error', 'Terjadi Kesalahan');
         }
     }
@@ -53,13 +53,13 @@ class ProdiController extends Controller
     {
         $request->validate([
             'fakultas_id' => 'required',
-            'kode_prodi' => 'required|unique:prodis,kode_prodi,' . $id,
-            'nama_prodi' => 'required'
+            'kode_prodi' => 'required|unique:prodis,kode_prodi,'.$id,
+            'nama_prodi' => 'required',
         ], [
             'fakultas_id.required' => 'Pilih salah satu fakultas',
             'kode_prodi.required' => 'Kode prodi wajib diisi',
             'kode_prodi.unique' => 'Kode prodi sudah digunakan',
-            'nama_prodi.required' => 'Nama prodi wajib diisi'
+            'nama_prodi.required' => 'Nama prodi wajib diisi',
         ]);
 
         $data = Prodi::findOrFail($id);
@@ -68,12 +68,13 @@ class ProdiController extends Controller
             $data->update([
                 'fakultas_id' => $request->fakultas_id,
                 'kode_prodi' => $request->kode_prodi,
-                'nama_prodi' => $request->nama_prodi
+                'nama_prodi' => $request->nama_prodi,
             ]);
 
             return back()->with('success', 'Berhasil mengedit prodi');
         } catch (\Throwable $th) {
             Log::info($th->getMessage());
+
             return back()->with('error', 'Terjadi Kesalahan');
         }
     }
@@ -83,9 +84,11 @@ class ProdiController extends Controller
         $data = Prodi::findOrFail($id);
         try {
             $data->delete();
+
             return back()->with('success', 'Berhasil menghapus prodi');
         } catch (\Throwable $th) {
             Log::info($th->getMessage());
+
             return back()->with('error', 'Terjadi Kesalahan');
         }
     }
@@ -93,6 +96,7 @@ class ProdiController extends Controller
     public function getProdi($id)
     {
         $prodi = Prodi::where('fakultas_id', $id)->get();
+
         return response()->json($prodi);
     }
 }

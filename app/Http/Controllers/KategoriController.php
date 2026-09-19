@@ -17,7 +17,7 @@ class KategoriController extends Controller
         $data = Kategori::paginate(10);
 
         return Inertia::render('admin/kategori/index', [
-            'data' => $data
+            'data' => $data,
         ]);
     }
 
@@ -27,19 +27,20 @@ class KategoriController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_kategori' => 'required'
+            'nama_kategori' => 'required',
         ], [
-            'nama_kategori.required' => 'Wajib diisi'
+            'nama_kategori.required' => 'Wajib diisi',
         ]);
 
         try {
             Kategori::create([
-                'nama_kategori' => $request->nama_kategori
+                'nama_kategori' => $request->nama_kategori,
             ]);
 
             return back()->with('success', 'Berhasil menambahkan kategori baru');
         } catch (\Throwable $th) {
             Log::info($th->getMessage());
+
             return back()->with('error', 'Terjadi Kesalahan');
         }
     }
@@ -50,19 +51,20 @@ class KategoriController extends Controller
     public function update(Request $request, Kategori $kategori)
     {
         $request->validate([
-            'nama_kategori' => 'required'
+            'nama_kategori' => 'required',
         ], [
-            'nama_kategori.required' => 'Wajib diisi'
+            'nama_kategori.required' => 'Wajib diisi',
         ]);
 
         try {
             $kategori->update([
-                'nama_kategori' => $request->nama_kategori
+                'nama_kategori' => $request->nama_kategori,
             ]);
 
             return back()->with('success', 'Berhasil mengedit kategori');
         } catch (\Throwable $th) {
             Log::info($th->getMessage());
+
             return back()->with('error', 'Terjadi Kesalahan');
         }
     }
@@ -74,9 +76,11 @@ class KategoriController extends Controller
     {
         try {
             $kategori->delete();
+
             return back()->with('success', 'Berhasil menghapus kategori');
         } catch (\Throwable $th) {
             Log::info($th->getMessage());
+
             return back()->with('error', 'Terjadi Kesalahan');
         }
     }

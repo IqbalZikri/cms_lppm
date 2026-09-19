@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Berita extends Model
 {
-    use SoftDeletes;
     use Searchable;
+    use SoftDeletes;
 
     protected array $searchable = [
         'judul_berita',
@@ -22,7 +22,7 @@ class Berita extends Model
         'published_at',
         'deleted_at',
         'user_id',
-        'kategori.nama_kategori'
+        'kategori.nama_kategori',
     ];
 
     protected $fillable = [

@@ -1,16 +1,16 @@
-import TablePage from '@/components/table-page';
+import TablePage from "@/components/table-page";
 import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbList,
-} from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Fakultas } from '@/interface/fakultas';
-import { PaginatedData } from '@/interface/pagination';
-import { Head, Link } from '@inertiajs/react';
+} from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Fakultas } from "@/interface/fakultas";
+import { PaginatedData } from "@/interface/pagination";
+import { Head, Link } from "@inertiajs/react";
 import {
     Building2,
     GraduationCap,
@@ -18,33 +18,27 @@ import {
     Plus,
     Venus,
     Users,
-} from 'lucide-react';
-import { route } from 'ziggy-js';
-import { DialogDelete } from '@/components/dialog-form';
-
-interface Dosen {
-    id: number;
-    fakultas_id: number;
-    nidn: number;
-    nuptk: number;
-    nama_dosen: string;
-    jenis_kelamin: string;
-    hp: number;
-}
+} from "lucide-react";
+import { route } from "ziggy-js";
+import { DialogDelete } from "@/components/dialog-form";
+import { Prodi } from "@/interface/prodi";
+import { Dosen as DosenTypes } from "@/types/dosen";
 
 interface DosenPageProps {
-    data: PaginatedData<Dosen>;
+    data: PaginatedData<DosenTypes>;
     fakultas: Fakultas[];
+    prodi: Prodi[]
 }
 
-export default function Dosen({ data, fakultas }: DosenPageProps) {
+export default function Dosen({ data, fakultas, prodi }: DosenPageProps) {
     const jumlahLakiLaki = data.data.filter(
-        (item) => item.jenis_kelamin === 'Laki-laki',
+        (item) => item.jenis_kelamin === "L",
     ).length;
 
     const jumlahPerempuan = data.data.filter(
-        (item) => item.jenis_kelamin === 'Perempuan',
+        (item) => item.jenis_kelamin === "P",
     ).length;
+    
 
     return (
         <>
@@ -68,7 +62,7 @@ export default function Dosen({ data, fakultas }: DosenPageProps) {
                             <BreadcrumbList>
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route('admin.dosen.index')}
+                                        href={route("admin.dosen.index")}
                                     >
                                         Dosen
                                     </BreadcrumbLink>
@@ -79,7 +73,7 @@ export default function Dosen({ data, fakultas }: DosenPageProps) {
                 </div>
 
                 {/* Statistics */}
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {/* Total Dosen */}
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -97,27 +91,6 @@ export default function Dosen({ data, fakultas }: DosenPageProps) {
 
                             <p className="text-muted-foreground text-xs">
                                 Seluruh dosen terdaftar
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    {/* Fakultas */}
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Fakultas
-                            </CardTitle>
-
-                            <Building2 className="text-muted-foreground h-5 w-5" />
-                        </CardHeader>
-
-                        <CardContent>
-                            <div className="text-2xl font-bold">
-                                {fakultas.length}
-                            </div>
-
-                            <p className="text-muted-foreground text-xs">
-                                Fakultas dengan data dosen
                             </p>
                         </CardContent>
                     </Card>
@@ -184,37 +157,43 @@ export default function Dosen({ data, fakultas }: DosenPageProps) {
                     </CardHeader>
 
                     <CardContent>
-                        <Link href={route('admin.dosen.create')} viewTransition>
+                        <Link href={route("admin.dosen.create")} viewTransition>
                             <Button className="mb-[20px]">
                                 <Plus className="mr-2 h-4 w-4" />
                                 Tambah Dosen
                             </Button>
                         </Link>
-                        <TablePage<Dosen>
+                        <TablePage<DosenTypes>
                             data={data}
                             columns={[
                                 {
-                                    key: 'fakultas_id',
-                                    label: 'Fakultas',
+                                    key: "fakultas_id",
+                                    label: "Fakultas",
                                     render: (value) =>
                                         fakultas.find((f) => f.id === value)
-                                            ?.nama_fakultas ?? '-',
+                                            ?.nama_fakultas ?? "-",
+                                },
+                                {
+                                    key: "prodi_id",
+                                    label: "Prodi",
+                                    render: (value) =>
+                                        prodi.find((p) => p.id === value)
+                                            ?.nama_prodi ?? "-",
+                                },
+                                {
+                                    key: "nidn",
+                                    label: "NIDN",
                                 },
 
                                 {
-                                    key: 'nidn',
-                                    label: 'NIDN',
+                                    key: "nuptk",
+                                    label: "NUPTK",
                                 },
 
                                 {
-                                    key: 'nuptk',
-                                    label: 'NUPTK',
-                                },
-
-                                {
-                                    key: 'nama_dosen',
-                                    label: 'Nama Dosen',
-                                    render: (value) => (
+                                    key: "nama_dosen",
+                                    label: "Nama Dosen",
+                                    render: (value: any) => (
                                         <div className="font-medium">
                                             {value}
                                         </div>
@@ -222,14 +201,14 @@ export default function Dosen({ data, fakultas }: DosenPageProps) {
                                 },
 
                                 {
-                                    key: 'jenis_kelamin',
-                                    label: 'Jenis Kelamin',
-                                    render: (value) => (
+                                    key: "jenis_kelamin",
+                                    label: "Jenis Kelamin",
+                                    render: (value: any) => (
                                         <Badge
                                             variant={
-                                                value === 'Laki-laki'
-                                                    ? 'default'
-                                                    : 'secondary'
+                                                value === "Laki-laki"
+                                                    ? "default"
+                                                    : "secondary"
                                             }
                                         >
                                             {value}
@@ -238,15 +217,15 @@ export default function Dosen({ data, fakultas }: DosenPageProps) {
                                 },
 
                                 {
-                                    key: 'hp',
-                                    label: 'No. HP',
+                                    key: "hp",
+                                    label: "No. HP",
                                 },
                             ]}
                             renderActions={(item) => (
                                 <div className="flex items-center gap-2">
                                     <Link
                                         href={route(
-                                            'admin.dosen.edit',
+                                            "admin.dosen.edit",
                                             item.id,
                                         )}
                                     >
@@ -254,9 +233,20 @@ export default function Dosen({ data, fakultas }: DosenPageProps) {
                                             Edit
                                         </Button>
                                     </Link>
+                                    <Link
+                                        href={route(
+                                            "admin.dosen.show",
+                                            item.id,
+                                        )}
+                                        viewTransition
+                                    >
+                                        <Button variant="default" size="sm">
+                                            Show
+                                        </Button>
+                                    </Link>
                                     <DialogDelete
                                         actionUrl={route(
-                                            'admin.dosen.destroy',
+                                            "admin.dosen.destroy",
                                             item.id,
                                         )}
                                         page="dosen"
@@ -276,8 +266,8 @@ export default function Dosen({ data, fakultas }: DosenPageProps) {
 Dosen.layout = {
     breadcrumbs: [
         {
-            title: 'Dosen',
-            href: route('admin.dosen.index'),
+            title: "Dosen",
+            href: route("admin.dosen.index"),
         },
     ],
 };

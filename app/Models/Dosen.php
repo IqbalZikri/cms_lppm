@@ -18,8 +18,8 @@ class Dosen extends Model
         'alamat',
         'hp',
         'email',
-        'id_penelitian',
-        'id_users',
+        'foto',
+        'user_id',
     ];
 
     public function fakultas()
@@ -30,5 +30,10 @@ class Dosen extends Model
     public function prodi()
     {
         return $this->belongsTo(Prodi::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

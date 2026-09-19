@@ -1,4 +1,5 @@
 <?php
+
 // app/Traits/Searchable.php
 
 namespace App\Traits;
