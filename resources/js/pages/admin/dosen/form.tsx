@@ -79,7 +79,7 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
         id_users: dosen ? String(dosen.user_id) : "",
         name: user?.name ?? "",
         password: user?.password ?? "",
-        role: user?.role ?? "",
+        confirm_password: "",
     });
 
     const handleFotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,8 +118,6 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
             });
         }
     };
-
-    const [fakultasId, setFakultasId] = useState<string>("");
     const [prodi, setProdi] = useState<Prodi[]>([]);
     const [prodiLoading, setProdiLoading] = useState(false);
 
@@ -128,14 +126,14 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
 
     // Reset prodi whenever fakultas changes, then fetch the new list.
     useEffect(() => {
-        if (!fakultasId) {
+        if (!data.fakultas_id) {
             setProdi([]);
             return;
         }
 
         setProdiLoading(true);
 
-        fetch(route("admin.prodi.getProdi", fakultasId))
+        fetch(route("admin.prodi.getProdi", data.fakultas_id))
             .then((response) => response.json())
             .then((data: Prodi[]) => setProdi(data))
             .catch((error) => {
@@ -143,7 +141,7 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
                 setProdi([]);
             })
             .finally(() => setProdiLoading(false));
-    }, [fakultasId]);
+    }, [data.fakultas_id]);
 
     const applyFotoFile = (file: File | null) => {
         if (!file) {
@@ -151,6 +149,7 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
             return;
         }
         setFotoPreview(URL.createObjectURL(file));
+        setData("foto", file);
     };
 
     return (
@@ -212,8 +211,10 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
 
                                     <Select
                                         name="fakultas_id"
-                                        value={fakultasId}
-                                        onValueChange={setFakultasId}
+                                        value={data.fakultas_id}
+                                        onValueChange={(value) =>
+                                            setData("fakultas_id", value)
+                                        }
                                         disabled={fakultas.length === 0}
                                     >
                                         <SelectTrigger
@@ -271,9 +272,13 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
                                     <Select
                                         name="prodi_id"
                                         disabled={
-                                            !fakultasId ||
+                                            !data.fakultas_id ||
                                             prodiLoading ||
                                             prodi.length === 0
+                                        }
+                                        value={data.prodi_id}
+                                        onValueChange={(value) =>
+                                            setData("prodi_id", value)
                                         }
                                     >
                                         <SelectTrigger
@@ -282,7 +287,7 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
                                         >
                                             <SelectValue
                                                 placeholder={
-                                                    !fakultasId
+                                                    !data.fakultas_id
                                                         ? "Pilih fakultas terlebih dahulu"
                                                         : prodiLoading
                                                           ? "Memuat prodi..."
@@ -374,32 +379,47 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
                                                 : "border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/50",
                                         )}
                                     >
-                                        {fotoPreview ? (
+                                        {dosen?.foto ? (
                                             <>
                                                 <img
-                                                    src={fotoPreview}
+                                                    src={dosen?.foto}
                                                     alt="Preview foto dosen"
                                                     className="h-full w-full object-cover"
                                                 />
-                                                <button
-                                                    type="button"
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        applyFotoFile(null);
-                                                    }}
-                                                    className="bg-background/90 hover:bg-background absolute top-1.5 right-1.5 flex size-6 items-center justify-center rounded-full shadow-sm"
-                                                    aria-label="Hapus foto"
-                                                >
-                                                    <X className="size-3.5" />
-                                                </button>
                                             </>
                                         ) : (
-                                            <div className="text-muted-foreground flex flex-col items-center gap-2 p-4 text-center">
-                                                <ImageUp className="size-8" />
-                                                <span className="text-xs">
-                                                    Klik atau seret foto ke sini
-                                                </span>
-                                            </div>
+                                            <>
+                                                {fotoPreview ? (
+                                                    <>
+                                                        <img
+                                                            src={fotoPreview}
+                                                            alt="Preview foto dosen"
+                                                            className="h-full w-full object-cover"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                applyFotoFile(
+                                                                    null,
+                                                                );
+                                                            }}
+                                                            className="bg-background/90 hover:bg-background absolute top-1.5 right-1.5 flex size-6 items-center justify-center rounded-full shadow-sm"
+                                                            aria-label="Hapus foto"
+                                                        >
+                                                            <X className="size-3.5" />
+                                                        </button>
+                                                    </>
+                                                ) : (
+                                                    <div className="text-muted-foreground flex flex-col items-center gap-2 p-4 text-center">
+                                                        <ImageUp className="size-8" />
+                                                        <span className="text-xs">
+                                                            Klik atau seret foto
+                                                            ke sini
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </>
                                         )}
                                     </label>
 
@@ -441,6 +461,10 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
                                             name="nidn"
                                             placeholder="Contoh: 0123456789"
                                             aria-invalid={!!errors.nidn}
+                                            value={data.nidn}
+                                            onChange={(e) =>
+                                                setData("nidn", e.target.value)
+                                            }
                                         />
                                         <p className="text-muted-foreground text-xs">
                                             Nomor Induk Dosen Nasional.
@@ -465,6 +489,13 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
                                             name="nuptk"
                                             placeholder="Contoh: 1234567890123456"
                                             aria-invalid={!!errors.nuptk}
+                                            value={data.nuptk}
+                                            onChange={(e) => {
+                                                setData(
+                                                    "nuptk",
+                                                    e.target.value,
+                                                );
+                                            }}
                                         />
                                         <p className="text-muted-foreground text-xs">
                                             Nomor Unik Pendidik dan Tenaga
@@ -526,7 +557,12 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
                                         <RequiredMark />
                                     </FieldLabel>
 
-                                    <Select name="jenis_kelamin">
+                                    <Select
+                                        name="jenis_kelamin"
+                                        onValueChange={(value) =>
+                                            setData("jenis_kelamin", value)
+                                        }
+                                    >
                                         <SelectTrigger
                                             id="jenis_kelamin"
                                             aria-invalid={
@@ -561,6 +597,12 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
                                         id="tempat_lahir"
                                         name="tempat_lahir"
                                         placeholder="Contoh: Tangerang"
+                                        onChange={(e) =>
+                                            setData(
+                                                "tempat_lahir",
+                                                e.target.value,
+                                            )
+                                        }
                                         aria-invalid={!!errors.tempat_lahir}
                                     />
                                     {errors.tempat_lahir && (
@@ -580,6 +622,12 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
                                         id="tanggal_lahir"
                                         name="tanggal_lahir"
                                         type="date"
+                                        onChange={(e) =>
+                                            setData(
+                                                "tanggal_lahir",
+                                                e.target.value,
+                                            )
+                                        }
                                         aria-invalid={!!errors.tanggal_lahir}
                                     />
                                     {errors.tanggal_lahir && (
@@ -618,6 +666,10 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
                                         type="tel"
                                         placeholder="Contoh: 081234567890"
                                         aria-invalid={!!errors.hp}
+                                        value={data.hp}
+                                        onChange={(e) =>
+                                            setData("hp", e.target.value)
+                                        }
                                     />
                                     {errors.hp && (
                                         <p className="text-sm text-red-500">
@@ -639,7 +691,9 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
                                         placeholder="Contoh: email_dosen@gmail.com"
                                         aria-invalid={!!errors.email}
                                         value={data.email}
-                                        onChange={(e) => setData('email', e.target.value)}
+                                        onChange={(e) =>
+                                            setData("email", e.target.value)
+                                        }
                                     />
                                     {errors.email && (
                                         <p className="text-sm text-red-500">
@@ -660,6 +714,10 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
                                         placeholder="Masukkan alamat lengkap dosen"
                                         className="min-h-28 resize-none"
                                         aria-invalid={!!errors.alamat}
+                                        value={data.alamat}
+                                        onChange={(e) =>
+                                            setData("alamat", e.target.value)
+                                        }
                                     />
                                     {errors.alamat && (
                                         <p className="text-sm text-red-500">
@@ -712,7 +770,16 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
                                         Email Akun
                                         <RequiredMark />
                                     </FieldLabel>
-                                    <Input name="email_akun" type="email" placeholder="Contoh email@example.com" value={data.email} onChange={(e) => setData('email', e.target.value)} disabled/>
+                                    <Input
+                                        name="email_akun"
+                                        type="email"
+                                        placeholder="Contoh email@example.com"
+                                        value={data.email}
+                                        onChange={(e) =>
+                                            setData("email", e.target.value)
+                                        }
+                                        disabled
+                                    />
                                 </Field>
                                 <Field>
                                     <FieldLabel htmlFor="password">
@@ -722,6 +789,26 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
                                     <Input
                                         name="password"
                                         placeholder="Password"
+                                        type="password"
+                                        onChange={(e) =>
+                                            setData("password", e.target.value)
+                                        }
+                                    />
+                                </Field>
+                                <Field>
+                                    <FieldLabel htmlFor="confirm_password">
+                                        Konfirmasi Password
+                                        <RequiredMark />
+                                    </FieldLabel>
+                                    <Input
+                                        name="confirm_password"
+                                        type="password"
+                                        onChange={(e) =>
+                                            setData(
+                                                "confirm_password",
+                                                e.target.value,
+                                            )
+                                        }
                                     />
                                 </Field>
                             </FieldGroup>

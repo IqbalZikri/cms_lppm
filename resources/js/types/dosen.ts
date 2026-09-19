@@ -12,7 +12,7 @@ export type Dosen = {
     nuptk: number;
     nama_dosen: string;
     jenis_kelamin: string;
-    tanggal_lahir: Date;
+    tanggal_lahir: string ;
     tempat_lahir: string;
     alamat: string;
     hp: number;
