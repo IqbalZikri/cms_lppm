@@ -15,5 +15,10 @@ export default function Create({ fakultas }: { fakultas: Fakultas[] }) {
 }
 
 Create.layout = {
-    breadcrumb: [{ Label: "Tambah Dosen", href: route("admin.dosen.create") }],
+    breadcrumbsw: [
+        {
+            title: "Tambah Dosen",
+            href: route("admin.dosen.create"),
+        },
+    ],
 };

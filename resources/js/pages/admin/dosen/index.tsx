@@ -21,30 +21,24 @@ import {
 } from "lucide-react";
 import { route } from "ziggy-js";
 import { DialogDelete } from "@/components/dialog-form";
-
-interface Dosen {
-    id: number;
-    fakultas_id: number;
-    nidn: number;
-    nuptk: number;
-    nama_dosen: string;
-    jenis_kelamin: string;
-    hp: number;
-}
+import { Prodi } from "@/interface/prodi";
+import { Dosen as DosenTypes } from "@/types/dosen";
 
 interface DosenPageProps {
-    data: PaginatedData<Dosen>;
+    data: PaginatedData<DosenTypes>;
     fakultas: Fakultas[];
+    prodi: Prodi[]
 }
 
-export default function Dosen({ data, fakultas }: DosenPageProps) {
+export default function Dosen({ data, fakultas, prodi }: DosenPageProps) {
     const jumlahLakiLaki = data.data.filter(
-        (item) => item.jenis_kelamin === "Laki-laki",
+        (item) => item.jenis_kelamin === "L",
     ).length;
 
     const jumlahPerempuan = data.data.filter(
-        (item) => item.jenis_kelamin === "Perempuan",
+        (item) => item.jenis_kelamin === "P",
     ).length;
+    
 
     return (
         <>
@@ -169,7 +163,7 @@ export default function Dosen({ data, fakultas }: DosenPageProps) {
                                 Tambah Dosen
                             </Button>
                         </Link>
-                        <TablePage<Dosen>
+                        <TablePage<DosenTypes>
                             data={data}
                             columns={[
                                 {
@@ -179,7 +173,13 @@ export default function Dosen({ data, fakultas }: DosenPageProps) {
                                         fakultas.find((f) => f.id === value)
                                             ?.nama_fakultas ?? "-",
                                 },
-
+                                {
+                                    key: "prodi_id",
+                                    label: "Prodi",
+                                    render: (value) =>
+                                        prodi.find((p) => p.id === value)
+                                            ?.nama_prodi ?? "-",
+                                },
                                 {
                                     key: "nidn",
                                     label: "NIDN",
@@ -193,7 +193,7 @@ export default function Dosen({ data, fakultas }: DosenPageProps) {
                                 {
                                     key: "nama_dosen",
                                     label: "Nama Dosen",
-                                    render: (value) => (
+                                    render: (value: any) => (
                                         <div className="font-medium">
                                             {value}
                                         </div>
@@ -203,7 +203,7 @@ export default function Dosen({ data, fakultas }: DosenPageProps) {
                                 {
                                     key: "jenis_kelamin",
                                     label: "Jenis Kelamin",
-                                    render: (value) => (
+                                    render: (value: any) => (
                                         <Badge
                                             variant={
                                                 value === "Laki-laki"
@@ -231,6 +231,17 @@ export default function Dosen({ data, fakultas }: DosenPageProps) {
                                     >
                                         <Button variant="outline" size="sm">
                                             Edit
+                                        </Button>
+                                    </Link>
+                                    <Link
+                                        href={route(
+                                            "admin.dosen.show",
+                                            item.id,
+                                        )}
+                                        viewTransition
+                                    >
+                                        <Button variant="default" size="sm">
+                                            Show
                                         </Button>
                                     </Link>
                                     <DialogDelete
