@@ -41,7 +41,7 @@ export default function UserPage({ users, totalUser }: UserPageProps) {
                 <StatisticsCard
                     dataCard={[
                         {
-                            label: "Total User Terdaftar",
+                            label: "User Terdaftar",
                             count: totalUser,
                             icon: Users,
                         },
@@ -148,34 +148,78 @@ export default function UserPage({ users, totalUser }: UserPageProps) {
                                             </Badge>
                                         ),
                                 },
+                                {
+                                    key: "role",
+                                    label: "Hak Akses / Role",
+                                },
                             ]}
                             renderActions={(item) => (
-                                {item.id === 1 }
                                 <div className="flex items-center gap-2">
-                                    <DialogFormEdit
-                                        page="User"
-                                        actionUrl={route(
-                                            "admin.user.update",
-                                            item.id,
-                                        )}
-                                        item={item}
-                                        kolomInput={[
-                                            {
-                                                label: "Nama Akun",
-                                                name: "name",
-                                                placeholder: "Nama Akun",
-                                            },
-                                        ]}
-                                    />
-                                    <DialogDelete
-                                        actionUrl={route(
-                                            "admin.dosen.destroy",
-                                            item.id,
-                                        )}
-                                        page="user"
-                                        item={item}
-                                        label={item.name}
-                                    />
+                                    {item.id !== 1 && (
+                                        <>
+                                            <DialogFormEdit
+                                                page="User"
+                                                actionUrl={route(
+                                                    "admin.user.update",
+                                                    item.id,
+                                                )}
+                                                item={item}
+                                                kolomInput={[
+                                                    {
+                                                        label: "Nama Akun",
+                                                        name: "name",
+                                                        placeholder:
+                                                            "Nama Akun",
+                                                        required: true,
+                                                    },
+                                                    {
+                                                        label: "Email",
+                                                        name: "email",
+                                                        placeholder:
+                                                            "Contoh : admin@example.com",
+                                                    },
+                                                    {
+                                                        label: "Password",
+                                                        name: "password",
+                                                        placeholder:
+                                                            "Password Akun",
+                                                        type: "password",
+                                                    },
+                                                    {
+                                                        label: "Konfirmasi Password",
+                                                        name: "password_confirmation",
+                                                        placeholder:
+                                                            "Konfirmasi Password",
+                                                        type: "password",
+                                                    },
+                                                    {
+                                                        label: "Hak Akses Akun / Role",
+                                                        name: "role",
+                                                        type: "radio",
+                                                        options: [
+                                                            {
+                                                                label: "Admin",
+                                                                value: "admin",
+                                                            },
+                                                            {
+                                                                label: "UPPM",
+                                                                value: "uppm",
+                                                            },
+                                                        ],
+                                                    },
+                                                ]}
+                                            />
+                                            <DialogDelete
+                                                actionUrl={route(
+                                                    "admin.dosen.destroy",
+                                                    item.id,
+                                                )}
+                                                page="user"
+                                                item={item}
+                                                label={item.name}
+                                            />
+                                        </>
+                                    )}
                                 </div>
                             )}
                         />

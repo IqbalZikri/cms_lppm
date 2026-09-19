@@ -152,7 +152,11 @@ export default function DialogFormCreate({
                                                                             item.value
                                                                         }
                                                                     />
-                                                                    <Label htmlFor={item.value}>
+                                                                    <Label
+                                                                        htmlFor={
+                                                                            item.value
+                                                                        }
+                                                                    >
                                                                         {
                                                                             item.label
                                                                         }
@@ -290,21 +294,60 @@ export function DialogFormEdit<T extends { id: number }>({
                                                     </SelectContent>
                                                 </Select>
                                             ) : (
-                                                <Input
-                                                    id={kolom.name}
-                                                    name={kolom.name}
-                                                    type={kolom.type ?? "text"}
-                                                    placeholder={
-                                                        kolom.placeholder
-                                                    }
-                                                    required={kolom.required}
-                                                    autoComplete={
-                                                        kolom.autoComplete
-                                                    }
-                                                    defaultValue={
-                                                        currentValue ?? ""
-                                                    }
-                                                />
+                                                <>
+                                                    {kolom.type == "radio" ? (
+                                                        <RadioGroup
+                                                            name={kolom.name}
+                                                        >
+                                                            {kolom.options?.map(
+                                                                (item: any) => (
+                                                                    <div className="flex items-center gap-3">
+                                                                        <RadioGroupItem
+                                                                        defaultValue={ currentValue ?? ""}
+                                                                            value={
+                                                                                item.value
+                                                                            }
+                                                                            id={
+                                                                                item.value
+                                                                            }
+                                                                        />
+                                                                        <Label
+                                                                            htmlFor={
+                                                                                item.value
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                item.label
+                                                                            }
+                                                                        </Label>
+                                                                    </div>
+                                                                ),
+                                                            )}
+                                                        </RadioGroup>
+                                                    ) : (
+                                                        <Input
+                                                            id={kolom.name}
+                                                            name={kolom.name}
+                                                            type={
+                                                                kolom.type ??
+                                                                "text"
+                                                            }
+                                                            placeholder={
+                                                                kolom.placeholder
+                                                            }
+                                                            required={
+                                                                kolom.required
+                                                            }
+                                                            autoComplete={
+                                                                kolom.autoComplete
+                                                            }
+                                                            defaultValue={
+                                                                currentValue ??
+                                                                ""
+                                                            }
+                                                        />
+                                                    )}
+                                                </>
                                             )}
 
                                             {errors[kolom.name] && (

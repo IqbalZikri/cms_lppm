@@ -14,8 +14,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::paginate(10);
-        $totalUser = $users->count();
+        $users = User::whereIn('role', ['admin', 'uppm'])->paginate(10)->withQueryString();
+        $totalUser = $users->total();
         return Inertia::render('admin/user/index', [
             'users' => $users,
             'totalUser' => $totalUser
