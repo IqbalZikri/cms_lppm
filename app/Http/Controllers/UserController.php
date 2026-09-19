@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Log;
 
 class UserController extends Controller
 {
@@ -11,15 +14,12 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $users = User::paginate(10);
+        $totalUser = $users->count();
+        return Inertia::render('admin/user/index', [
+            'users' => $users,
+            'totalUser' => $totalUser
+        ]);
     }
 
     /**
@@ -27,7 +27,27 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required',
+            'email' => 'required',
+            'password' => 'required|confirmed',
+            'role' => 'required',
+        ], [
+            'name.required' => "Nama akun wajib diisi",
+            'email.required' => 'Email wajib diisi',
+            'password.required' => "Password wajib diisi",
+            'password.confirmed' => "Konfirmasi Password wajib diisi",
+            'role.required' => 'Pilih salah satu role'
+        ]);
+
+        try {
+            User::create($validated);
+
+            return back()->with('success', 'Berhasil menambahkan data user');
+        } catch (\Throwable $th) {
+            Log::info($th->getMessage());
+            return back()->with('error', 'Terjadi Kesalahan');
+        }
     }
 
     /**

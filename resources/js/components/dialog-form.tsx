@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
     Dialog,
     DialogClose,
@@ -8,21 +8,22 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from './ui/dialog';
-import { Button } from './ui/button';
-import { Form } from '@inertiajs/react';
-import { route } from 'ziggy-js';
-import { Field, FieldGroup } from './ui/field';
-import { Label } from './ui/label';
-import { Input } from './ui/input';
+} from "./ui/dialog";
+import { Button } from "./ui/button";
+import { Form } from "@inertiajs/react";
+import { route } from "ziggy-js";
+import { Field, FieldGroup } from "./ui/field";
+import { Label } from "./ui/label";
+import { Input } from "./ui/input";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from './ui/select';
-import { Plus } from 'lucide-react';
+} from "./ui/select";
+import { Plus } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 
 type SelectOption = {
     value: string | number;
@@ -32,7 +33,7 @@ type SelectOption = {
 type KolomInput = {
     name: string;
     label: string;
-    type?: 'text' | 'email' | 'number' | 'select';
+    type?: "text" | "email" | "number" | "select" | "password" | "radio";
     placeholder?: string;
     required?: boolean;
     options?: SelectOption[];
@@ -98,7 +99,7 @@ export default function DialogFormCreate({
                                 {kolomInput.map((kolom) => (
                                     <Field key={kolom.name}>
                                         <Label htmlFor={kolom.name}>
-                                            {kolom.label}{' '}
+                                            {kolom.label}{" "}
                                             {kolom.required && (
                                                 <span className="text-destructive">
                                                     *
@@ -106,7 +107,7 @@ export default function DialogFormCreate({
                                             )}
                                         </Label>
 
-                                        {kolom.type === 'select' ? (
+                                        {kolom.type === "select" ? (
                                             <Select
                                                 name={kolom.name}
                                                 required={kolom.required}
@@ -135,16 +136,50 @@ export default function DialogFormCreate({
                                                 </SelectContent>
                                             </Select>
                                         ) : (
-                                            <Input
-                                                id={kolom.name}
-                                                name={kolom.name}
-                                                type={kolom.type ?? 'text'}
-                                                placeholder={kolom.placeholder}
-                                                required={kolom.required}
-                                                autoComplete={
-                                                    kolom.autoComplete
-                                                }
-                                            />
+                                            <>
+                                                {kolom.type === "radio" ? (
+                                                    <RadioGroup
+                                                        name={kolom.name}
+                                                    >
+                                                        {kolom.options?.map(
+                                                            (item: any) => (
+                                                                <div className="flex items-center gap-3">
+                                                                    <RadioGroupItem
+                                                                        value={
+                                                                            item.value
+                                                                        }
+                                                                        id={
+                                                                            item.value
+                                                                        }
+                                                                    />
+                                                                    <Label htmlFor={item.value}>
+                                                                        {
+                                                                            item.label
+                                                                        }
+                                                                    </Label>
+                                                                </div>
+                                                            ),
+                                                        )}
+                                                    </RadioGroup>
+                                                ) : (
+                                                    <Input
+                                                        id={kolom.name}
+                                                        name={kolom.name}
+                                                        type={
+                                                            kolom.type ?? "text"
+                                                        }
+                                                        placeholder={
+                                                            kolom.placeholder
+                                                        }
+                                                        required={
+                                                            kolom.required
+                                                        }
+                                                        autoComplete={
+                                                            kolom.autoComplete
+                                                        }
+                                                    />
+                                                )}
+                                            </>
                                         )}
 
                                         {errors[kolom.name] && (
@@ -162,7 +197,7 @@ export default function DialogFormCreate({
                                     </Button>
                                 </DialogClose>
                                 <Button type="submit" disabled={processing}>
-                                    {processing ? '...Menyimpan' : 'Simpan'}
+                                    {processing ? "...Menyimpan" : "Simpan"}
                                 </Button>
                             </DialogFooter>
                         </>
@@ -207,7 +242,7 @@ export function DialogFormEdit<T extends { id: number }>({
                                     return (
                                         <Field key={kolom.name}>
                                             <Label htmlFor={kolom.name}>
-                                                {kolom.label}{' '}
+                                                {kolom.label}{" "}
                                                 {kolom.required && (
                                                     <span className="text-destructive">
                                                         *
@@ -215,7 +250,7 @@ export function DialogFormEdit<T extends { id: number }>({
                                                 )}
                                             </Label>
 
-                                            {kolom.type === 'select' ? (
+                                            {kolom.type === "select" ? (
                                                 <Select
                                                     name={kolom.name}
                                                     required={kolom.required}
@@ -258,7 +293,7 @@ export function DialogFormEdit<T extends { id: number }>({
                                                 <Input
                                                     id={kolom.name}
                                                     name={kolom.name}
-                                                    type={kolom.type ?? 'text'}
+                                                    type={kolom.type ?? "text"}
                                                     placeholder={
                                                         kolom.placeholder
                                                     }
@@ -267,7 +302,7 @@ export function DialogFormEdit<T extends { id: number }>({
                                                         kolom.autoComplete
                                                     }
                                                     defaultValue={
-                                                        currentValue ?? ''
+                                                        currentValue ?? ""
                                                     }
                                                 />
                                             )}
@@ -288,7 +323,7 @@ export function DialogFormEdit<T extends { id: number }>({
                                     </Button>
                                 </DialogClose>
                                 <Button type="submit" disabled={processing}>
-                                    {processing ? 'Menyimpan...' : 'Simpan'}
+                                    {processing ? "Menyimpan..." : "Simpan"}
                                 </Button>
                             </DialogFooter>
                         </>
@@ -330,27 +365,27 @@ export function DialogDelete<T extends { id: number }>({
                         <>
                             <DialogHeader>
                                 <DialogTitle>
-                                    Hapus{' '}
+                                    Hapus{" "}
                                     {page.charAt(0).toUpperCase() +
                                         page.slice(1)}
                                 </DialogTitle>
                                 <DialogDescription>
-                                    Apakah anda yakin ingin menghapus {page}{' '}
+                                    Apakah anda yakin ingin menghapus {page}{" "}
                                     {label}?
                                 </DialogDescription>
                             </DialogHeader>
                             <DialogFooter>
                                 <DialogClose asChild>
-                                    <Button type="button" variant={'outline'}>
+                                    <Button type="button" variant={"outline"}>
                                         Kembali
                                     </Button>
                                 </DialogClose>
                                 <Button
                                     type="submit"
                                     disabled={processing}
-                                    variant={'destructive'}
+                                    variant={"destructive"}
                                 >
-                                    {processing ? '...Menghapus' : 'Hapus'}
+                                    {processing ? "...Menghapus" : "Hapus"}
                                 </Button>
                             </DialogFooter>
                         </>
@@ -378,7 +413,7 @@ export function DialogUpdateStatus<T extends { id: number }>({
             }}
         >
             <DialogTrigger asChild>
-                {status_published === 'draft' ? (
+                {status_published === "draft" ? (
                     <Button
                         type="submit"
                         className="bg-green-500 text-white hover:bg-green-600"
@@ -402,27 +437,27 @@ export function DialogUpdateStatus<T extends { id: number }>({
                         <>
                             <DialogHeader>
                                 <DialogTitle>
-                                    Update Status{' '}
+                                    Update Status{" "}
                                     {page.charAt(0).toUpperCase() +
                                         page.slice(1)}
                                 </DialogTitle>
                                 <DialogDescription>
-                                    Apakah anda yakin ingin mengupdate {page}{' '}
+                                    Apakah anda yakin ingin mengupdate {page}{" "}
                                     {label}?
                                 </DialogDescription>
                             </DialogHeader>
                             <DialogFooter>
                                 <DialogClose asChild>
-                                    <Button type="button" variant={'outline'}>
+                                    <Button type="button" variant={"outline"}>
                                         Kembali
                                     </Button>
                                 </DialogClose>
                                 <Button
                                     type="submit"
                                     disabled={processing}
-                                    variant={'default'}
+                                    variant={"default"}
                                 >
-                                    {processing ? '...Mengupdate' : 'Update'}
+                                    {processing ? "...Mengupdate" : "Update"}
                                 </Button>
                             </DialogFooter>
                         </>
