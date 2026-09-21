@@ -16,6 +16,9 @@ Route::inertia('/', 'welcome')->name('home');
 Route::get('register', [SesiController::class, 'register'])->name('sesi.register');
 Route::post('register', [SesiController::class, 'registerAccount'])->name('sesi.registerAccount');
 
+Route::get('login', [SesiController::class, 'login'])->name('login');
+Route::post('login', [SesiController::class, 'authenticate'])->name('authenticate');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -64,4 +67,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/dosen.php';

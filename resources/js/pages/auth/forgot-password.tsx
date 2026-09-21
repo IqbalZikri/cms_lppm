@@ -6,8 +6,8 @@ import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { login } from '@/routes';
 import { email } from '@/routes/password';
+import { route } from 'ziggy-js';
 
 export default function ForgotPassword({ status }: { status?: string }) {
     return (
@@ -56,7 +56,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
                 <div className="text-muted-foreground space-x-1 text-center text-sm">
                     <span>Or, return to</span>
-                    <TextLink href={login()}>log in</TextLink>
+                    <TextLink href={route('sesi.login')}>log in</TextLink>
                 </div>
             </div>
         </>

@@ -22,7 +22,6 @@ interface UserPageProps {
 export default function UserPage({ users, totalUser }: UserPageProps) {
     const userAdmin = users.data.filter((item) => item.role === "admin").length;
     const userUppm = users.data.filter((item) => item.role === "uppm").length;
-    const userDosen = users.data.filter((item) => item.role === "dosen").length;
     return (
         <>
             <Head title="User" />
@@ -129,7 +128,7 @@ export default function UserPage({ users, totalUser }: UserPageProps) {
                                     label: "Email",
                                 },
                                 {
-                                    key: "email_verification_at",
+                                    key: "email_verified_at",
                                     label: "Email Terverifikasi",
                                     render: (value) =>
                                         value ? (

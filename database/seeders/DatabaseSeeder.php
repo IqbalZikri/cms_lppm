@@ -22,20 +22,16 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@example.com',
             'email_verified_at' => now(),
             'password' => Hash::make('admin'),
-            'role' => fake()->randomElement([
-                'admin',
-                'dosen',
-                'uppm',
-            ]),
+            'role' => 'admin'
         ]);
 
         User::factory()->count(10)->create();
 
 
-        // $this->call([
-        //     FakultasSeeder::class,
-        //     ProdiSeeder::class
-        // ]);
+        $this->call([
+            FakultasSeeder::class,
+            ProdiSeeder::class
+        ]);
 
     }
 }

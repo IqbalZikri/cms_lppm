@@ -23,8 +23,6 @@ export default function Profile({
     status?: string;
 }) {
     const { auth } = usePage<PageProps>().props;
-    console.log(auth.user);
-    
 
     return (
         <>
@@ -125,9 +123,7 @@ export default function Profile({
                 </Form>
             </div>
 
-            {auth.user.id !== 1 && (
-                <DeleteUser />
-            )}
+            {auth.user.id !== 1 && <DeleteUser />}
         </>
     );
 }

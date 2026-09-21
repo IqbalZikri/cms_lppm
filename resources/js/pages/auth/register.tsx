@@ -6,11 +6,7 @@ import InputError from "@/components/input-error";
 import PasswordInput from "@/components/password-input";
 import TextLink from "@/components/text-link";
 import { Button } from "@/components/ui/button";
-import {
-    Field,
-    FieldDescription,
-    FieldGroup,
-} from "@/components/ui/field";
+import { Field, FieldDescription, FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -25,18 +21,11 @@ import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { Fakultas } from "@/interface/fakultas";
 import { cn } from "@/lib/utils";
-import { login } from "@/routes";
+import { Prodi } from "@/interface/prodi";
 
 /* ------------------------------------------------------------------ */
 /* Types & konfigurasi langkah                                         */
 /* ------------------------------------------------------------------ */
-
-// Sesuaikan dengan model Prodi Anda (atau pindahkan ke @/interface/prodi)
-type Prodi = {
-    id: number;
-    fakultas_id: number;
-    nama_prodi: string;
-};
 
 type Props = {
     passwordRules: string;
@@ -95,6 +84,7 @@ export default function Register({
         <>
             <Head title="Buat Akun" />
             <Form
+                method="POST"
                 action={route("sesi.registerAccount")}
                 resetOnSuccess={["password", "password_confirmation"]}
                 disableWhileProcessing
@@ -240,11 +230,7 @@ function RegisterSteps({
     // Tekan Enter di langkah 1-3 = lanjut (bukan mengirim form secara tidak sengaja)
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
         const target = e.target as HTMLElement;
-        if (
-            e.key === "Enter" &&
-            !isLast &&
-            target.tagName === "INPUT"
-        ) {
+        if (e.key === "Enter" && !isLast && target.tagName === "INPUT") {
             e.preventDefault();
             next();
         }
@@ -256,9 +242,7 @@ function RegisterSteps({
         <div
             ref={rootRef}
             className="flex scroll-mt-6 flex-col gap-8"
-            onChange={(e) =>
-                clearError((e.target as HTMLInputElement).name)
-            }
+            onChange={(e) => clearError((e.target as HTMLInputElement).name)}
             onKeyDown={handleKeyDown}
         >
             {/* ---------- Indikator langkah ---------- */}
@@ -339,8 +323,8 @@ function RegisterSteps({
             )}
 
             <p className="text-muted-foreground -mb-4 text-base">
-                Isian bertanda <span className="text-destructive">*</span>{" "}
-                wajib diisi.
+                Isian bertanda <span className="text-destructive">*</span> wajib
+                diisi.
             </p>
 
             {/* ---------- Langkah 1: Data diri ---------- */}
@@ -587,8 +571,10 @@ function RegisterSteps({
                         </Field>
                     </div>
                     <FieldDescription className="-mt-3 text-base">
-                        NIDN dan NUPTK boleh dikosongkan jika Anda belum
-                        memilikinya.
+                        Silakan isi kolom NIDN dan/atau NUPTK. Jika hanya
+                        memiliki salah satunya, cukup isi kolom yang tersedia.
+                        Jika memiliki keduanya, silakan isi kedua kolom
+                        tersebut.
                     </FieldDescription>
                 </FieldGroup>
             </div>
@@ -750,7 +736,7 @@ function RegisterSteps({
 
             <div className="text-muted-foreground text-center text-base">
                 Sudah punya akun?{" "}
-                <TextLink href={login()} className="font-medium">
+                <TextLink href={route("login")} className="font-medium">
                     Masuk di sini
                 </TextLink>
             </div>

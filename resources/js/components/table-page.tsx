@@ -88,7 +88,7 @@ export default function TablePage<T extends { id: number }>({
                     )}
                 </TableBody>
             </Table>
-            {data.total !== 0 && (
+            {data.total >= 10 && (
                 <Pagination className="mt-[20px]">
                     <PaginationContent>
                         {data.links.map((link, index) => {

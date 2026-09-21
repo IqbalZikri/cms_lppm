@@ -1,6 +1,6 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 @plugin "@tailwindcss/typography";
-@import 'tw-animate-css';
+@import "tw-animate-css";
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -9,9 +9,9 @@
 
 @theme {
     --font-sans:
-        'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
-        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
-        'Noto Color Emoji';
+        "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+        "Noto Color Emoji";
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
@@ -59,6 +59,29 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
+
+    /* Halaman Dosen */
+    --font-uca-body:
+        "Atkinson Hyperlegible", ui-sans-serif, system-ui, sans-serif;
+    --font-uca-title: "Source Serif 4", Georgia, serif;
+
+    --color-uca-green-50: #f1f8f4;
+    --color-uca-green-100: #ddeee3;
+    --color-uca-green-600: #157a45;
+    --color-uca-green-700: #0e6236;
+    --color-uca-green-800: #0a4b28;
+    --color-uca-green-900: #063519;
+
+    --color-uca-gold-50: #fbf7ec;
+    --color-uca-gold-100: #f5ecd6;
+    --color-uca-gold-500: #c6a25a;
+    --color-uca-gold-700: #7c5f17;
+    --color-uca-gold-800: #5f4810;
+
+    --color-uca-orange-100: #fde9d9;
+    --color-uca-orange-500: #e8792b;
+    --color-uca-orange-600: #c2570f;
+    --color-uca-orange-800: #8f3f0a;
 }
 
 :root {
