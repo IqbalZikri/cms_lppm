@@ -17,7 +17,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "./ui/pagination";
-import { Link } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 
 type ColumnDef<T> = {
     key: keyof T;
@@ -88,24 +88,104 @@ export default function TablePage<T extends { id: number }>({
                     )}
                 </TableBody>
             </Table>
-            <Pagination className="mt-[20px]">
-                <PaginationContent>
-                    {data.links.map((link, index) => (
-                        <PaginationItem key={index}>
-                            <PaginationLink
-                                isActive={link.active}
-                                href={link.url}
-                            >
-                                <span
-                                    dangerouslySetInnerHTML={{
-                                        __html: link.label,
-                                    }}
-                                />
-                            </PaginationLink>
-                        </PaginationItem>
-                    ))}
-                </PaginationContent>
-            </Pagination>
+            {data.total !== 0 && (
+                <Pagination className="mt-[20px]">
+                    <PaginationContent>
+                        {data.links.map((link, index) => {
+                            // Previous
+                            if (link.label.includes("Previous")) {
+                                return (
+                                    <PaginationItem key={index}>
+                                        <PaginationPrevious
+                                            href={link.url ?? "#"}
+                                            aria-disabled={!link.url}
+                                            className={
+                                                !link.url
+                                                    ? "pointer-events-none opacity-50"
+                                                    : ""
+                                            }
+                                            onClick={(e) => {
+                                                e.preventDefault();
+
+                                                if (link.url) {
+                                                    router.visit(link.url, {
+                                                        preserveScroll: true,
+                                                    });
+                                                }
+                                            }}
+                                        />
+                                    </PaginationItem>
+                                );
+                            }
+
+                            // Next
+                            if (link.label.includes("Next")) {
+                                return (
+                                    <PaginationItem key={index}>
+                                        <PaginationNext
+                                            href={link.url ?? "#"}
+                                            aria-disabled={!link.url}
+                                            className={
+                                                !link.url
+                                                    ? "pointer-events-none opacity-50"
+                                                    : ""
+                                            }
+                                            onClick={(e) => {
+                                                e.preventDefault();
+
+                                                if (link.url) {
+                                                    router.visit(link.url, {
+                                                        preserveScroll: true,
+                                                    });
+                                                }
+                                            }}
+                                        />
+                                    </PaginationItem>
+                                );
+                            }
+
+                            // Ellipsis
+                            if (link.label.includes("...")) {
+                                return (
+                                    <PaginationItem key={index}>
+                                        <PaginationEllipsis />
+                                    </PaginationItem>
+                                );
+                            }
+
+                            // Nomor halaman
+                            return (
+                                <PaginationItem key={index}>
+                                    <PaginationLink
+                                        href={link.url ?? "#"}
+                                        isActive={link.active}
+                                        aria-current={
+                                            link.active ? "page" : undefined
+                                        }
+                                        aria-disabled={!link.url}
+                                        className={
+                                            !link.url
+                                                ? "pointer-events-none opacity-50"
+                                                : ""
+                                        }
+                                        onClick={(e) => {
+                                            e.preventDefault();
+
+                                            if (link.url) {
+                                                router.visit(link.url, {
+                                                    preserveScroll: true,
+                                                });
+                                            }
+                                        }}
+                                    >
+                                        {link.label}
+                                    </PaginationLink>
+                                </PaginationItem>
+                            );
+                        })}
+                    </PaginationContent>
+                </Pagination>
+            )}
         </>
     );
 }

@@ -5,6 +5,7 @@ import {
     Building2,
     ChevronRight,
     CircleArrowRight,
+    Cog,
     FolderGit2,
     GraduationCap,
     LayoutGrid,
@@ -51,7 +52,7 @@ const mainNavItems: NavItem[] = [
                 icon: BookOpenIcon,
             },
             {
-                title: 'Users',
+                title: 'Users Admin & UPPM',
                 href: route('admin.user.index'),
                 icon: User,
             },

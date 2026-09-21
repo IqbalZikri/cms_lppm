@@ -6,10 +6,15 @@ use App\Http\Controllers\DosenController;
 use App\Http\Controllers\FakultasController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\ProdiController;
+use App\Http\Controllers\SesiController;
+use App\Http\Controllers\SiteSettingsController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
+
+Route::get('register', [SesiController::class, 'register'])->name('sesi.register');
+Route::post('register', [SesiController::class, 'registerAccount'])->name('sesi.registerAccount');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
@@ -51,6 +56,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('berita/ubah_status/{berita}', [BeritaController::class, 'updateStatus'])->name('berita.updateStatus');
         Route::put('berita/{berita}', [BeritaController::class, 'update'])->name('berita.update');
         Route::delete('berita/{berita}', [BeritaController::class, 'destroy'])->name('berita.destroy');
+
+        Route::get('site_setting', [SiteSettingsController::class, 'index'])->name('site_setting.index');
+        Route::put('site_setting', [SiteSettingsController::class, 'update'])->name('site_setting.update');
 
         Route::get('get-prodi/{id}', [ProdiController::class, 'getProdi'])->name('prodi.getProdi');
     });

@@ -41,7 +41,7 @@ export default function UserPage({ users, totalUser }: UserPageProps) {
                 <StatisticsCard
                     dataCard={[
                         {
-                            label: "User Terdaftar",
+                            label: "Admin dan UPPM User Terdaftar",
                             count: totalUser,
                             icon: Users,
                         },
@@ -53,11 +53,6 @@ export default function UserPage({ users, totalUser }: UserPageProps) {
                         {
                             label: "UPPM Terdaftar",
                             count: userUppm,
-                            icon: Users,
-                        },
-                        {
-                            label: "Dosen Terdaftar",
-                            count: userDosen,
                             icon: Users,
                         },
                     ]}

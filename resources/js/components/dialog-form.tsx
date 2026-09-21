@@ -295,15 +295,16 @@ export function DialogFormEdit<T extends { id: number }>({
                                                 </Select>
                                             ) : (
                                                 <>
+                                                {console.log(currentValue)}
                                                     {kolom.type == "radio" ? (
                                                         <RadioGroup
                                                             name={kolom.name}
+                                                            defaultValue={ currentValue ?? ""}
                                                         >
                                                             {kolom.options?.map(
                                                                 (item: any) => (
                                                                     <div className="flex items-center gap-3">
                                                                         <RadioGroupItem
-                                                                        defaultValue={ currentValue ?? ""}
                                                                             value={
                                                                                 item.value
                                                                             }
