@@ -249,4 +249,10 @@ class DosenController extends Controller
             return back()->with('error', 'Terjadi Kesalahan');
         }
     }
+
+    public function getDosen($id)
+    {
+        $dosen = Dosen::where('fakultas_id', $id)->get();
+        return response()->json($dosen);
+    }
 }

@@ -40,7 +40,7 @@ export default function StatisticsCard({ dataCard }: StatisticsCardProps) {
                                 </div>
 
                                 <p className="text-muted-foreground text-xs">
-                                    Seluruh dosen terdaftar
+                                    Seluruh {item.label.toLowerCase()} terdaftar
                                 </p>
                             </CardContent>
                         </Card>

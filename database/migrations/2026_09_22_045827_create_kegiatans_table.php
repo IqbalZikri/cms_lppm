@@ -10,18 +10,18 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('pkms', function (Blueprint $table) {
+        Schema::create('kegiatans', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('fakultas_id')->constrained()->cascadeOnDelete();
             $table->foreignId('dosen_id')->constrained()->cascadeOnDelete();
-            $table->enum('jenis_pkm', ['pelaksanaan', 'jurnal']);
-            $table->string('judul_pkm');
+            $table->string('judul_kegiatan');
             $table->text('abstrak');
             $table->string('semester');
             $table->year('tahun');
-            $table->decimal('dana', 15, 2)->nullable();
-            $table->string('sumber_dana')->nullable();
-            $table->string('jumlah_dana')->nullable();
-            $table->text('pelaksana');
+            $table->string('link_berkas');
+            $table->enum('sumber_dana', ['internal', 'eksternal']);
+            $table->decimal('jumlah_dana', 15, 2);
+            $table->text('penulis');
             $table->timestamps();
         });
     }
@@ -31,6 +31,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('pkms');
+        Schema::dropIfExists('kegiatans');
     }
 };

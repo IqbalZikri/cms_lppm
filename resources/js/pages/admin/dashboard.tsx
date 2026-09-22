@@ -20,17 +20,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Props {
     dosens: number;
-    penelitian: number;
-    pkm: number;
+    // penelitian: number;
+    // pkm: number;
     jurnal: number;
     user: User;
 }
 
 export default function Dashboard({
     dosens,
-    penelitian,
-    pkm,
-    jurnal,
+    // penelitian,
+    // pkm,
+    // jurnal,
     user,
 }: Props) {
     const namaUser = user.name.charAt(0).toUpperCase() + user.name.slice(1);
@@ -71,7 +71,7 @@ export default function Dashboard({
 
                         <CardContent>
                             <div className="text-2xl font-bold">
-                                {penelitian}
+                                {/* {penelitian} */}
                             </div>
 
                             <p className="text-muted-foreground text-xs">
@@ -90,7 +90,7 @@ export default function Dashboard({
                         </CardHeader>
 
                         <CardContent>
-                            <div className="text-2xl font-bold">{pkm}</div>
+                            <div className="text-2xl font-bold"></div>
 
                             <p className="text-muted-foreground text-xs">
                                 Total PKM terdaftar dalam sistem
@@ -108,7 +108,7 @@ export default function Dashboard({
                         </CardHeader>
 
                         <CardContent>
-                            <div className="text-2xl font-bold">{jurnal}</div>
+                            <div className="text-2xl font-bold"></div>
 
                             <p className="text-muted-foreground text-xs">
                                 Total jurnal terdaftar dalam sistem
@@ -121,7 +121,7 @@ export default function Dashboard({
                     <TabsList>
                         <TabsTrigger value="account">Dosen</TabsTrigger>
                         <TabsTrigger value="password">PKM</TabsTrigger>
-                        <TabsTrigger value="password">Jur</TabsTrigger>
+                        <TabsTrigger value="password">Jurnal</TabsTrigger>
                     </TabsList>
                     <TabsContent value="account">
                         Make changes to your account here.

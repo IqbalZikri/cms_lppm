@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\BeritaController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Dosen\PkmController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\FakultasController;
 use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\SesiController;
 use App\Http\Controllers\SiteSettingsController;
@@ -60,10 +62,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('berita/{berita}', [BeritaController::class, 'update'])->name('berita.update');
         Route::delete('berita/{berita}', [BeritaController::class, 'destroy'])->name('berita.destroy');
 
+        Route::get('kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.index');
+        Route::get('kegiatan/create', [KegiatanController::class, 'create'])->name('kegiatan.create');
+        Route::post('kegiatan/create', [KegiatanController::class, 'store'])->name('kegiatan.store');
+        Route::get('kegiatan//detail/{id}', [KegiatanController::class, 'show'])->name('kegiatan.show');
+        Route::get('kegiatan/{id}', [KegiatanController::class, 'edit'])->name('kegiatan.edit');
+        Route::put('kegiatan/{id}', [KegiatanController::class, 'update'])->name('kegiatan.update');
+        Route::delete('kegiatan/{id}', [KegiatanController::class, 'destroy'])->name('kegiatan.destroy');
+
+        Route::get('pkm', [PkmController::class, 'index'])->name('pkm.index');
+        Route::get('pkm/create', [PkmController::class, 'create'])->name('pkm.create');
+        Route::post('pkm/create', [PkmController::class, 'store'])->name('pkm.store');
+        Route::get('pkm//detail/{id}', [PkmController::class, 'show'])->name('pkm.show');
+        Route::get('pkm/{id}', [PkmController::class, 'edit'])->name('pkm.edit');
+        Route::put('pkm/{id}', [PkmController::class, 'update'])->name('pkm.update');
+        Route::delete('pkm/{id}', [PkmController::class, 'destroy'])->name('pkm.destroy');
+
         Route::get('site_setting', [SiteSettingsController::class, 'index'])->name('site_setting.index');
         Route::put('site_setting', [SiteSettingsController::class, 'update'])->name('site_setting.update');
 
         Route::get('get-prodi/{id}', [ProdiController::class, 'getProdi'])->name('prodi.getProdi');
+        Route::get('get-dosen/{id}', [DosenController::class, 'getDosen'])->name('prodi.getDosen');
     });
 });
 

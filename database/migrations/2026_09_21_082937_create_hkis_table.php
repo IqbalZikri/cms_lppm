@@ -18,6 +18,8 @@ return new class extends Migration {
             $table->text('abstrak');
             $table->string('semester');
             $table->year('tahun');
+            $table->string('link_berkas');
+            $table->string('nomer_paten_haki'); // Nomer Pengajuan Haki / Nomer Paten
             $table->decimal('dana', 15, 2)->nullable();
             $table->string('sumber_dana')->nullable();
             $table->string('jumlah_dana')->nullable();

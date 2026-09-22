@@ -20,9 +20,9 @@ import {
 import { Link, router } from "@inertiajs/react";
 
 type ColumnDef<T> = {
+    id?: string;
     key: keyof T;
     label: string;
-    // opsional: untuk kolom yang butuh transformasi, mis. fakultas_id -> nama_fakultas
     render?: (value: T[keyof T], item: T) => ReactNode;
 };
 
@@ -46,7 +46,7 @@ export default function TablePage<T extends { id: number }>({
                     <TableRow>
                         <TableHead className="w-[100px]">No</TableHead>
                         {columns.map((col) => (
-                            <TableHead key={String(col.key)}>
+                            <TableHead key={col.id ?? String(col.key)}>
                                 {col.label}
                             </TableHead>
                         ))}
@@ -72,7 +72,7 @@ export default function TablePage<T extends { id: number }>({
                                         1}
                                 </TableCell>
                                 {columns.map((col) => (
-                                    <TableCell key={String(col.key)}>
+                                    <TableCell key={col.id ?? String(col.key)}>
                                         {col.render
                                             ? col.render(item[col.key], item)
                                             : String(item[col.key] ?? "-")}
