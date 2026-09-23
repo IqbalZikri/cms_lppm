@@ -12,8 +12,6 @@ return new class extends Migration {
     {
         Schema::create('kegiatans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('fakultas_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('dosen_id')->constrained()->cascadeOnDelete();
             $table->string('judul_kegiatan');
             $table->text('abstrak');
             $table->string('semester');

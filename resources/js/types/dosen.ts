@@ -1,6 +1,6 @@
 import { Fakultas } from "@/interface/fakultas";
 import { Prodi } from "@/interface/prodi";
-import { User } from "@/interface/user";
+import { User } from "./auth";
 
 export type Dosen = {
     id: number;

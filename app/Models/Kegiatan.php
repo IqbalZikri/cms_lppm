@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Kegiatan extends Model
 {
     protected $fillable = [
-        'fakultas_id',
-        'dosen_id',
         'judul_kegiatan',
         'abstrak',
         'semester',

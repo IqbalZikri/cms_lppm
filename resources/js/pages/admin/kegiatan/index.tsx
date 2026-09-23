@@ -20,6 +20,8 @@ interface Props {
 
 export default function Kegiatan({ data, fakultas, dosen }: Props) {
     const totalKegiatan = data.total;
+                    console.log(data.data);
+
 
     return (
         <>
@@ -36,9 +38,16 @@ export default function Kegiatan({ data, fakultas, dosen }: Props) {
                 />
 
                 {fakultas.map((item) => {
-                    const totalKegiatanFakultas = data.data.filter(
-                        (d) => d.fakultas_id === item.id,
+                    // const totalKegiatanFakultas = data.data.filter(
+                    //     (d) => d.penulis.fakultas_id === item.id,
+                    // );
+                    const totalKegiatanFakultas = data.data.filter((kegiatan) =>
+                        kegiatan.penulis.some(
+                            (penulis) => penulis.fakultas_id === item.id,
+                        ),
                     );
+
+                    
 
                     return (
                         <StatisticsCard
@@ -92,18 +101,36 @@ export default function Kegiatan({ data, fakultas, dosen }: Props) {
                             data={data}
                             columns={[
                                 {
-                                    key: "fakultas_id",
+                                    id: "fakultas",
+                                    key: "penulis",
                                     label: "Fakultas",
-                                    render: (value) =>
-                                        fakultas.find((f) => f.id === value)
-                                            ?.nama_fakultas ?? "-",
+                                    render: (_, item) =>
+                                        item.penulis
+                                            .map(
+                                                (penulis) =>
+                                                    fakultas.find(
+                                                        (f) =>
+                                                            f.id ===
+                                                            penulis.fakultas_id,
+                                                    )?.nama_fakultas ?? "-",
+                                            )
+                                            .join(", "),
                                 },
                                 {
-                                    key: "dosen_id",
+                                    id: "dosen",
+                                    key: "penulis",
                                     label: "Dosen",
-                                    render: (value) =>
-                                        dosen.find((d) => d.id === value)
-                                            ?.nama_dosen ?? "-",
+                                    render: (_, item) =>
+                                        item.penulis
+                                            .map(
+                                                (penulis) =>
+                                                    dosen.find(
+                                                        (d) =>
+                                                            d.id ===
+                                                            penulis.dosen_id,
+                                                    )?.nama_dosen ?? "-",
+                                            )
+                                            .join(", "),
                                 },
                                 {
                                     key: "judul_kegiatan",
