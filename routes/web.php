@@ -7,6 +7,7 @@ use App\Http\Controllers\DosenController;
 use App\Http\Controllers\FakultasController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\KegiatanController;
+use App\Http\Controllers\LuaranProsidingController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\SesiController;
 use App\Http\Controllers\SiteSettingsController;
@@ -77,6 +78,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('pkm/{id}', [PkmController::class, 'edit'])->name('pkm.edit');
         Route::put('pkm/{id}', [PkmController::class, 'update'])->name('pkm.update');
         Route::delete('pkm/{id}', [PkmController::class, 'destroy'])->name('pkm.destroy');
+
+        Route::get('luaran_prosiding', [LuaranProsidingController::class, 'index'])->name('luaran_prosiding.index');
+        Route::get('luaran_prosiding/create', [LuaranProsidingController::class, 'create'])->name('luaran_prosiding.create');
+        Route::post('luaran_prosiding/create', [LuaranProsidingController::class, 'store'])->name('luaran_prosiding.store');
+        Route::get('luaran_prosiding//detail/{luaran_prosiding}', [LuaranProsidingController::class, 'show'])->name('luaran_prosiding.show');
+        Route::get('luaran_prosiding/{luaran_prosiding}', [LuaranProsidingController::class, 'edit'])->name('luaran_prosiding.edit');
+        Route::put('luaran_prosiding/{luaran_prosiding}', [LuaranProsidingController::class, 'update'])->name('luaran_prosiding.update');
+        Route::delete('luaran_prosiding/{luaran_prosiding}', [LuaranProsidingController::class, 'destroy'])->name('luaran_prosiding.destroy');
 
         Route::get('site_setting', [SiteSettingsController::class, 'index'])->name('site_setting.index');
         Route::put('site_setting', [SiteSettingsController::class, 'update'])->name('site_setting.update');

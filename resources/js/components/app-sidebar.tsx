@@ -15,6 +15,7 @@ import {
     Newspaper,
     NewspaperIcon,
     Plus,
+    ScrollText,
     Tags,
     User,
 } from "lucide-react";
@@ -112,6 +113,11 @@ const mainNavItems: NavItem[] = [
                 title: "PKM",
                 href: route("admin.pkm.index"),
                 icon: HandHeart,
+            },
+            {
+                title: "Luaran Prosiding",
+                href: route("admin.luaran_prosiding.index"),
+                icon: ScrollText,
             },
         ],
     },
