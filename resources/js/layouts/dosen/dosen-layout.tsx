@@ -149,6 +149,7 @@ export default function DosenLayout({ children }: { children: ReactNode }) {
                         method="post"
                         as="button"
                         className={cn(BTN_SECONDARY, "w-full")}
+                        viewTransition
                     >
                         <LogOut className="size-6" aria-hidden />
                         Keluar
