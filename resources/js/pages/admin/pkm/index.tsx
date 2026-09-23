@@ -2,6 +2,7 @@ import { DialogDelete } from "@/components/dialog-form";
 import Header from "@/components/header";
 import StatisticsCard from "@/components/statistic-card";
 import TablePage from "@/components/table-page";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -13,7 +14,6 @@ import {
 import { Fakultas } from "@/interface/fakultas";
 import { PaginatedData } from "@/interface/pagination";
 import { Pkm as PkmInterface } from "@/interface/pkm";
-import { Dosen } from "@/types/dosen";
 import { Head, Link } from "@inertiajs/react";
 import { HandHeart, Plus } from "lucide-react";
 import { route } from "ziggy-js";
@@ -21,10 +21,9 @@ import { route } from "ziggy-js";
 interface Props {
     data: PaginatedData<PkmInterface>;
     fakultas: Fakultas[];
-    dosen: Dosen[];
 }
 
-export default function Pkm({ data, fakultas, dosen }: Props) {
+export default function Pkm({ data, fakultas }: Props) {
     return (
         <>
             <Head title="Pengabdian Kepaga Masyarakat" />
@@ -40,8 +39,8 @@ export default function Pkm({ data, fakultas, dosen }: Props) {
                 />
                 {fakultas.map((item) => {
                     const totalPkmFakultas = data.data.filter((pkm) =>
-                        pkm.pelaksana.some(
-                            (pelaksana) => pelaksana.fakultas_id === item.id,
+                        pkm.penulis.some(
+                            (penulis) => penulis.fakultas_id === item.id,
                         ),
                     );
                     return (
@@ -95,35 +94,28 @@ export default function Pkm({ data, fakultas, dosen }: Props) {
                             columns={[
                                 {
                                     id: "fakultas",
-                                    key: "pelaksana",
+                                    key: "penulis",
                                     label: "Fakultas",
                                     render: (_, item) =>
-                                        item.pelaksana
-                                            .map(
-                                                (pelaksana) =>
-                                                    fakultas.find(
-                                                        (f) =>
-                                                            f.id ===
-                                                            pelaksana.fakultas_id,
-                                                    )?.nama_fakultas ?? "-",
-                                            )
-                                            .join(", "),
+                                        item.penulis.map((penulis, i) => (
+                                            <Badge key={i} className="mr-2">
+                                                {penulis.nama_fakultas}
+                                            </Badge>
+                                        )),
                                 },
                                 {
                                     id: "dosen",
-                                    key: "pelaksana",
+                                    key: "penulis",
                                     label: "Dosen",
                                     render: (_, item) =>
-                                        item.pelaksana
-                                            .map(
-                                                (pelaksana) =>
-                                                    dosen.find(
-                                                        (d) =>
-                                                            d.id ===
-                                                            pelaksana.dosen_id,
-                                                    )?.nama_dosen ?? "-",
-                                            )
-                                            .join(", "),
+                                        item.penulis.map((penulis, i) => (
+                                            <Badge
+                                                key={i}
+                                                className="mr-2 rounded-md px-2 py-1 text-xs"
+                                            >
+                                                {penulis.nama_dosen}
+                                            </Badge>
+                                        )),
                                 },
                                 {
                                     key: "judul",
@@ -136,7 +128,13 @@ export default function Pkm({ data, fakultas, dosen }: Props) {
                                         href={route("admin.pkm.edit", item.id)}
                                         viewTransition
                                     >
-                                        Edit
+                                        <Button variant={"outline"}>Edit</Button>
+                                    </Link>
+                                    <Link
+                                        href={route("admin.pkm.show", item.id)}
+                                        viewTransition
+                                    >
+                                        <Button>Show</Button>
                                     </Link>
                                     <DialogDelete
                                         label={item.judul}

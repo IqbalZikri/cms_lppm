@@ -48,4 +48,8 @@ class User extends Authenticatable implements PasskeyUser, MustVerifyEmail
             'two_factor_confirmed_at' => 'datetime',
         ];
     }
+
+    public function dosen(){
+        return $this->hasOne(Dosen::class);
+    }
 }

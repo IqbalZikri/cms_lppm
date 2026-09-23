@@ -14,10 +14,9 @@ import {
 
 interface Props {
     fakultas: Fakultas[];
-    dosen?: Dosen[];
 }
 
-export default function CreateKegiatan({ fakultas, dosen }: Props) {
+export default function CreateKegiatan({ fakultas }: Props) {
     return (
         <>
             <Head title="Tambah Penelitian Kegiatan" />
@@ -55,7 +54,7 @@ export default function CreateKegiatan({ fakultas, dosen }: Props) {
                         </Breadcrumb>
                     </div>
                 </div>
-                <FormKegiatan fakultas={fakultas} dosen={dosen} />
+                <FormKegiatan fakultas={fakultas} />
             </div>
         </>
     );

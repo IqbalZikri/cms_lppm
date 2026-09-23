@@ -18,10 +18,10 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { ArrowLeft, FileText, Pencil } from "lucide-react";
-import { Kegiatan } from "@/interface/kegiatan";
+import { Pkm } from "@/interface/pkm";
 
 interface Props {
-    data: Kegiatan;
+    data: Pkm;
 }
 
 function formatRupiah(value: string | number) {
@@ -39,7 +39,7 @@ export default function Show({ data }: Props) {
 
     return (
         <>
-            <Head title={`Detail - ${data.judul_kegiatan}`} />
+            <Head title={`Detail - ${data.judul}`} />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
                     <Link href={route("admin.kegiatan.index")} viewTransition>
@@ -60,10 +60,10 @@ export default function Show({ data }: Props) {
                 <Card className="mx-auto w-full max-w-3xl">
                     <CardHeader>
                         <CardTitle className="text-xl">
-                            {data.judul_kegiatan}
+                            {data.judul}
                         </CardTitle>
                         <CardDescription>
-                            Detail kegiatan penelitian
+                            Detail Pengabdian Kepada Masyarakat ( PKM )
                         </CardDescription>
                     </CardHeader>
 

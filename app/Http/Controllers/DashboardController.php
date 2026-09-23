@@ -12,8 +12,8 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $dosens = Dosen::latest()->take(5)->with('fakultas', 'prodi')->get();
-        $kegiatan = Kegiatan::latest()->get();
+        $dosens = Dosen::latest()->take(5)->with('fakultas', 'prodi', 'user')->get();
+        $kegiatan = Kegiatan::latest()->take(5)->get();
         $pkm = Pkm::latest()->get();
         $user = auth()->user();
         return Inertia::render('admin/dashboard', [

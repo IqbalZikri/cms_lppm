@@ -25,12 +25,21 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin'
         ]);
 
+        User::create([
+            'name' => 'bambang',
+            'email' => 'user1@example.com',
+            'email_verified_at' => now(),
+            'password' => Hash::make('admin'),
+            'role' => 'dosen'
+        ]);
+
         User::factory()->count(10)->create();
 
 
         $this->call([
             FakultasSeeder::class,
-            ProdiSeeder::class
+            ProdiSeeder::class,
+            DosenSeeder::class
         ]);
 
     }

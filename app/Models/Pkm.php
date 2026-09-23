@@ -15,6 +15,10 @@ class Pkm extends Model
         'sumber_dana',
         'jumlah_dana',
         'link_berkas',
-        'pelaksana',
+        'penulis',
+    ];
+
+    protected $casts = [
+        'penulis' => 'array'
     ];
 }

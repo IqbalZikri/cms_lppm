@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Fakultas } from "@/interface/fakultas";
 import { Kegiatan as KegiatanInterface } from "@/interface/kegiatan";
 import { PaginatedData } from "@/interface/pagination";
+import kegiatan from "@/routes/admin/kegiatan";
 import { Dosen } from "@/types/dosen";
 import { Head, Link } from "@inertiajs/react";
 import { Activity, Plus } from "lucide-react";
@@ -20,8 +21,7 @@ interface Props {
 
 export default function Kegiatan({ data, fakultas, dosen }: Props) {
     const totalKegiatan = data.total;
-                    console.log(data.data);
-
+    console.log(data.data);
 
     return (
         <>
@@ -38,16 +38,11 @@ export default function Kegiatan({ data, fakultas, dosen }: Props) {
                 />
 
                 {fakultas.map((item) => {
-                    // const totalKegiatanFakultas = data.data.filter(
-                    //     (d) => d.penulis.fakultas_id === item.id,
-                    // );
                     const totalKegiatanFakultas = data.data.filter((kegiatan) =>
                         kegiatan.penulis.some(
                             (penulis) => penulis.fakultas_id === item.id,
                         ),
                     );
-
-                    
 
                     return (
                         <StatisticsCard
@@ -146,7 +141,20 @@ export default function Kegiatan({ data, fakultas, dosen }: Props) {
                                         )}
                                         viewTransition
                                     >
-                                        Edit
+                                        <Button variant="outline" size="sm">
+                                            Edit
+                                        </Button>
+                                    </Link>
+                                    <Link
+                                        href={route(
+                                            "admin.kegiatan.show",
+                                            item.id,
+                                        )}
+                                        viewTransition
+                                    >
+                                        <Button variant="default" size="sm">
+                                            Show
+                                        </Button>
                                     </Link>
                                     <DialogDelete
                                         label={item.judul_kegiatan}

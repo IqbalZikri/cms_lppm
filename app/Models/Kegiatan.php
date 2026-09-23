@@ -17,11 +17,7 @@ class Kegiatan extends Model
         'penulis',
     ];
 
-    public function fakultas(){
-        return $this->belongsTo(Fakultas::class);
-    }
-
-    public function dosen(){
-        return $this->belongsTo(Dosen::class);
-    }
+    protected $casts = [
+        'penulis' => 'array',
+    ];
 }

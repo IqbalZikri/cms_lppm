@@ -1,6 +1,11 @@
+import { Dosen } from "@/types/dosen";
+import { Fakultas } from "@/types/fakultas";
+
 export interface Penulis {
     fakultas_id: number;
+    nama_fakultas: string;
     dosen_id: number;
+    nama_dosen: string;
 }
 
 export interface Kegiatan {

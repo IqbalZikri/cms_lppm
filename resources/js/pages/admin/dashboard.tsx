@@ -1,4 +1,4 @@
-import { Head } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 import { PlaceholderPattern } from "@/components/ui/placeholder-pattern";
 import { route } from "ziggy-js";
 import Header from "@/components/header";
@@ -25,6 +25,9 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Kegiatan } from "@/interface/kegiatan";
 import { Pkm } from "@/interface/pkm";
+
+import dayjs from "dayjs";
+import "dayjs/locale/id";
 
 interface Props {
     dosen: Dosen[];
@@ -211,8 +214,17 @@ export default function Dashboard({ dosen, kegiatan, pkm, user }: Props) {
                                                                         "-"}
                                                                 </TableCell>
                                                                 <TableCell>
-                                                                    {item.user
-                                                                        .email_verified_at ??
+                                                                    {dayjs(
+                                                                        item
+                                                                            .user
+                                                                            .email_verified_at,
+                                                                    )
+                                                                        .locale(
+                                                                            "id",
+                                                                        )
+                                                                        .format(
+                                                                            "DD MMMM YYYY",
+                                                                        ) ??
                                                                         "-"}
                                                                 </TableCell>
                                                             </>
@@ -256,19 +268,73 @@ export default function Dashboard({ dosen, kegiatan, pkm, user }: Props) {
                                             </>
                                         ) : (
                                             <>
-                                                {kegiatan.map((item, index = 0) => (
+                                                {kegiatan.map((item, index) => (
                                                     <TableRow key={item.id}>
                                                         <TableCell className="font-medium">
                                                             {index + 1}
                                                         </TableCell>
+
                                                         <TableCell>
-                                                            {item.fakultas.nama_fakultas}
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {(
+                                                                    item.penulis ??
+                                                                    []
+                                                                ).map(
+                                                                    (p, i) => (
+                                                                        <span
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                            className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                        >
+                                                                            {
+                                                                                p.nama_fakultas
+                                                                            }
+                                                                        </span>
+                                                                    ),
+                                                                )}
+                                                            </div>
                                                         </TableCell>
+
                                                         <TableCell>
-                                                            Credit Card
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {(
+                                                                    item.penulis ??
+                                                                    []
+                                                                ).map(
+                                                                    (p, i) => (
+                                                                        <span
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                            className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                        >
+                                                                            {
+                                                                                p.nama_dosen
+                                                                            }
+                                                                        </span>
+                                                                    ),
+                                                                )}
+                                                            </div>
                                                         </TableCell>
-                                                        <TableCell className="text-right">
-                                                            $250.00
+
+                                                        <TableCell>
+                                                            {
+                                                                item.judul_kegiatan
+                                                            }
+                                                        </TableCell>
+
+                                                        <TableCell>
+                                                            <Link
+                                                                href={
+                                                                    item.link_berkas
+                                                                }
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-blue-600 underline"
+                                                            >
+                                                                Lihat Berkas
+                                                            </Link>
                                                         </TableCell>
                                                     </TableRow>
                                                 ))}

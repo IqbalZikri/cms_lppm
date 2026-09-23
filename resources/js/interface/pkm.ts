@@ -1,6 +1,8 @@
 export interface Pelaksana {
     fakultas_id: number;
+    nama_fakultas: string;
     dosen_id: number;
+    nama_dosen: string;
 }
 
 export interface Pkm {
@@ -13,5 +15,5 @@ export interface Pkm {
     link_berkas: string;
     sumber_dana: string;
     jumlah_dana: string;
-    pelaksana: Pelaksana[];
+    penulis: Pelaksana[];
 }

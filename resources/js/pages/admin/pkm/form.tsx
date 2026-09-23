@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect } from "react";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -21,15 +21,15 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Fakultas } from "@/interface/fakultas";
-import { Kegiatan, Penulis } from "@/interface/kegiatan";
 import { Dosen } from "@/types/dosen";
-import { Form, Link } from "@inertiajs/react";
+import { Form } from "@inertiajs/react";
 import { useState } from "react";
 import { route } from "ziggy-js";
+import { Pelaksana, Pkm } from "@/interface/pkm";
 
 interface Props {
     fakultas: Fakultas[];
-    kegiatan?: Kegiatan; // kalau ada berarti mode edit
+    pkm?: Pkm; // kalau ada berarti mode edit
 }
 
 interface AuthorRow {
@@ -44,8 +44,8 @@ function makeKey() {
     return Math.random().toString(36).slice(2);
 }
 
-function buildInitialAuthors(penulis: Penulis[] | undefined): AuthorRow[] {
-    if (!penulis || penulis.length === 0) {
+function buildInitialAuthors(pelaksana: Pelaksana[] | undefined): AuthorRow[] {
+    if (!pelaksana || pelaksana.length === 0) {
         return [
             {
                 key: makeKey(),
@@ -57,7 +57,7 @@ function buildInitialAuthors(penulis: Penulis[] | undefined): AuthorRow[] {
         ];
     }
 
-    return penulis.map((p) => ({
+    return pelaksana.map((p) => ({
         key: makeKey(),
         fakultasId: String(p.fakultas_id),
         dosenId: String(p.dosen_id),
@@ -70,17 +70,18 @@ function RequiredMark() {
     return <span className="ml-0.5 text-red-500">*</span>;
 }
 
-export default function FormKegiatan({ fakultas, kegiatan }: Props) {
-    const isEdit = !!kegiatan;
-    const [semester, setSemester] = useState(kegiatan?.semester ?? "");
-    const [sumberDana, setSumberDana] = useState(kegiatan?.sumber_dana ?? "");
+export default function FormPkm({ fakultas, pkm }: Props) {
+    const isEdit = !!pkm;
+    const [jenisPkm, setJenisPkm] = useState(pkm?.jenis_pkm ?? "");
+    const [semester, setSemester] = useState(pkm?.semester ?? "");
+    const [sumberDana, setSumberDana] = useState(pkm?.sumber_dana ?? "");
 
     const action = isEdit
-        ? route("admin.kegiatan.update", kegiatan!.id)
-        : route("admin.kegiatan.store");
+        ? route("admin.pkm.update", pkm!.id)
+        : route("admin.pkm.store");
 
     const [authors, setAuthors] = useState<AuthorRow[]>(() =>
-        buildInitialAuthors(kegiatan?.penulis),
+        buildInitialAuthors(pkm?.penulis),
     );
 
     async function fetchDosenByFakultas(fakultasId: string): Promise<Dosen[]> {
@@ -161,16 +162,8 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
             prev.map((a) => (a.key === key ? { ...a, dosenId } : a)),
         );
     }
-
-    // Untuk edit mode, nama dosen terpilih diambil dari dosenOptions baris itu sendiri
-    // const penulisValue = authors
-    //     .map(
-    //         (a) =>
-    //             a.dosenOptions.find((d) => String(d.id) === a.dosenId)
-    //                 ?.nama_dosen,
-    //     )
-    //     .filter(Boolean)
-    //     .join(", ");
+    console.log(pkm);
+    
 
     return (
         <Form action={action} method={isEdit ? "put" : "post"}>
@@ -178,35 +171,67 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
                 <Card className="mx-auto w-full max-w-3xl">
                     <CardHeader>
                         <CardTitle className="text-xl">
-                            {isEdit ? "Edit Kegiatan" : "Tambah Kegiatan"}
+                            {isEdit ? "Edit PKM" : "Tambah PKM"}
                         </CardTitle>
                         <CardDescription>
                             {isEdit
-                                ? "Perbarui data kegiatan penelitian di bawah ini."
-                                : "Isi data kegiatan penelitian dengan lengkap dan benar."}
+                                ? "Perbarui data PKM di bawah ini."
+                                : "Isi data PKM dengan lengkap dan benar."}
                         </CardDescription>
                     </CardHeader>
 
                     <CardContent className="space-y-6">
-                        {/* Judul Kegiatan */}
+                        {/* Jenis Pkm */}
                         <div className="space-y-2">
-                            <Label
-                                htmlFor="judul_kegiatan"
-                                className="text-base"
+                            <Label htmlFor="jenis_pkm" className="text-base">
+                                Jenis PKM
+                                <RequiredMark />
+                            </Label>
+                            <Select
+                                value={jenisPkm}
+                                onValueChange={setJenisPkm}
                             >
-                                Judul Kegiatan
+                                <SelectTrigger
+                                    id="jenis_pkm"
+                                    className="h-11 text-base"
+                                >
+                                    <SelectValue placeholder="Pilih Jenis PKM" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="pelaksanaan">
+                                        Pelaksanaan
+                                    </SelectItem>
+                                    <SelectItem value="jurnal">Jurnal</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <input
+                                type="hidden"
+                                name="jenis_pkm"
+                                value={jenisPkm}
+                            />
+                            {errors.jenis_pkm && (
+                                <p className="text-sm text-red-500">
+                                    {errors.jenis_pkm}
+                                </p>
+                            )}
+                        </div>
+                        
+                        {/* Judul */}
+                        <div className="space-y-2">
+                            <Label htmlFor="judul" className="text-base">
+                                Judul PKM
                                 <RequiredMark />
                             </Label>
                             <Input
-                                id="judul_kegiatan"
-                                name="judul_kegiatan"
-                                defaultValue={kegiatan?.judul_kegiatan}
+                                id="judul"
+                                name="judul"
+                                defaultValue={pkm?.judul}
                                 placeholder="Contoh: Analisis Implementasi..."
                                 className="h-11 text-base"
                             />
-                            {errors.judul_kegiatan && (
+                            {errors.judul && (
                                 <p className="text-sm text-red-500">
-                                    {errors.judul_kegiatan}
+                                    {errors.judul}
                                 </p>
                             )}
                         </div>
@@ -220,8 +245,8 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
                             <Textarea
                                 id="abstrak"
                                 name="abstrak"
-                                defaultValue={kegiatan?.abstrak}
-                                placeholder="Ringkasan singkat kegiatan penelitian"
+                                defaultValue={pkm?.abstrak}
+                                placeholder="Ringkasan singkat PKM"
                                 rows={5}
                                 className="text-base"
                             />
@@ -279,7 +304,7 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
                                     id="tahun"
                                     name="tahun"
                                     type="number"
-                                    defaultValue={kegiatan?.tahun}
+                                    defaultValue={pkm?.tahun}
                                     placeholder="2026"
                                     className="h-11 text-base"
                                 />
@@ -341,7 +366,7 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
                                     id="dana"
                                     name="jumlah_dana"
                                     type="number"
-                                    defaultValue={kegiatan?.jumlah_dana}
+                                    defaultValue={pkm?.jumlah_dana}
                                     placeholder="5000000"
                                     className="h-11 text-base"
                                 />
@@ -363,7 +388,7 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
                                 id="link_berkas"
                                 name="link_berkas"
                                 type="url"
-                                defaultValue={kegiatan?.link_berkas}
+                                defaultValue={pkm?.link_berkas}
                                 placeholder="https://drive.google.com/..."
                                 className="h-11 text-base"
                             />
@@ -389,7 +414,7 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
                                     >
                                         <div className="space-y-2">
                                             <Label className="text-sm text-muted-foreground">
-                                                Fakultas Penulis {index + 1}
+                                                Fakultas Penulis / Pelaksana {index + 1}
                                             </Label>
                                             <Select
                                                 value={author.fakultasId}
@@ -532,21 +557,12 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
                     </CardContent>
 
                     <CardFooter className="flex justify-end gap-3">
-                        <Link
-                            href={route("admin.kegiatan.index")}
-                            viewTransition
-                        >
-                            <Button className="h-11 px-6 text-base" variant={"outline"}>
-                                <ArrowLeft />
-                                Kembali
-                            </Button>
-                        </Link>
                         <Button
                             type="submit"
                             disabled={processing}
                             className="h-11 px-6 text-base"
                         >
-                            {isEdit ? "Simpan Perubahan" : "Simpan Kegiatan"}
+                            {isEdit ? "Simpan Perubahan" : "Simpan PKM"}
                         </Button>
                     </CardFooter>
                 </Card>
