@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Dosen;
-use App\Models\Jurnal;
-use App\Models\Penelitian;
+use App\Models\Kegiatan;
 use App\Models\Pkm;
 use Inertia\Inertia;
 use Log;
@@ -13,16 +12,14 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $dosens = Dosen::count();
-        // $penelitian = Penelitian::count();
-        // $pkm = Pkm::count();
-        // $jurnal = Jurnal::count();
+        $dosens = Dosen::latest()->take(5)->with('fakultas', 'prodi')->get();
+        $kegiatan = Kegiatan::latest()->get();
+        $pkm = Pkm::latest()->get();
         $user = auth()->user();
         return Inertia::render('admin/dashboard', [
-            'dosens' => $dosens,
-            // 'penelitian' => $penelitian,
-            // 'pkm' => $pkm,
-            // 'jurnal' => $jurnal,
+            'dosen' => $dosens,
+            'kegiatan' => $kegiatan,
+            'pkm' => $pkm,
             'user' => $user,
         ]);
     }

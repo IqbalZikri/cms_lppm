@@ -82,7 +82,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('site_setting', [SiteSettingsController::class, 'update'])->name('site_setting.update');
 
         Route::get('get-prodi/{id}', [ProdiController::class, 'getProdi'])->name('prodi.getProdi');
-        Route::get('get-dosen/{id}', [DosenController::class, 'getDosen'])->name('prodi.getDosen');
+        Route::get('get-dosen/{id}', [DosenController::class, 'getDosen'])->name('dosen.getDosen');
     });
 });
 

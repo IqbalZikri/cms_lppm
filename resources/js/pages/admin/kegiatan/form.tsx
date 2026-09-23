@@ -102,7 +102,7 @@ export default function FormKegiatan({
     kegiatan,
 }: Props) {
     const isEdit = !!kegiatan;
-    
+
     const [dosenId, setDosenId] = useState(
         kegiatan?.dosen_id ? String(kegiatan.dosen_id) : "",
     );
@@ -122,7 +122,7 @@ export default function FormKegiatan({
 
     async function fetchDosenByFakultas(fakultasId: string): Promise<Dosen[]> {
         const { data } = await axios.get<Dosen[]>(
-            route("prodi.getDosen", fakultasId),
+            route("admin.dosen.getDosen", fakultasId),
         );
         return data;
     }
@@ -225,47 +225,6 @@ export default function FormKegiatan({
                     </CardHeader>
 
                     <CardContent className="space-y-6">
-                        {/* Dosen (opsional, misal untuk admin yang pilih atas nama dosen mana) */}
-                        {dosen.length > 0 && (
-                            <div className="space-y-2">
-                                <Label htmlFor="dosen_id" className="text-base">
-                                    Dosen
-                                    <RequiredMark />
-                                </Label>
-                                <Select
-                                    value={dosenId}
-                                    onValueChange={setDosenId}
-                                >
-                                    <SelectTrigger
-                                        id="dosen_id"
-                                        className="h-11 text-base"
-                                    >
-                                        <SelectValue placeholder="Pilih dosen" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {dosen.map((d) => (
-                                            <SelectItem
-                                                key={d.id}
-                                                value={String(d.id)}
-                                            >
-                                                {d.nama_dosen}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <input
-                                    type="hidden"
-                                    name="dosen_id"
-                                    value={dosenId}
-                                />
-                                {errors.dosen_id && (
-                                    <p className="text-sm text-red-500">
-                                        {errors.dosen_id}
-                                    </p>
-                                )}
-                            </div>
-                        )}
-
                         {/* Judul Kegiatan */}
                         <div className="space-y-2">
                             <Label
@@ -390,10 +349,10 @@ export default function FormKegiatan({
                                         <SelectValue placeholder="Pilih sumber dana" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Internal">
+                                        <SelectItem value="internal">
                                             Internal
                                         </SelectItem>
-                                        <SelectItem value="Eksternal">
+                                        <SelectItem value="eksternal">
                                             Eksternal
                                         </SelectItem>
                                     </SelectContent>
@@ -417,15 +376,15 @@ export default function FormKegiatan({
                                 </Label>
                                 <Input
                                     id="dana"
-                                    name="dana"
+                                    name="jumlah_dana"
                                     type="number"
                                     defaultValue={kegiatan?.jumlah_dana}
                                     placeholder="5000000"
                                     className="h-11 text-base"
                                 />
-                                {errors.dana && (
+                                {errors.jumlah_dana && (
                                     <p className="text-sm text-red-500">
-                                        {errors.dana}
+                                        {errors.jumlah_dana}
                                     </p>
                                 )}
                             </div>
@@ -508,7 +467,11 @@ export default function FormKegiatan({
                                                 }
                                                 disabled={
                                                     !author.fakultasId ||
-                                                    author.loadingDosen
+                                                    author.loadingDosen ||
+                                                    (author.dosenOptions
+                                                        .length === 0 &&
+                                                        !author.loadingDosen &&
+                                                        !!author.fakultasId)
                                                 }
                                             >
                                                 <SelectTrigger className="h-11 text-base">
@@ -518,7 +481,12 @@ export default function FormKegiatan({
                                                                 ? "Pilih fakultas dulu"
                                                                 : author.loadingDosen
                                                                   ? "Memuat dosen..."
-                                                                  : "Pilih dosen"
+                                                                  : author
+                                                                          .dosenOptions
+                                                                          .length ===
+                                                                      0
+                                                                    ? "Tidak ada data dosen"
+                                                                    : "Pilih dosen"
                                                         }
                                                     />
                                                 </SelectTrigger>

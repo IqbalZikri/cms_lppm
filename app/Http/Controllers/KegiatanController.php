@@ -47,24 +47,15 @@ class KegiatanController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'fakultas_id' => 'required|exists:fakultas,id',
-            'dosen_id' => [
-                'required',
-                Rule::exists('dosens', 'id')->where('fakultas_id', $request->fakultas_id),
-            ],
             'judul_kegiatan' => 'required',
             'abstrak' => 'required',
             'semester' => 'required',
             'tahun' => 'required',
             'link_berkas' => 'required',
-            'sumber_dana' => "required|enum:internal,eksternal",
+            'sumber_dana' => "required",
             'jumlah_dana' => "required|numeric",
             'penulis' => "required",
         ], [
-            "fakultas_id.required" => "Silahkan pilih salah satu fakultas",
-            "fakultas_id.exists" => "Data fakultas tidak ada",
-            "dosen_id.required" => "Silahkan pilih salah satu dosen",
-            "dosen_id.exists" => "Data dosen tidak sesuai dengan fakultas",
             "judul_kegiatan.required" => "Silahkan isi judul kegiatan",
             "abstrak.required" => "Silahkan isi abstrak",
             "semester.required" => "Silahkan isi semester",
@@ -79,10 +70,12 @@ class KegiatanController extends Controller
 
         try {
             Kegiatan::create($validated);
+            DB::commit();
 
             return redirect()->route('admin.kegiatan.index')->with('success', 'Berhasil menambahkan penelitian kegiatan');
         } catch (\Throwable $th) {
-            Log::info($th->getMessage(), $th->getTrace());
+            DB::rollBack();
+            Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
             return back()->with('error', 'Terjadi Kesalahan');
         }
     }
