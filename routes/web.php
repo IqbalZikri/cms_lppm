@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Dosen\PkmController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\FakultasController;
+use App\Http\Controllers\HkiController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\LuaranProsidingController;
@@ -86,6 +87,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('luaran_prosiding/{luaran_prosiding}', [LuaranProsidingController::class, 'edit'])->name('luaran_prosiding.edit');
         Route::put('luaran_prosiding/{luaran_prosiding}', [LuaranProsidingController::class, 'update'])->name('luaran_prosiding.update');
         Route::delete('luaran_prosiding/{luaran_prosiding}', [LuaranProsidingController::class, 'destroy'])->name('luaran_prosiding.destroy');
+
+        Route::get('hki', [HkiController::class, 'index'])->name('hki.index');
+        Route::get('hki/create', [HkiController::class, 'create'])->name('hki.create');
+        Route::post('hki/create', [HkiController::class, 'store'])->name('hki.store');
+        Route::get('hki//detail/{hki}', [HkiController::class, 'show'])->name('hki.show');
+        Route::get('hki/{hki}', [HkiController::class, 'edit'])->name('hki.edit');
+        Route::put('hki/{hki}', [HkiController::class, 'update'])->name('hki.update');
+        Route::delete('hki/{hki}', [HkiController::class, 'destroy'])->name('hki.destroy');
 
         Route::get('site_setting', [SiteSettingsController::class, 'index'])->name('site_setting.index');
         Route::put('site_setting', [SiteSettingsController::class, 'update'])->name('site_setting.update');

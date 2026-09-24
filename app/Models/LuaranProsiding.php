@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class LuaranProsiding extends Model
 {
     protected $fillable = [
-        'judul_kegiatan',
+        'judul',
         'abstrak',
         'semester',
         'tahun',

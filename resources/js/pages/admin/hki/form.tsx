@@ -26,11 +26,12 @@ import { Dosen } from "@/types/dosen";
 import { Form, Link } from "@inertiajs/react";
 import { useState } from "react";
 import { route } from "ziggy-js";
-import { LuaranProsiding, Penulis } from "@/interface/luaran-prosiding";
+import { hki, Penulis } from "@/interface/luaran-prosiding";
+import { Hki } from "@/interface/hki";
 
 interface Props {
     fakultas: Fakultas[];
-    luaranProsiding?: LuaranProsiding; // kalau ada berarti mode edit
+    hki?: Hki;
 }
 
 interface AuthorRow {
@@ -98,16 +99,16 @@ function SectionHeading({
     );
 }
 
-export default function FormLuaranProsiding({ fakultas, luaranProsiding }: Props) {
-    const isEdit = !!luaranProsiding;
-    const [semester, setSemester] = useState(luaranProsiding?.semester ?? "");
+export default function FormHki({ fakultas, hki }: Props) {
+    const isEdit = !!hki;
+    const [semester, setSemester] = useState(hki?.semester ?? "");
 
     const action = isEdit
-        ? route("admin.luaran_prosiding.update", luaranProsiding!.id)
-        : route("admin.luaran_prosiding.store");
+        ? route("admin.hki.update", hki!.id)
+        : route("admin.hki.store");
 
     const [authors, setAuthors] = useState<AuthorRow[]>(() =>
-        buildInitialAuthors(luaranProsiding?.penulis),
+        buildInitialAuthors(hki?.penulis),
     );
 
     async function fetchDosenByFakultas(fakultasId: string): Promise<Dosen[]> {
@@ -212,7 +213,7 @@ export default function FormLuaranProsiding({ fakultas, luaranProsiding }: Props
                                     <Input
                                         id="judul"
                                         name="judul"
-                                        defaultValue={luaranProsiding?.judul}
+                                        defaultValue={hki?.judul}
                                         placeholder="Contoh: Analisis Implementasi..."
                                         className="h-11 text-base"
                                     />
@@ -231,7 +232,7 @@ export default function FormLuaranProsiding({ fakultas, luaranProsiding }: Props
                                     <Textarea
                                         id="abstrak"
                                         name="abstrak"
-                                        defaultValue={luaranProsiding?.abstrak}
+                                        defaultValue={hki?.abstrak}
                                         placeholder="Ringkasan singkat luaran prosiding"
                                         rows={6}
                                         className="text-base"
@@ -299,7 +300,7 @@ export default function FormLuaranProsiding({ fakultas, luaranProsiding }: Props
                                             id="tahun"
                                             name="tahun"
                                             type="number"
-                                            defaultValue={luaranProsiding?.tahun}
+                                            defaultValue={hki?.tahun}
                                             placeholder="2026"
                                             className="h-11 text-base"
                                         />
@@ -323,7 +324,7 @@ export default function FormLuaranProsiding({ fakultas, luaranProsiding }: Props
                                         id="link_berkas"
                                         name="link_berkas"
                                         type="url"
-                                        defaultValue={luaranProsiding?.link_berkas}
+                                        defaultValue={hki?.link_berkas}
                                         placeholder="https://drive.google.com/..."
                                         className="h-11 text-base"
                                     />

@@ -18,15 +18,15 @@ export default function CreateKegiatan({ fakultas }: Props) {
     return (
         <>
             <Head title="Tambah Penelitian Kegiatan" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 sm:p-6">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">
-                            Tambah Data Penelitian Kegiatan
+                            Tambah Data Luaran Prosiding
                         </h1>
 
-                        <p className="text-muted-foreground">
-                            Form tambah data penelitian kegiatan.
+                        <p className="mt-1 text-muted-foreground">
+                            Form tambah data luaran prosiding.
                         </p>
                     </div>
 
@@ -35,9 +35,9 @@ export default function CreateKegiatan({ fakultas }: Props) {
                             <BreadcrumbList>
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("admin.kegiatan.index")}
+                                        href={route("admin.luaran_prosiding.index")}
                                     >
-                                        Penelitian Kegiatan
+                                        Luaran Prosiding
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator />
@@ -45,14 +45,14 @@ export default function CreateKegiatan({ fakultas }: Props) {
                                     <BreadcrumbLink
                                         href={route("admin.kegiatan.create")}
                                     >
-                                        Tambah Penelitian Kegiatan
+                                        Tambah Luaran Prosiding
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>
                     </div>
                 </div>
-                <FormLuaranProsiding  />
+                <FormLuaranProsiding fakultas={fakultas} />
             </div>
         </>
     );
@@ -62,7 +62,6 @@ CreateKegiatan.layout = {
     breadcrumbs: [
         {
             title: "Tambah Penelitian Kegiatan",
-            href: route("admin.kegiatan.create"),
         },
     ],
 };

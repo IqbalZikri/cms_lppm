@@ -9,7 +9,7 @@ import { Fakultas } from "@/interface/fakultas";
 import { LuaranProsiding as LuaranProsidingInterface } from "@/interface/luaran-prosiding";
 import { PaginatedData } from "@/interface/pagination";
 import { Head, Link } from "@inertiajs/react";
-import { Plus, ScrollText } from "lucide-react";
+import { Eye, FileText, Pencil, Plus, ScrollText } from "lucide-react";
 import { route } from "ziggy-js";
 
 interface Props {
@@ -18,10 +18,19 @@ interface Props {
 }
 
 export default function LuaranProsiding({ data, fakultas }: Props) {
+    const statistikFakultas = fakultas.map((item) => ({
+        label: item.nama_fakultas,
+        count: data.data.filter((luaranProsiding) =>
+            luaranProsiding.penulis.some(
+                (penulis) => penulis.fakultas_id === item.id,
+            ),
+        ).length,
+    }));
+
     return (
         <>
             <Head title="Luaran Prosiding" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 sm:p-6">
                 <Header
                     page="Luaran Prosiding"
                     breadcrumb={[
@@ -32,36 +41,17 @@ export default function LuaranProsiding({ data, fakultas }: Props) {
                     ]}
                 />
 
-                {fakultas.map((item) => {
-                    const totalLuaranProsiding = data.total;
-                    const totalLuaranProsidingFakultas = data.data.filter(
-                        (luaranProsiding) =>
-                            luaranProsiding.penulis.some(
-                                (penulis) => penulis.fakultas_id === item.id,
-                            ),
-                    );
-                    return (
-                        <StatisticsCard
-                            key={item.id}
-                            dataCard={[
-                                {
-                                    label: "Luaran Prosiding",
-                                    count: totalLuaranProsiding,
-                                },
-                                {
-                                    label:
-                                        "Luaran Prosiding" + item.nama_fakultas,
-                                    count: totalLuaranProsidingFakultas.length,
-                                },
-                            ]}
-                        />
-                    );
-                })}
+                <StatisticsCard
+                    dataCard={[
+                        { label: "Total Luaran Prosiding", count: data.total },
+                        ...statistikFakultas,
+                    ]}
+                />
 
-                <Card>
-                    <CardHeader>
+                <Card className="shadow-sm">
+                    <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-lg">
+                            <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
                                 <ScrollText className="h-5 w-5" />
                             </div>
 
@@ -69,65 +59,92 @@ export default function LuaranProsiding({ data, fakultas }: Props) {
                                 <CardTitle>Daftar Luaran Prosiding</CardTitle>
 
                                 <p className="text-muted-foreground mt-1 text-sm">
-                                    Informasi Luaran Prosiding yang terdaftar
+                                    Informasi luaran prosiding yang terdaftar
                                     dalam sistem.
                                 </p>
                             </div>
                         </div>
-                    </CardHeader>
-                    <CardContent>
+
                         <Link
                             href={route("admin.luaran_prosiding.create")}
                             viewTransition
+                            className="w-full sm:w-auto"
                         >
-                            <Button className="mb-[20px]">
+                            <Button className="w-full sm:w-auto">
                                 <Plus />
-                                Tambah Penelitian Kegiatan
+                                Tambah Luaran Prosiding
                             </Button>
                         </Link>
+                    </CardHeader>
+                    <CardContent className="pt-6">
                         <TablePage<LuaranProsidingInterface>
                             data={data}
                             columns={[
                                 {
-                                    id: "fakultas",
-                                    key: "penulis",
-                                    label: "Fakultas",
-                                    render: (_, item) =>
-                                        item.penulis.map((penulis, i) => (
-                                            <Badge key={i} className="mr-2">
-                                                {penulis.nama_fakultas}
-                                            </Badge>
-                                        )),
-                                },
-                                {
-                                    id: "dosen",
-                                    key: "penulis",
-                                    label: "Dosen",
-                                    render: (_, item) =>
-                                        item.penulis.map((penulis, i) => (
-                                            <Badge key={i} className="mr-2">
-                                                {penulis.nama_dosen}
-                                            </Badge>
-                                        )),
-                                },
-                                {
+                                    id: "judul",
                                     key: "judul",
                                     label: "Judul",
+                                    render: (_, item) => (
+                                        <span
+                                            className="line-clamp-2 max-w-xs font-medium"
+                                            title={item.judul}
+                                        >
+                                            {item.judul}
+                                        </span>
+                                    ),
+                                },
+                                {
+                                    id: "penulis",
+                                    key: "penulis",
+                                    label: "Penulis",
+                                    render: (_, item) => (
+                                        <div className="flex flex-col gap-1.5">
+                                            {item.penulis.map((penulis, i) => (
+                                                <div
+                                                    key={i}
+                                                    className="flex flex-wrap items-center gap-1.5"
+                                                >
+                                                    <Badge className="whitespace-nowrap text-[13px]">
+                                                        {penulis.nama_dosen}
+                                                    </Badge>
+                                                    <span className="text-muted-foreground text-xs text-[13px]">
+                                                        Fakultas{" "}
+                                                        {penulis.nama_fakultas}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ),
+                                },
+                                {
+                                    id: "periode",
+                                    key: "semester",
+                                    label: "Periode",
+                                    render: (_, item) => (
+                                        <span className="whitespace-nowrap text-sm">
+                                            {item.semester} {item.tahun}
+                                        </span>
+                                    ),
+                                },
+                                {
+                                    id: "berkas",
+                                    key: "link_berkas",
+                                    label: "Berkas",
+                                    render: (_, item) => (
+                                        <a
+                                            href={item.link_berkas}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-primary inline-flex items-center gap-1.5 text-sm hover:underline"
+                                        >
+                                            <FileText className="h-3.5 w-3.5" />
+                                            Lihat
+                                        </a>
+                                    ),
                                 },
                             ]}
                             renderActions={(item) => (
-                                <>
-                                    <Link
-                                        href={route(
-                                            "admin.luaran_prosiding.edit",
-                                            item.id,
-                                        )}
-                                        viewTransition
-                                    >
-                                        <Button variant="outline" size="sm">
-                                            Edit
-                                        </Button>
-                                    </Link>
+                                <div className="flex items-center gap-3">
                                     <Link
                                         href={route(
                                             "admin.luaran_prosiding.show",
@@ -135,20 +152,36 @@ export default function LuaranProsiding({ data, fakultas }: Props) {
                                         )}
                                         viewTransition
                                     >
-                                        <Button variant="default" size="sm">
+                                        <Button
+                                            variant="outline"
+                                            title="Lihat detail"
+                                        >
                                             Show
+                                        </Button>
+                                    </Link>
+                                    <Link
+                                        href={route(
+                                            "admin.luaran_prosiding.edit",
+                                            item.id,
+                                        )}
+                                        viewTransition
+                                    >
+                                        <Button
+                                            title="Edit"
+                                        >
+                                            Edit
                                         </Button>
                                     </Link>
                                     <DialogDelete
                                         label={item.judul}
                                         actionUrl={route(
-                                            "admin.kegiatan.destroy",
+                                            "admin.luaran_prosiding.destroy",
                                             item.id,
                                         )}
                                         page="Penelitian Kegiatan"
                                         item={item}
                                     />
-                                </>
+                                </div>
                             )}
                         />
                     </CardContent>

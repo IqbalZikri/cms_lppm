@@ -8,15 +8,13 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import FormLuaranProsiding from "./form";
-import { LuaranProsiding } from "@/interface/luaran-prosiding";
+import FormHki from "./form";
 
 interface Props {
     fakultas: Fakultas[];
-    data: LuaranProsiding;
 }
 
-export default function EditLuaranProsiding({ fakultas, data }: Props) {
+export default function CreateHki({ fakultas }: Props) {
     return (
         <>
             <Head title="Tambah Penelitian Kegiatan" />
@@ -24,11 +22,11 @@ export default function EditLuaranProsiding({ fakultas, data }: Props) {
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">
-                            Edit Data Luaran Prosiding
+                            Tambah Data Luaran Prosiding
                         </h1>
 
                         <p className="mt-1 text-muted-foreground">
-                            Form edit data luaran prosiding.
+                            Form tambah data luaran prosiding.
                         </p>
                     </div>
 
@@ -45,22 +43,22 @@ export default function EditLuaranProsiding({ fakultas, data }: Props) {
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("admin.kegiatan.edit", data.id)}
+                                        href={route("admin.kegiatan.create")}
                                     >
-                                        Edit Luaran Prosiding
+                                        Tambah Luaran Prosiding
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>
                     </div>
                 </div>
-                <FormLuaranProsiding fakultas={fakultas} luaranProsiding={data}/>
+                <FormHki fakultas={fakultas} />
             </div>
         </>
     );
 }
 
-EditLuaranProsiding.layout = {
+CreateHki.layout = {
     breadcrumbs: [
         {
             title: "Tambah Penelitian Kegiatan",

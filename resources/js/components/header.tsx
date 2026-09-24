@@ -1,15 +1,17 @@
-import { route } from 'ziggy-js';
+import { route } from "ziggy-js";
 import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbList,
     BreadcrumbSeparator,
-} from './ui/breadcrumb';
+} from "./ui/breadcrumb";
+import React from "react";
 
 interface BreadCrumbPage {
     label: string;
     href: string;
+    params?: string | number | Record<string, string | number>;
 }
 
 interface HeaderPageProps {
@@ -37,23 +39,32 @@ export default function Header({ page, breadcrumb }: HeaderPageProps) {
                             {breadcrumb.length === 1 ? (
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route(breadcrumb[0].href)}
+                                        href={route(
+                                            breadcrumb[0].href,
+                                            breadcrumb[0].params,
+                                        ).toString()}
                                     >
                                         {breadcrumb[0].label}
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                             ) : (
-                                breadcrumb.map((item) => (
-                                    <>
+                                breadcrumb.map((item, index) => (
+                                    <React.Fragment key={item.label}>
                                         <BreadcrumbItem>
                                             <BreadcrumbLink
-                                                href={route(item.href)}
+                                                href={route(
+                                                    item.href,
+                                                    item.params,
+                                                ).toString()}
                                             >
                                                 {item.label}
                                             </BreadcrumbLink>
                                         </BreadcrumbItem>
-                                        <BreadcrumbSeparator />
-                                    </>
+
+                                        {index < breadcrumb.length - 1 && (
+                                            <BreadcrumbSeparator />
+                                        )}
+                                    </React.Fragment>
                                 ))
                             )}
                         </BreadcrumbList>
