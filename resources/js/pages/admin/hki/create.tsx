@@ -22,11 +22,11 @@ export default function CreateHki({ fakultas }: Props) {
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">
-                            Tambah Data Luaran Prosiding
+                            Tambah Data HKI
                         </h1>
 
                         <p className="mt-1 text-muted-foreground">
-                            Form tambah data luaran prosiding.
+                            Form tambah data HKI.
                         </p>
                     </div>
 
@@ -35,17 +35,17 @@ export default function CreateHki({ fakultas }: Props) {
                             <BreadcrumbList>
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("admin.luaran_prosiding.index")}
+                                        href={route("admin.hki.index")}
                                     >
-                                        Luaran Prosiding
+                                        HKI
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("admin.kegiatan.create")}
+                                        href={route("admin.hki.create")}
                                     >
-                                        Tambah Luaran Prosiding
+                                        Tambah HKI
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
@@ -61,7 +61,7 @@ export default function CreateHki({ fakultas }: Props) {
 CreateHki.layout = {
     breadcrumbs: [
         {
-            title: "Tambah Penelitian Kegiatan",
+            title: "Tambah Hak Kekayaan Intelektual",
         },
     ],
 };

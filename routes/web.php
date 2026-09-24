@@ -1,18 +1,18 @@
 <?php
 
-use App\Http\Controllers\BeritaController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Dosen\PkmController;
-use App\Http\Controllers\DosenController;
-use App\Http\Controllers\FakultasController;
-use App\Http\Controllers\HkiController;
-use App\Http\Controllers\KategoriController;
-use App\Http\Controllers\KegiatanController;
-use App\Http\Controllers\LuaranProsidingController;
-use App\Http\Controllers\ProdiController;
-use App\Http\Controllers\SesiController;
-use App\Http\Controllers\SiteSettingsController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\Admin\BeritaController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\PkmController;
+use App\Http\Controllers\Admin\DosenController;
+use App\Http\Controllers\Admin\FakultasController;
+use App\Http\Controllers\Admin\HkiController;
+use App\Http\Controllers\Admin\KategoriController;
+use App\Http\Controllers\Admin\KegiatanController;
+use App\Http\Controllers\Admin\LuaranProsidingController;
+use App\Http\Controllers\Admin\ProdiController;
+use App\Http\Controllers\Admin\SesiController;
+use App\Http\Controllers\Admin\SiteSettingsController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');

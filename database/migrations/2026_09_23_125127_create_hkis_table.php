@@ -21,7 +21,7 @@ return new class extends Migration {
             $table->string('nomer_pengajuan_haki')->nullable();
             $table->string('nomer_paten')->nullable();
             $table->decimal('jumlah_dana', 15, 2)->nullable();
-            $table->string('sumber_dana')->nullable();
+            $table->enum('sumber_dana', ['internal', 'eksternal']);
             $table->timestamps();
         });
     }

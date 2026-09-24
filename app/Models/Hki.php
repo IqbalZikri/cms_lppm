@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Hki extends Model
 {
@@ -19,7 +20,8 @@ class Hki extends Model
         'sumber_dana',
     ];
 
-    public function penulisRelasi(){
-        return $this->hasMany(Penulis::class);
+    public function penulis(): MorphMany
+    {
+        return $this->morphMany(Penulis::class, 'penulisable')->orderBy('urutan');
     }
 }

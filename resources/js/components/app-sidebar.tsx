@@ -4,6 +4,7 @@ import {
     BookOpen,
     BookOpenIcon,
     Building2,
+    Database,
     FileBadge,
     FileText,
     FolderGit2,
@@ -42,7 +43,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: "Master Data",
-        icon: LayoutGrid,
+        icon: Database,
         items: [
             {
                 title: "Fakultas",
@@ -127,16 +128,16 @@ const mainNavItems: NavItem[] = [
 ];
 
 const footerNavItems: NavItem[] = [
-    {
-        title: "Repository",
-        href: "https://github.com/laravel/react-starter-kit",
-        icon: FolderGit2,
-    },
-    {
-        title: "Documentation",
-        href: "https://laravel.com/docs/starter-kits#react",
-        icon: BookOpen,
-    },
+    // {
+    //     title: "Repository",
+    //     href: "https://github.com/laravel/react-starter-kit",
+    //     icon: FolderGit2,
+    // },
+    // {
+    //     title: "Documentation",
+    //     href: "https://laravel.com/docs/starter-kits#react",
+    //     icon: BookOpen,
+    // },
 ];
 
 export function AppSidebar() {

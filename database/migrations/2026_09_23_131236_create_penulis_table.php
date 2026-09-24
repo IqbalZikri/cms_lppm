@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,13 +12,13 @@ return new class extends Migration
     {
         Schema::create('penulis', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('kegiatans_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignId('pkms_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignId('hkis_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignId('luaran_prosidings_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignId('luaran_jurnals_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignId('fakultas_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('dosen_id')->constrained()->cascadeOnDelete();
+            $table->morphs('penulisable');
+            $table->foreignId('fakultas_id')->constrained()->nullOnDelete();
+            $table->foreignId('dosen_id')->constrained()->nullOnDelete();
+            $table->string('nama_fakultas');
+            $table->string('nama_dosen');
+            $table->unsignedTinyInteger('urutan')->default(1);
+            $table->unique(['penulisable_type', 'penulisable_id', 'dosen_id']);
             $table->timestamps();
         });
     }
