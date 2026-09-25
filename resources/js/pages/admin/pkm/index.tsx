@@ -63,32 +63,36 @@ export default function Pkm({ data, fakultas }: Props) {
                 })}
 
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-lg">
+                            <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
                                 <HandHeart className="h-5 w-5" />
                             </div>
 
                             <div>
                                 <CardTitle>
-                                    Daftar Penelitian Pengabdian Kepada
-                                    Masyarakat
+                                    Daftar Pengabdian Kepada Masyarakat ( PKM )
                                 </CardTitle>
 
                                 <p className="text-muted-foreground mt-1 text-sm">
-                                    Informasi penelitian pengabdian kepada
-                                    masyarakat yang terdaftar dalam sistem.
+                                    Informasi pengabdian kepada masyarakat yang
+                                    terdaftar dalam sistem.
                                 </p>
                             </div>
                         </div>
-                    </CardHeader>
-                    <CardContent>
-                        <Link href={route("admin.pkm.create")} viewTransition>
-                            <Button className="mb-[20px]">
+
+                        <Link
+                            href={route("admin.pkm.create")}
+                            viewTransition
+                            className="w-full sm:w-auto"
+                        >
+                            <Button className="w-full sm:w-auto">
                                 <Plus />
-                                Tambah Penelitian PKM
+                                Tambah PKM
                             </Button>
                         </Link>
+                    </CardHeader>
+                    <CardContent>
                         <TablePage<PkmInterface>
                             data={data}
                             columns={[
@@ -128,7 +132,9 @@ export default function Pkm({ data, fakultas }: Props) {
                                         href={route("admin.pkm.edit", item.id)}
                                         viewTransition
                                     >
-                                        <Button variant={"outline"}>Edit</Button>
+                                        <Button variant={"outline"}>
+                                            Edit
+                                        </Button>
                                     </Link>
                                     <Link
                                         href={route("admin.pkm.show", item.id)}

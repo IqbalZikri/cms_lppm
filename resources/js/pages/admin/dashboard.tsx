@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Book } from "lucide-react";
 import { Dosen } from "@/types/dosen";
-import { ChartAreaInteractive } from "@/components/chart-area-interactive";
+import { ChartAreaInteractive, ChartPoint } from "@/components/chart-area-interactive";
 import { User } from "@/types";
 import {
     Table,
@@ -34,9 +34,16 @@ interface Props {
     kegiatan: Kegiatan[];
     pkm: Pkm[];
     user: User;
+    chartData: ChartPoint[];
 }
 
-export default function Dashboard({ dosen, kegiatan, pkm, user }: Props) {
+export default function Dashboard({
+    dosen,
+    kegiatan,
+    pkm,
+    user,
+    chartData,
+}: Props) {
     const namaUser = user.name.charAt(0).toUpperCase() + user.name.slice(1);
     const totalKegiatan = kegiatan.length;
     const totalDosen = dosen.length;
@@ -126,7 +133,7 @@ export default function Dashboard({ dosen, kegiatan, pkm, user }: Props) {
                         </CardContent>
                     </Card>
                 </div>
-                <ChartAreaInteractive />
+                <ChartAreaInteractive chartData={chartData}/>
 
                 <Card>
                     <CardHeader>

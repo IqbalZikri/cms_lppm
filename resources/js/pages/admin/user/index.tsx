@@ -58,26 +58,24 @@ export default function UserPage({ users, totalUser }: UserPageProps) {
                 />
 
                 <Card>
-                    <CardHeader>
-                        <CardTitle>
-                            <div className="flex items-center gap-3">
-                                <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-lg">
-                                    <Users className="h-5 w-5" />
-                                </div>
-
-                                <div>
-                                    <CardTitle>Daftar User</CardTitle>
-
-                                    <p className="text-muted-foreground mt-1 text-sm">
-                                        Informasi user yang terdaftar dalam
-                                        sistem.
-                                    </p>
-                                </div>
+                    <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
+                                <Users className="h-5 w-5" />
                             </div>
-                        </CardTitle>
-                    </CardHeader>
 
-                    <CardContent>
+                            <div>
+                                <CardTitle>
+                                    Daftar User Admin LPPM & UPPM
+                                </CardTitle>
+
+                                <p className="text-muted-foreground mt-1 text-sm">
+                                    Informasi users LPPM & UPPM yang terdaftar
+                                    dalam sistem.
+                                </p>
+                            </div>
+                        </div>
+
                         <DialogFormCreate
                             page="User"
                             actionUrl="admin.user.store"
@@ -116,6 +114,9 @@ export default function UserPage({ users, totalUser }: UserPageProps) {
                                 },
                             ]}
                         />
+                    </CardHeader>
+
+                    <CardContent>
                         <TablePage<User>
                             data={users}
                             columns={[

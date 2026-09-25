@@ -64,9 +64,9 @@ export default function Kegiatan({ data, fakultas, dosen }: Props) {
                 })}
 
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-lg">
+                            <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
                                 <Activity className="h-5 w-5" />
                             </div>
 
@@ -81,8 +81,7 @@ export default function Kegiatan({ data, fakultas, dosen }: Props) {
                                 </p>
                             </div>
                         </div>
-                    </CardHeader>
-                    <CardContent>
+
                         <Link
                             href={route("admin.kegiatan.create")}
                             viewTransition
@@ -92,6 +91,8 @@ export default function Kegiatan({ data, fakultas, dosen }: Props) {
                                 Tambah Penelitian Kegiatan
                             </Button>
                         </Link>
+                    </CardHeader>
+                    <CardContent>
                         <TablePage<KegiatanInterface>
                             data={data}
                             columns={[

@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('luaran_jurnals', function (Blueprint $table) {
             $table->id();
-            $table->enum('jenis_jurnal', ['scopus Q1', 'scopus Q2', 'scopus Q3', 'sinta 1', 'sinta 2', 'sinta 3', 'sinta 4', 'sinta 5', 'non sinta', 'non scopus']);
+            $table->enum('jenis_luaran_jurnal', ['scopus q1', 'scopus q2', 'scopus q3', 'sinta 1', 'sinta 2', 'sinta 3', 'sinta 4', 'sinta 5', 'non sinta', 'non scopus']);
             $table->string('judul');
             $table->text('abstrak');
             $table->string('semester');

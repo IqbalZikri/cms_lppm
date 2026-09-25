@@ -140,29 +140,37 @@ export default function Dosen({ data, fakultas, prodi }: DosenPageProps) {
 
                 {/* Table */}
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-lg">
+                            <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
                                 <Users className="h-5 w-5" />
                             </div>
 
                             <div>
-                                <CardTitle>Daftar Dosen</CardTitle>
+                                <CardTitle>
+                                    Daftar Dosen
+                                </CardTitle>
 
                                 <p className="text-muted-foreground mt-1 text-sm">
-                                    Informasi dosen yang terdaftar dalam sistem.
+                                    Informasi dosen yang
+                                    terdaftar dalam sistem.
                                 </p>
                             </div>
                         </div>
-                    </CardHeader>
 
-                    <CardContent>
-                        <Link href={route("admin.dosen.create")} viewTransition>
-                            <Button className="mb-[20px]">
-                                <Plus className="mr-2 h-4 w-4" />
+                        <Link
+                            href={route("admin.hki.create")}
+                            viewTransition
+                            className="w-full sm:w-auto"
+                        >
+                            <Button className="w-full sm:w-auto">
+                                <Plus />
                                 Tambah Dosen
                             </Button>
                         </Link>
+                    </CardHeader>
+
+                    <CardContent>
                         <TablePage<DosenTypes>
                             data={data}
                             columns={[

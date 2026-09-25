@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\BeritaController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\LuaranJurnalController;
 use App\Http\Controllers\Admin\PkmController;
 use App\Http\Controllers\Admin\DosenController;
 use App\Http\Controllers\Admin\FakultasController;
@@ -95,6 +96,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('hki/{hki}', [HkiController::class, 'edit'])->name('hki.edit');
         Route::put('hki/{hki}', [HkiController::class, 'update'])->name('hki.update');
         Route::delete('hki/{hki}', [HkiController::class, 'destroy'])->name('hki.destroy');
+
+        Route::get('luaran_jurnal', [LuaranJurnalController::class, 'index'])->name('luaran_jurnal.index');
+        Route::get('luaran_jurnal/create', [LuaranJurnalController::class, 'create'])->name('luaran_jurnal.create');
+        Route::post('luaran_jurnal/create', [LuaranJurnalController::class, 'store'])->name('luaran_jurnal.store');
+        Route::get('luaran_jurnal//detail/{luaran_jurnal}', [LuaranJurnalController::class, 'show'])->name('luaran_jurnal.show');
+        Route::get('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'edit'])->name('luaran_jurnal.edit');
+        Route::put('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'update'])->name('luaran_jurnal.update');
+        Route::delete('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'destroy'])->name('luaran_jurnal.destroy');
 
         Route::get('site_setting', [SiteSettingsController::class, 'index'])->name('site_setting.index');
         Route::put('site_setting', [SiteSettingsController::class, 'update'])->name('site_setting.update');

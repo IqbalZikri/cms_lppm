@@ -110,33 +110,36 @@ export default function BeritaPage({
                 </div>
 
                 <Card>
-                    <CardHeader>
-                        <CardTitle>
-                            <div className="flex items-center gap-3">
-                                <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-lg">
-                                    <Newspaper className="h-5 w-5" />
-                                </div>
-
-                                <div>
-                                    <CardTitle>Daftar Berita</CardTitle>
-
-                                    <p className="text-muted-foreground mt-1 text-sm">
-                                        Informasi berita yang telah dibuat.
-                                    </p>
-                                </div>
+                   <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
+                                <Newspaper className="h-5 w-5" />
                             </div>
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
+
+                            <div>
+                                <CardTitle>
+                                    Daftar Berita
+                                </CardTitle>
+
+                                <p className="text-muted-foreground mt-1 text-sm">
+                                    Informasi berita yang
+                                    terdaftar dalam sistem.
+                                </p>
+                            </div>
+                        </div>
+
                         <Link
-                            href={route('admin.berita.create')}
+                            href={route("admin.berita.create")}
                             viewTransition
+                            className="w-full sm:w-auto"
                         >
-                            <Button className="mb-[20px]">
+                            <Button className="w-full sm:w-auto">
                                 <Plus />
-                                Buat Berita
+                                Tambah Berita
                             </Button>
                         </Link>
+                    </CardHeader>
+                    <CardContent>
                         <TablePage<Berita>
                             data={data}
                             columns={[

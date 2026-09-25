@@ -21,8 +21,10 @@ class HkiController extends Controller
     {
         $data = Hki::latest()->paginate(10);
         $data->load('penulis');
+        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
         return Inertia::render('admin/hki/index', [
-            'data' => $data
+            'data' => $data,
+            'fakultas' => $fakultas
         ]);
     }
 

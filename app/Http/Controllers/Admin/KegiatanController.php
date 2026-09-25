@@ -73,24 +73,7 @@ class KegiatanController extends Controller
         DB::beginTransaction();
 
         try {
-            // Ambil nama dosen dari DB berdasarkan dosen_id yang tervalidasi
-            // (lebih aman daripada percaya nama_dosen dari client)
-            $dosenIds = collect($validated['authors'])->pluck('dosen_id');
-            $dosenMap = Dosen::whereIn('id', $dosenIds)->pluck('nama_dosen', 'id');
-
-            $fakultasIds = collect($validated['authors'])->pluck('fakultas_id');
-            $fakultasMap = Fakultas::whereIn('id', $fakultasIds)->pluck('nama_fakultas', 'id');
-
-            $penulisJson = collect($validated['authors'])->map(function ($author) use ($dosenMap, $fakultasMap) {
-                return [
-                    'fakultas_id' => (int) $author['fakultas_id'],
-                    'nama_fakultas' => $fakultasMap[$author['fakultas_id']] ?? null,
-                    'dosen_id' => (int) $author['dosen_id'],
-                    'nama_dosen' => $dosenMap[$author['dosen_id']] ?? null,
-                ];
-            })->values()->all();
-
-            Kegiatan::create([
+            $kegiatan = Kegiatan::create([
                 'judul_kegiatan' => $validated['judul_kegiatan'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
@@ -98,8 +81,17 @@ class KegiatanController extends Controller
                 'link_berkas' => $validated['link_berkas'],
                 'sumber_dana' => $validated['sumber_dana'],
                 'jumlah_dana' => $validated['jumlah_dana'],
-                'penulis' => $penulisJson, // otomatis di-encode ke JSON karena cast 'array'
             ]);
+
+            foreach ($validated as $i => $author) {
+                $kegiatan->penulis()->create([
+                    'fakultas_id' => $author['fakultas_id'],
+                    'dosen_id' => $author['dosen_id'],
+                    'nama_fakultas' => $author['nama_fakultas'],
+                    'nama_dosen' => $author['nama_dosen'],
+                    'urutan' => $i + 1,
+                ]);
+            }
 
             DB::commit();
 
