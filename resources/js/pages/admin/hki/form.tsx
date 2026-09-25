@@ -82,6 +82,14 @@ function buildInitialAuthors(penulis: Penulis[] | undefined): AuthorRow[] {
     }));
 }
 
+export function formatRupiah(inputAngka: number) {
+    new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+    }).format(inputAngka);
+}
+
 function RequiredMark() {
     return <span className="ml-0.5 text-red-500">*</span>;
 }
@@ -120,6 +128,12 @@ export default function FormHki({ fakultas, hki }: Props) {
     const [jenisHki, setJenisHki] = useState(hki?.jenis_hki ?? "");
     const [semester, setSemester] = useState(hki?.semester ?? "");
     const [sumberDana, setSumberDana] = useState(hki?.sumber_dana ?? "");
+    const [jumlahDana, setJumlahDana] = useState("");
+
+    const handleFormatAngkaChange = (e: any) => {
+        const nilaiSaja = e.target.value.replace(/\D/g,'');
+        setJumlahDana(nilaiSaja)
+    }
 
     const action = isEdit
         ? route("admin.hki.update", hki!.id)
@@ -597,7 +611,9 @@ export default function FormHki({ fakultas, hki }: Props) {
                                                     aria-invalid={
                                                         !!errors.nomer_pengajuan_haki
                                                     }
-                                                    value={hki?.nomer_pengajuan_haki}
+                                                    value={
+                                                        hki?.nomer_pengajuan_haki
+                                                    }
                                                 />
                                                 {errors.nomer_pengajuan_haki && (
                                                     <p className="text-sm text-red-500">
