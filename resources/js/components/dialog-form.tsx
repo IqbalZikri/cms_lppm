@@ -115,7 +115,6 @@ export default function DialogFormCreate({
                                                 <SelectTrigger id={kolom.name}>
                                                     <SelectValue
                                                         placeholder={
-                                                            kolom.placeholder ??
                                                             `Pilih ${kolom.label}`
                                                         }
                                                     />
@@ -134,6 +133,7 @@ export default function DialogFormCreate({
                                                         ),
                                                     )}
                                                 </SelectContent>
+                                                <small>Pastikan data {kolom.placeholder} sudah terdaftar di sistem.</small>
                                             </Select>
                                         ) : (
                                             <>

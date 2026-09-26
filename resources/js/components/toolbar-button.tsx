@@ -1,5 +1,5 @@
-import { cn } from '@/lib/utils';
-import { Button } from './ui/button';
+import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
 
 interface ToolbarButtonProps {
     onClick: () => void;
@@ -22,8 +22,8 @@ export default function ToolbarButton({
             onClick={onClick}
             aria-label={label}
             className={cn(
-                'h-8 w-8 p-0',
-                isActive && 'text-foreground ring-border ring-1',
+                "h-8 w-8 p-0",
+                isActive && "bg-[#bf9f62] text-white ring-1 ring-border",
             )}
         >
             {children}

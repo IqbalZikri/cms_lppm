@@ -1,30 +1,40 @@
 // resources/js/Pages/Admin/Berita/Partials/BeritaForm.tsx
-import { FormEventHandler, useState } from 'react';
-import { Link, useForm } from '@inertiajs/react';
+import { FormEventHandler, useState } from "react";
+import { Form, Link, useForm } from "@inertiajs/react";
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import {
     Card,
     CardContent,
     CardHeader,
     CardTitle,
     CardDescription,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '@/components/ui/select';
-import { ImagePlus, Loader2, X } from 'lucide-react';
-import { route } from 'ziggy-js';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import RichTextEditor from '@/components/rich-text-editor';
+} from "@/components/ui/select";
+import { ImagePlus, Loader2, X } from "lucide-react";
+import { route } from "ziggy-js";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import RichTextEditor from "@/components/rich-text-editor";
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 
 interface Kategori {
     id: number;
@@ -53,9 +63,9 @@ function generateSlug(text: string) {
     return text
         .toLowerCase()
         .trim()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-');
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-");
 }
 
 export default function BeritaForm({ kategoris, berita }: Props) {
@@ -67,13 +77,13 @@ export default function BeritaForm({ kategoris, berita }: Props) {
     const [slugManual, setSlugManual] = useState(isEdit); // di edit, slug sudah ada -> anggap manual
 
     const { data, setData, post, put, processing, errors, reset } = useForm({
-        kategori_id: berita ? String(berita.kategori_id) : '',
-        judul_berita: berita?.judul_berita ?? '',
-        slug: berita?.slug ?? '',
-        ringkasan_berita: berita?.ringkasan_berita ?? '',
-        isi_berita: berita?.isi_berita ?? '',
-        status_published: berita?.status_published ?? '',
-        published_at: berita?.published_at ?? '',
+        kategori_id: berita ? String(berita.kategori_id) : "",
+        judul_berita: berita?.judul_berita ?? "",
+        slug: berita?.slug ?? "",
+        ringkasan_berita: berita?.ringkasan_berita ?? "",
+        isi_berita: berita?.isi_berita ?? "",
+        status_published: berita?.status_published ?? "",
+        published_at: berita?.published_at ?? "",
         gambar: null as File | null,
     });
 
@@ -87,7 +97,7 @@ export default function BeritaForm({ kategoris, berita }: Props) {
 
     const handleGambarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] ?? null;
-        setData('gambar', file);
+        setData("gambar", file);
 
         if (file) {
             const reader = new FileReader();
@@ -99,7 +109,7 @@ export default function BeritaForm({ kategoris, berita }: Props) {
     };
 
     const removeGambar = () => {
-        setData('gambar', null);
+        setData("gambar", null);
         setPreview(null);
     };
 
@@ -109,31 +119,33 @@ export default function BeritaForm({ kategoris, berita }: Props) {
         if (isEdit) {
             // POST + _method: put -> supaya file upload tetap jalan (Laravel/PHP
             // tidak bisa parse multipart/form-data pada request PUT asli)
-            put(route('admin.berita.update', berita!.id), {
+            put(route("admin.berita.update", berita!.id), {
                 forceFormData: true,
-                onSuccess: () => setData('gambar', null),
+                onSuccess: () => setData("gambar", null),
                 // Inertia otomatis menambahkan _method=PUT kalau method aslinya
                 // di-set lewat useForm({ _method: 'put', ... }) — lihat catatan di bawah.
             });
         } else {
-            post(route('admin.berita.store'), {
+            post(route("admin.berita.store"), {
                 forceFormData: true,
                 onSuccess: () => reset(),
             });
         }
     };
 
+    const [open, setOpen] = useState(false);
+
     return (
         <Card>
             <CardHeader>
                 <CardTitle>
-                    {isEdit ? 'Edit Berita' : 'Buat Berita Baru'}
+                    {isEdit ? "Edit Berita" : "Buat Berita Baru"}
                 </CardTitle>
                 <CardDescription>
                     {isEdit
-                        ? 'Perbarui detail berita di bawah ini.'
-                        : 'Isi detail berita di bawah ini.'}{' '}
-                    Field yang bertanda{' '}
+                        ? "Perbarui detail berita di bawah ini."
+                        : "Isi detail berita di bawah ini."}{" "}
+                    Field yang bertanda{" "}
                     <span className="text-destructive">*</span> wajib diisi.
                 </CardDescription>
             </CardHeader>
@@ -148,12 +160,18 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                         <Select
                             value={data.kategori_id}
                             onValueChange={(value) =>
-                                setData('kategori_id', value)
+                                setData("kategori_id", value)
                             }
                         >
-                            <SelectTrigger id="kategori_id">
-                                <SelectValue placeholder="Pilih kategori berita" />
-                            </SelectTrigger>
+                            {kategoris.length === 0 ? (
+                                <SelectTrigger id="kategori_id" disabled>
+                                    <SelectValue placeholder="Data kategori belum ada" />
+                                </SelectTrigger>
+                            ) : (
+                                <SelectTrigger id="kategori_id">
+                                    <SelectValue placeholder="Pilih kategori berita" />
+                                </SelectTrigger>
+                            )}
                             <SelectContent>
                                 {kategoris.map((kategori) => (
                                     <SelectItem
@@ -165,16 +183,78 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                                 ))}
                             </SelectContent>
                         </Select>
-                        <small>
-                            Pastikan data kategori sudah ada di{' '}
+                        <Dialog open={open} onOpenChange={setOpen}>
+                            <DialogTrigger asChild>
+                                <button type="button" className="text-sm">
+                                    Klik link ini untuk menambahkan{" "}
+                                    <span className="underline">kategori</span>
+                                </button>
+                            </DialogTrigger>
+                            <DialogContent onSubmit={(e) => e.stopPropagation()}>
+                                <DialogHeader>
+                                    <DialogTitle>Tambah Kategori</DialogTitle>
+                                </DialogHeader>
+                                <Form
+                                    action={route("admin.kategori.store")}
+                                    method="POST"
+                                    onSuccess={() => {
+                                        setOpen(false);
+                                    }}
+                                    resetOnSuccess
+                                >
+                                    {({ errors: kategoriErrors, processing: kategoriProcessing }) => (
+                                        <>
+                                            <FieldGroup>
+                                                <Field>
+                                                    <FieldLabel htmlFor="nama_kategori">
+                                                        Nama Kategori
+                                                    </FieldLabel>
+                                                    <Input
+                                                        name="nama_kategori"
+                                                        placeholder="Nama Kategori"
+                                                    />
+                                                    {kategoriErrors.nama_kategori && (
+                                                        <p className="text-sm text-red-500">
+                                                            {
+                                                                kategoriErrors.nama_kategori
+                                                            }
+                                                        </p>
+                                                    )}
+                                                </Field>
+                                            </FieldGroup>
+                                            <DialogFooter className="mt-[20px]">
+                                                <DialogClose asChild>
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                    >
+                                                        Kembali
+                                                    </Button>
+                                                </DialogClose>
+                                                <Button
+                                                    type="submit"
+                                                    disabled={kategoriProcessing}
+                                                >
+                                                    {kategoriProcessing
+                                                        ? "...Menyimpan"
+                                                        : "Simpan"}
+                                                </Button>
+                                            </DialogFooter>
+                                        </>
+                                    )}
+                                </Form>
+                            </DialogContent>
+                        </Dialog>
+                        {/* <small>
+                            Pastikan data kategori sudah ada di{" "}
                             <Link
-                                href={route('admin.kategori.index')}
+                                href={route("admin.kategori.index")}
                                 className="underline"
                                 viewTransition
                             >
                                 Kategori
                             </Link>
-                        </small>
+                        </small> */}
                         {errors.kategori_id && (
                             <p className="text-destructive text-sm">
                                 {errors.kategori_id}
@@ -185,7 +265,7 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                     {/* Judul */}
                     <div className="space-y-2">
                         <Label htmlFor="judul_berita">
-                            Judul Berita{' '}
+                            Judul Berita{" "}
                             <span className="text-destructive">*</span>
                         </Label>
                         <Input
@@ -211,7 +291,7 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                             value={data.slug}
                             onChange={(e) => {
                                 setSlugManual(true);
-                                setData('slug', generateSlug(e.target.value));
+                                setData("slug", generateSlug(e.target.value));
                             }}
                             placeholder="judul-berita-otomatis"
                         />
@@ -225,7 +305,7 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                     {/* Ringkasan */}
                     <div className="space-y-2">
                         <Label htmlFor="ringkasan_berita">
-                            Ringkasan Berita{' '}
+                            Ringkasan Berita{" "}
                             <span className="text-destructive">*</span>
                         </Label>
                         <Textarea
@@ -233,7 +313,7 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                             rows={3}
                             value={data.ringkasan_berita}
                             onChange={(e) =>
-                                setData('ringkasan_berita', e.target.value)
+                                setData("ringkasan_berita", e.target.value)
                             }
                             placeholder="Ringkasan singkat yang tampil di daftar berita"
                         />
@@ -247,21 +327,12 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                     {/* Isi Berita */}
                     <div className="space-y-2">
                         <Label htmlFor="isi_berita">
-                            Isi Berita{' '}
+                            Isi Berita{" "}
                             <span className="text-destructive">*</span>
                         </Label>
-                        {/* <Textarea
-                            id="isi_berita"
-                            rows={10}
-                            value={data.isi_berita}
-                            onChange={(e) =>
-                                setData("isi_berita", e.target.value)
-                            }
-                            placeholder="Tulis isi lengkap berita di sini"
-                        /> */}
                         <RichTextEditor
                             value={data.isi_berita}
-                            onChange={(value) => setData('isi_berita', value)}
+                            onChange={(value) => setData("isi_berita", value)}
                         />
 
                         {errors.isi_berita && (
@@ -322,7 +393,7 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                     <div className="flex flex-col rounded-md border p-4">
                         <div className="space-y-0.5">
                             <Label htmlFor="status_published">
-                                Publikasikan{' '}
+                                Publikasikan{" "}
                                 <span className="text-destructive">*</span>
                             </Label>
                             <p className="text-muted-foreground text-xs">
@@ -334,7 +405,7 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                             className="mt-[20px]"
                             value={data.status_published}
                             onValueChange={(value) =>
-                                setData('status_published', value)
+                                setData("status_published", value)
                             }
                         >
                             <div className="flex items-center gap-3">
@@ -352,7 +423,7 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                     </div>
 
                     {/* Tanggal Publish */}
-                    {data.status_published == 'published' && (
+                    {data.status_published == "published" && (
                         <div className="space-y-2">
                             <Label htmlFor="published_at">
                                 Tanggal Publish
@@ -360,9 +431,9 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                             <Input
                                 id="published_at"
                                 type="datetime-local"
-                                value={data.published_at ?? ''}
+                                value={data.published_at ?? ""}
                                 onChange={(e) =>
-                                    setData('published_at', e.target.value)
+                                    setData("published_at", e.target.value)
                                 }
                             />
                             <p className="text-muted-foreground text-xs">
@@ -380,7 +451,7 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                     <div className="flex justify-end gap-2 pt-2">
                         <Button variant="outline" type="button" asChild>
                             <Link
-                                href={route('admin.berita.index')}
+                                href={route("admin.berita.index")}
                                 viewTransition
                             >
                                 Batal
@@ -390,7 +461,7 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                             {processing && (
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                             )}
-                            {isEdit ? 'Perbarui Berita' : 'Simpan Berita'}
+                            {isEdit ? "Perbarui Berita" : "Simpan Berita"}
                         </Button>
                     </div>
                 </form>

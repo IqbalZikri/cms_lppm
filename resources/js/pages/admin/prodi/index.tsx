@@ -92,6 +92,7 @@ export default function Prodi({ data, fakultas }: ProdiPageProps) {
                                     name: "fakultas_id",
                                     label: "Fakultas",
                                     type: "select",
+                                    placeholder: "fakultas",
                                     // required: true,
                                     options: fakultas.map((f) => ({
                                         value: f.id,

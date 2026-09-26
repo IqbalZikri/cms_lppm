@@ -152,7 +152,7 @@ export function AppSidebar() {
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
+                        <SidebarMenuButton size="lg" asChild className="bg-[#bf9f62]">
                             <Link
                                 href={route("admin.dashboard")}
                                 prefetch
