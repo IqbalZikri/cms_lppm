@@ -19,7 +19,7 @@ interface Props {
 export default function EditLuaranProsiding({ fakultas, data }: Props) {
     return (
         <>
-            <Head title="Tambah Penelitian Kegiatan" />
+            <Head title="Edit Luaran Prosiding" />
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 sm:p-6">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
@@ -45,7 +45,7 @@ export default function EditLuaranProsiding({ fakultas, data }: Props) {
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("admin.kegiatan.edit", data.id)}
+                                        href={route("admin.luaran_prosiding.edit", data.id)}
                                     >
                                         Edit Luaran Prosiding
                                     </BreadcrumbLink>
@@ -63,7 +63,7 @@ export default function EditLuaranProsiding({ fakultas, data }: Props) {
 EditLuaranProsiding.layout = {
     breadcrumbs: [
         {
-            title: "Tambah Penelitian Kegiatan",
+            title: "Edit Luaran Prosiding",
         },
     ],
 };

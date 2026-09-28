@@ -14,13 +14,14 @@ return new class extends Migration {
             $table->id();
             $table->enum('jenis_pkm', ['pelaksanaan', 'jurnal']);
             $table->string('judul');
+            $table->string('slug');
+            $table->string('gambar')->nullable();
             $table->string('abstrak');
             $table->string('semester');
             $table->year('tahun');
             $table->string('link_berkas');
             $table->enum('sumber_dana', ['internal', 'eksternal']);
             $table->decimal('jumlah_dana', 15, 2);
-            $table->text('penulis');
             $table->timestamps();
         });
     }

@@ -1,163 +1,164 @@
-import Header from "@/components/header";
+import { Head, Link } from "@inertiajs/react";
+import { route } from "ziggy-js";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { LuaranJurnal } from "@/interface/luaran-jurnal";
-import { Head, Link } from "@inertiajs/react";
 import {
-    ArrowLeft,
-    BookText,
-    Calendar,
-    FileText,
-    GraduationCap,
-    Pencil,
-    ScrollText,
-    Users,
-} from "lucide-react";
-import { route } from "ziggy-js";
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import { ArrowLeft, FileText, Pencil } from "lucide-react";
+import { LuaranJurnal } from "@/interface/luaran-jurnal";
 
 interface Props {
-    luaranJurnal: LuaranJurnal;
+    data: LuaranJurnal;
 }
 
-export default function ShowLuaranJurnal({ luaranJurnal }: Props) {
-    console.log(luaranJurnal);
-    
+function formatRupiah(value: string | number) {
+    const number = Number(value);
+    if (Number.isNaN(number)) return "-";
+    return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+    }).format(number);
+}
+
+export default function Show({ data }: Props) {
+    const penulis = data.penulis ?? [];
+
     return (
         <>
-            <Head title={luaranJurnal.judul} />
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 sm:p-6">
-                <Header
-                    page="Luaran Prosiding"
-                    breadcrumb={[
-                        {
-                            label: "luaranJurnal",
-                            href: "admin.luaran_jurnal.index",
-                        },
-                        {
-                            label: "Detail",
-                            href: "admin.luaran_jurnal.show",
-                            params: luaranJurnal.id,
-                        },
-                    ]}
-                />
+            <Head title={`Detail - ${data.judul}`} />
+            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+                <div className="flex items-center justify-between">
+                    <Link
+                        href={route("admin.luaran_jurnal.index")}
+                        viewTransition
+                    >
+                        <Button variant="outline" size="sm">
+                            <ArrowLeft className="mr-1 h-4 w-4" />
+                            Kembali
+                        </Button>
+                    </Link>
 
-                <Card className="shadow-sm">
-                    <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-start sm:justify-between">
-                        <div className="flex items-start gap-3">
-                            <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-                                <ScrollText className="h-5 w-5" />
-                            </div>
-                            <div className="space-y-2">
-                                <CardTitle className="text-2xl leading-snug">
-                                    {luaranJurnal.judul}
-                                </CardTitle>
-                                <div className="flex flex-wrap items-center gap-2">
-                                    <Badge
-                                        variant="secondary"
-                                        className="inline-flex items-center gap-1.5"
-                                    >
-                                        <Calendar className="h-3 w-3" />
-                                        {luaranJurnal.semester}{" "}
-                                        {luaranJurnal.tahun}
-                                    </Badge>
-                                </div>
-                            </div>
-                        </div>
+                    <Link
+                        href={route("admin.luaran_jurnal.edit", data.id)}
+                        viewTransition
+                    >
+                        <Button size="sm">
+                            <Pencil className="mr-1 h-4 w-4" />
+                            Edit
+                        </Button>
+                    </Link>
+                </div>
 
-                        <div className="flex w-full gap-2 sm:w-auto">
-                            <Link
-                                href={route("admin.luaran_jurnal.index")}
-                                viewTransition
-                                className="w-full sm:w-auto"
-                            >
-                                <Button
-                                    variant="outline"
-                                    className="w-full sm:w-auto"
-                                >
-                                    <ArrowLeft />
-                                    Kembali
-                                </Button>
-                            </Link>
-                            <Link
-                                href={route(
-                                    "admin.luaran_jurnal.edit",
-                                    luaranJurnal.id,
-                                )}
-                                viewTransition
-                                className="w-full sm:w-auto"
-                            >
-                                <Button className="w-full sm:w-auto">
-                                    <Pencil />
-                                    Edit
-                                </Button>
-                            </Link>
-                        </div>
+                <Card className="w-full">
+                    <CardHeader>
+                        <CardTitle className="text-xl">
+                            {data.judul}
+                            <small className="text-base font-thin">
+                                slug: {data.slug}
+                            </small>
+                        </CardTitle>
+                        <CardDescription>Detail Luaran Jurnal</CardDescription>
                     </CardHeader>
 
-                    <CardContent className="grid grid-cols-1 gap-8 pt-6 lg:grid-cols-3 lg:gap-10">
-                        {/* Kolom kiri: Abstrak + Berkas */}
-                        <div className="space-y-8 lg:col-span-2">
-                            <div className="space-y-3">
-                                <SectionLabel icon={BookText} title="Abstrak" />
-                                <p className="text-base leading-relaxed whitespace-pre-line sm:pl-12">
-                                    {luaranJurnal.abstrak}
+                    <CardContent className="space-y-6">
+                        {/* Info ringkas */}
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <p className="text-muted-foreground text-sm">
+                                    Semester
                                 </p>
+                                <p className="font-medium">{data.semester}</p>
                             </div>
-
-                            <Separator />
-
-                            <div className="space-y-3">
-                                <SectionLabel
-                                    icon={FileText}
-                                    title="Berkas Luaran Jurnal"
-                                />
-                                <div className="sm:pl-12">
-                                    <a
-                                        href={luaranJurnal.link_berkas}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
-                                        <Button
-                                            variant="outline"
-                                            className="h-11"
-                                        >
-                                            <FileText className="h-4 w-4" />
-                                            Buka Berkas
-                                        </Button>
-                                    </a>
-                                </div>
+                            <div>
+                                <p className="text-muted-foreground text-sm">
+                                    Tahun
+                                </p>
+                                <p className="font-medium">{data.tahun}</p>
                             </div>
                         </div>
 
-                        {/* Kolom kanan: Penulis */}
-                        <div className="space-y-4 rounded-xl border bg-muted/20 p-5 lg:col-span-1 lg:self-start">
-                            <SectionLabel
-                                icon={Users}
-                                title={`Penulis (${luaranJurnal.penulis.length})`}
-                            />
+                        {/* Abstrak */}
+                        <div>
+                            <p className="text-muted-foreground mb-1 text-sm">
+                                Abstrak
+                            </p>
+                            <p className="text-sm leading-relaxed">
+                                {data.abstrak}
+                            </p>
+                        </div>
 
-                            <div className="space-y-3">
-                                {luaranJurnal.penulis.map((penulis, i) => (
-                                    <div
-                                        key={i}
-                                        className="flex items-start gap-3 rounded-lg border bg-background p-3"
-                                    >
-                                        <div className="bg-primary/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
-                                            <GraduationCap className="h-4 w-4" />
-                                        </div>
-                                        <div className="min-w-0">
-                                            <p className="truncate text-sm font-medium">
-                                                {penulis.nama_dosen}
-                                            </p>
-                                            <p className="text-muted-foreground truncate text-xs">
-                                                {penulis.nama_fakultas}
-                                            </p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                        {/* Link berkas */}
+                        <div>
+                            <p className="text-muted-foreground mb-1 text-sm">
+                                Link Berkas
+                            </p>
+                            <Link
+                                href={data.link_berkas}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-sm text-blue-600 underline"
+                                viewTransition
+                            >
+                                <FileText className="h-4 w-4" />
+                                Lihat Berkas
+                            </Link>
+                        </div>
+
+                        {/* Daftar penulis */}
+                        <div>
+                            <p className="text-muted-foreground mb-2 text-sm">
+                                Penulis
+                            </p>
+
+                            {penulis.length === 0 ? (
+                                <p className="text-muted-foreground text-sm">
+                                    Belum ada data penulis.
+                                </p>
+                            ) : (
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="w-[50px]">
+                                                No.
+                                            </TableHead>
+                                            <TableHead>Nama Dosen</TableHead>
+                                            <TableHead>Fakultas</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {penulis.map((p, index) => (
+                                            <TableRow
+                                                key={`${p.dosen_id}-${index}`}
+                                            >
+                                                <TableCell>
+                                                    {index + 1}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {p.dosen.nama_dosen ?? "-"}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {p.fakultas.nama_fakultas ??
+                                                        "-"}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
@@ -166,28 +167,15 @@ export default function ShowLuaranJurnal({ luaranJurnal }: Props) {
     );
 }
 
-/** Small inline heading used to label a content section, without the icon-circle used on the form pages. */
-function SectionLabel({
-    icon: Icon,
-    title,
-}: {
-    icon: React.ElementType;
-    title: string;
-}) {
-    return (
-        <div className="flex items-center gap-3">
-            <div className="bg-primary/10 text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
-                <Icon className="h-4 w-4" />
-            </div>
-            <h3 className="text-base font-semibold">{title}</h3>
-        </div>
-    );
-}
-
-ShowLuaranJurnal.layout = {
+Show.layout = {
     breadcrumbs: [
         {
-            title: "Detail luaranJurnal",
+            title: "Luaran Jurnal",
+            href: route("admin.luaran_jurnal.index"),
+        },
+        {
+            title: "Detail",
+            href: "#",
         },
     ],
 };

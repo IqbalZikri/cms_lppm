@@ -281,12 +281,8 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
                                 >
                                     {prodi.length === 0 ? (
                                         <>
-                                            <SelectTrigger
-                                                id="prodi_id"
-                                            >
-                                                <SelectValue
-                                                    placeholder="Prodi belum ada"
-                                                />
+                                            <SelectTrigger id="prodi_id">
+                                                <SelectValue placeholder="Prodi belum ada" />
                                             </SelectTrigger>
                                         </>
                                     ) : (
@@ -295,9 +291,7 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
                                                 id="prodi_id"
                                                 aria-invalid={!!errors.prodi_id}
                                             >
-                                                <SelectValue
-                                                    placeholder="Pilih prodi"
-                                                />
+                                                <SelectValue placeholder="Pilih prodi" />
                                             </SelectTrigger>
                                         </>
                                     )}
@@ -547,6 +541,7 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
 
                                 <Select
                                     name="jenis_kelamin"
+                                    value={data.jenis_kelamin}
                                     onValueChange={(value) =>
                                         setData("jenis_kelamin", value)
                                     }
@@ -583,6 +578,7 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
                                     id="tempat_lahir"
                                     name="tempat_lahir"
                                     placeholder="Contoh: Tangerang"
+                                    value={data.tempat_lahir}
                                     onChange={(e) =>
                                         setData("tempat_lahir", e.target.value)
                                     }
@@ -605,6 +601,7 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
                                     id="tanggal_lahir"
                                     name="tanggal_lahir"
                                     type="date"
+                                    value={data.tanggal_lahir}
                                     onChange={(e) =>
                                         setData("tanggal_lahir", e.target.value)
                                     }
@@ -737,6 +734,10 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
                                         )
                                     }
                                 />
+                                <small>
+                                    Nama akun otomatis terisi mengambil dari
+                                    nama dosen, bisa diganti jika ingin diganti
+                                </small>
                                 {errors.name && (
                                     <p className="text-destructive text-sm">
                                         {errors.name}
@@ -758,11 +759,15 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
                                     }
                                     disabled
                                 />
+                                <small>
+                                    Silahkan ganti email dengan mengganti email
+                                    dosen.
+                                </small>
                             </Field>
                             <Field>
                                 <FieldLabel htmlFor="password">
                                     Password
-                                    <RequiredMark />
+                                    {!isEdit && <RequiredMark />}
                                 </FieldLabel>
                                 <Input
                                     name="password"
@@ -772,15 +777,26 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
                                         setData("password", e.target.value)
                                     }
                                 />
+                                {isEdit && (
+                                    <>
+                                        <small>
+                                            Isi kembali password dan konfirmasi
+                                            password jika ingin mengganti
+                                            password dosen. Jika tidak ingin
+                                            diganti tidak perlu diisi ulang.
+                                        </small>
+                                    </>
+                                )}
                             </Field>
                             <Field>
                                 <FieldLabel htmlFor="confirm_password">
                                     Konfirmasi Password
-                                    <RequiredMark />
+                                    {!isEdit && <RequiredMark />}
                                 </FieldLabel>
                                 <Input
                                     name="confirm_password"
                                     type="password"
+                                    placeholder="Konfirmasi Password"
                                     onChange={(e) =>
                                         setData(
                                             "confirm_password",

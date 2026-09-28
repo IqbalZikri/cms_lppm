@@ -94,23 +94,44 @@ export default function LuaranProsiding({ data, fakultas }: Props) {
                                     ),
                                 },
                                 {
-                                    id: "penulis",
+                                    id: "fakultas",
                                     key: "penulis",
-                                    label: "Penulis",
+                                    label: "Fakultas",
                                     render: (_, item) => (
-                                        <div className="flex flex-col gap-1.5">
+                                        <div className="flex flex-wrap gap-1.5">
                                             {item.penulis.map((penulis, i) => (
                                                 <div
                                                     key={i}
                                                     className="flex flex-wrap items-center gap-1.5"
                                                 >
                                                     <Badge className="whitespace-nowrap text-[13px]">
-                                                        {penulis.nama_dosen}
+                                                        {
+                                                            penulis.fakultas
+                                                                .nama_fakultas
+                                                        }
                                                     </Badge>
-                                                    <span className="text-muted-foreground text-xs text-[13px]">
-                                                        Fakultas{" "}
-                                                        {penulis.nama_fakultas}
-                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ),
+                                },
+                                {
+                                    id: "dosen",
+                                    key: "penulis",
+                                    label: "Penulis",
+                                    render: (_, item) => (
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {item.penulis.map((penulis, i) => (
+                                                <div
+                                                    key={i}
+                                                    className="flex flex-wrap items-center gap-1.5"
+                                                >
+                                                    <Badge className="whitespace-nowrap text-[13px]">
+                                                        {
+                                                            penulis.dosen
+                                                                .nama_dosen
+                                                        }
+                                                    </Badge>
                                                 </div>
                                             ))}
                                         </div>
@@ -166,11 +187,7 @@ export default function LuaranProsiding({ data, fakultas }: Props) {
                                         )}
                                         viewTransition
                                     >
-                                        <Button
-                                            title="Edit"
-                                        >
-                                            Edit
-                                        </Button>
+                                        <Button title="Edit">Edit</Button>
                                     </Link>
                                     <DialogDelete
                                         label={item.judul}

@@ -19,7 +19,7 @@ class LuaranJurnalController extends Controller
     public function index()
     {
         $data = LuaranJurnal::latest()->paginate(10);
-        $data->load('penulis');
+        $data->load('penulis.fakultas', 'penulis.dosen');
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
         return Inertia::render('admin/luaran-jurnal/index', [
             'data' => $data,
@@ -46,6 +46,7 @@ class LuaranJurnalController extends Controller
         $validated = $request->validate([
             'jenis_luaran_jurnal' => "required",
             'judul' => "required",
+            'slug' => "required",
             'abstrak' => "required",
             'semester' => "required",
             'tahun' => "required",
@@ -58,6 +59,7 @@ class LuaranJurnalController extends Controller
         ], [
             "jenis_luaran_jurnal.required" => "Silahkan isi luaran jurnal",
             "judul.required" => "Silahkan isi judul",
+            "slug.required" => "Silahkan isi slug",
             "abstrak.required" => "Silahkan isi abstrak",
             "semester.required" => "Silahkan isi semester",
             "tahun.required" => "Silahkan isi tahun",
@@ -74,6 +76,7 @@ class LuaranJurnalController extends Controller
             $luaranJurnal = LuaranJurnal::create([
                 'jenis_luaran_jurnal' => $validated['jenis_luaran_jurnal'],
                 'judul' => $validated['judul'],
+                'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],
@@ -84,8 +87,6 @@ class LuaranJurnalController extends Controller
                 $luaranJurnal->penulis()->create([
                     'fakultas_id' => $author['fakultas_id'],
                     'dosen_id' => $author['dosen_id'],
-                    'nama_fakultas' => $author['nama_fakultas'],
-                    'nama_dosen' => $author['nama_dosen'],
                     'urutan' => $i + 1,
                 ]);
             }
@@ -105,9 +106,9 @@ class LuaranJurnalController extends Controller
      */
     public function show(LuaranJurnal $luaranJurnal)
     {
-        $luaranJurnal->load('penulis');
+        $luaranJurnal->load('penulis.fakultas', 'penulis.dosen');
         return Inertia::render('admin/luaran-jurnal/show', [
-            'luaranJurnal' => $luaranJurnal
+            'data' => $luaranJurnal
         ]);
     }
 
@@ -132,6 +133,7 @@ class LuaranJurnalController extends Controller
         $validated = $request->validate([
             'jenis_luaran_jurnal' => "required",
             'judul' => "required",
+            'slug' => "required",
             'abstrak' => "required",
             'semester' => "required",
             'tahun' => "required",
@@ -144,6 +146,7 @@ class LuaranJurnalController extends Controller
         ], [
             "jenis_luaran_jurnal.required" => "Silahkan isi luaran jurnal",
             "judul.required" => "Silahkan isi judul",
+            "slug.required" => "Silahkan isi slug",
             "abstrak.required" => "Silahkan isi abstrak",
             "semester.required" => "Silahkan isi semester",
             "tahun.required" => "Silahkan isi tahun",
@@ -157,30 +160,21 @@ class LuaranJurnalController extends Controller
         DB::beginTransaction();
 
         try {
-            $luaranJurnal = LuaranJurnal::create([
+            $luaranJurnal->update([
                 'jenis_luaran_jurnal' => $validated['jenis_luaran_jurnal'],
                 'judul' => $validated['judul'],
+                'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],
                 'link_berkas' => $validated['link_berkas'],
             ]);
 
-            $dosens = Dosen::whereIn('id', collect($validated['authors'])->pluck('dosen_id'))
-                ->get()
-                ->keyBy('id');
-
-            $fakultas = Fakultas::whereIn('id', collect($validated['authors'])->pluck('fakultas_id'))
-                ->get()
-                ->keyBy('id');
-
             $luaranJurnal->penulis()->delete();
             foreach ($validated['authors'] as $i => $author) {
                 $luaranJurnal->penulis()->create([
                     'fakultas_id' => $author['fakultas_id'],
                     'dosen_id' => $author['dosen_id'],
-                    'nama_dosen' => $dosens[$author['dosen_id']]->nama_dosen,
-                    'nama_fakultas' => $fakultas[$author['fakultas_id']]->nama_fakultas,
                     'urutan' => $i + 1,
                 ]);
             }

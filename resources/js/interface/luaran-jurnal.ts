@@ -4,6 +4,7 @@ export interface LuaranJurnal {
     id: number;
     jenis_luaran_jurnal: string;
     judul: string;
+    slug: string;
     abstrak: string;
     semester: string;
     tahun: number;

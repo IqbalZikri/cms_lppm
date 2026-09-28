@@ -20,7 +20,7 @@ class HkiController extends Controller
     public function index()
     {
         $data = Hki::latest()->paginate(10);
-        $data->load('penulis');
+        $data->load('penulis.fakultas', 'penulis.dosen');
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
         return Inertia::render('admin/hki/index', [
             'data' => $data,
@@ -47,6 +47,7 @@ class HkiController extends Controller
         $validated = $request->validate([
             'jenis_hki' => ['required', Rule::in(['paten', 'haki'])],
             'judul' => 'required',
+            'slug' => 'required',
             'abstrak' => 'required',
             'semester' => 'required',
             'tahun' => 'required',
@@ -64,6 +65,7 @@ class HkiController extends Controller
             'jenis_hki.required' => 'Silahkan pilih salah satu jenis HKI',
             'jenis_hki.in' => 'Jenis HKI tidak valid',
             'judul.required' => 'Silahkan isi judul',
+            'slug.required' => 'Silahkan isi slug',
             'abstrak.required' => 'Silahkan isi abstrak',
             'semester.required' => 'Silahkan isi semester',
             'tahun.required' => 'Silahkan isi tahun',
@@ -83,6 +85,7 @@ class HkiController extends Controller
             $hki = Hki::create([
                 'jenis_hki' => $validated['jenis_hki'],
                 'judul' => $validated['judul'],
+                'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],
@@ -118,8 +121,9 @@ class HkiController extends Controller
      */
     public function show(Hki $hki)
     {
+        $hki->load('penulis.fakultas', 'penulis.dosen');
         return Inertia::render('admin/hki/show', [
-            'hki' => $hki->with('penulisRelasi')
+            'data' => $hki
         ]);
     }
 
@@ -189,21 +193,11 @@ class HkiController extends Controller
                 'jumlah_dana' => $validated['jumlah_dana'] ?? null,
             ]);
 
-            $dosens = Dosen::whereIn('id', collect($validated['authors'])->pluck('dosen_id'))
-                ->get()
-                ->keyBy('id');
-
-            $fakultas = Fakultas::whereIn('id', collect($validated['authors'])->pluck('fakultas_id'))
-                ->get()
-                ->keyBy('id');
-
             $hki->penulis()->delete();
             foreach ($validated['authors'] as $i => $author) {
                 $hki->penulis()->create([
                     'fakultas_id' => $author['fakultas_id'],
                     'dosen_id' => $author['dosen_id'],
-                    'nama_dosen' => $dosens[$author['dosen_id']]->nama_dosen,
-                    'nama_fakultas' => $fakultas[$author['fakultas_id']]->nama_fakultas,
                     'urutan' => $i + 1,
                 ]);
             }

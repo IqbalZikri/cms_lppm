@@ -39,6 +39,14 @@ import { route } from "ziggy-js";
 import { Hki } from "@/interface/hki";
 import { Penulis } from "@/interface/penulis";
 import { Field, FieldGroup } from "@/components/ui/field";
+import {
+    InputGroup,
+    InputGroupAddon,
+    InputGroupInput,
+} from "@/components/ui/input-group";
+import { formatRupiah } from "../pkm/form";
+import { Combobox } from "@/components/ui/combobox";
+import { generateSlug } from "../berita/form";
 
 interface Props {
     fakultas: Fakultas[];
@@ -82,14 +90,6 @@ function buildInitialAuthors(penulis: Penulis[] | undefined): AuthorRow[] {
     }));
 }
 
-export function formatRupiah(inputAngka: number) {
-    new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-    }).format(inputAngka);
-}
-
 function RequiredMark() {
     return <span className="ml-0.5 text-red-500">*</span>;
 }
@@ -128,12 +128,14 @@ export default function FormHki({ fakultas, hki }: Props) {
     const [jenisHki, setJenisHki] = useState(hki?.jenis_hki ?? "");
     const [semester, setSemester] = useState(hki?.semester ?? "");
     const [sumberDana, setSumberDana] = useState(hki?.sumber_dana ?? "");
-    const [jumlahDana, setJumlahDana] = useState("");
+    const [jumlahDana, setJumlahDana] = useState(
+        hki?.jumlah_dana ? String(hki?.jumlah_dana) : "",
+    );
+    const [slug, setSlug] = useState(hki?.slug ?? "");
 
-    const handleFormatAngkaChange = (e: any) => {
-        const nilaiSaja = e.target.value.replace(/\D/g,'');
-        setJumlahDana(nilaiSaja)
-    }
+    const handleJudulChange = (value: string) => {
+        setSlug(generateSlug(value));
+    };
 
     const action = isEdit
         ? route("admin.hki.update", hki!.id)
@@ -294,12 +296,51 @@ export default function FormHki({ fakultas, hki }: Props) {
                                                 name="judul"
                                                 defaultValue={hki?.judul}
                                                 placeholder="Contoh: Analisis Implementasi..."
+                                                onChange={(e) =>
+                                                    handleJudulChange(
+                                                        e.target.value,
+                                                    )
+                                                }
                                                 className="h-11 text-base"
                                                 aria-invalid={!!errors.judul}
                                             />
                                             {errors.judul && (
                                                 <p className="text-sm text-red-500">
                                                     {errors.judul}
+                                                </p>
+                                            )}
+                                        </Field>
+                                    </FieldGroup>
+                                </div>
+
+                                <div className="space-y-2 sm:pl-12">
+                                    <FieldGroup>
+                                        <Field>
+                                            <Label
+                                                htmlFor="slug"
+                                                className="text-base"
+                                            >
+                                                Slug
+                                                <RequiredMark />
+                                            </Label>
+                                            <Input
+                                                id="slug"
+                                                name="slug"
+                                                value={slug}
+                                                onChange={(e) =>
+                                                    setSlug(
+                                                        generateSlug(
+                                                            e.target.value,
+                                                        ),
+                                                    )
+                                                }
+                                                placeholder="judul-penelitian-otomatis"
+                                                className="h-11 text-base"
+                                                aria-invalid={!!errors.slug}
+                                            />
+                                            {errors.slug && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.slug}
                                                 </p>
                                             )}
                                         </Field>
@@ -476,14 +517,40 @@ export default function FormHki({ fakultas, hki }: Props) {
                                                     Jumlah Dana
                                                     <RequiredMark />
                                                 </Label>
-                                                <Input
+                                                <InputGroup>
+                                                    <InputGroupInput
+                                                        id="jumlah_dana"
+                                                        inputMode="numeric"
+                                                        placeholder="Jumlah Dana"
+                                                        value={
+                                                            jumlahDana
+                                                                ? formatRupiah(
+                                                                      Number(
+                                                                          jumlahDana,
+                                                                      ),
+                                                                  )
+                                                                : ""
+                                                        }
+                                                        onChange={(e) =>
+                                                            setJumlahDana(
+                                                                e.target.value.replace(
+                                                                    /\D/g,
+                                                                    "",
+                                                                ),
+                                                            )
+                                                        }
+                                                        aria-invalid={
+                                                            !!errors.jumlah_dana
+                                                        }
+                                                    />
+                                                    <InputGroupAddon>
+                                                        Rp.
+                                                    </InputGroupAddon>
+                                                </InputGroup>
+                                                <input
+                                                    type="hidden"
                                                     name="jumlah_dana"
-                                                    id="jumlah_dana"
-                                                    placeholder="Jumlah Dana"
-                                                    value={hki?.jumlah_dana}
-                                                    aria-invalid={
-                                                        !!errors.jumlah_dana
-                                                    }
+                                                    value={jumlahDana}
                                                 />
                                                 {errors.jumlah_dana && (
                                                     <p className="text-sm text-red-500">
@@ -670,7 +737,15 @@ export default function FormHki({ fakultas, hki }: Props) {
                                                         <Label className="text-sm text-muted-foreground">
                                                             Fakultas
                                                         </Label>
-                                                        <Select
+                                                        <Combobox
+                                                            options={fakultas.map(
+                                                                (f) => ({
+                                                                    value: String(
+                                                                        f.id,
+                                                                    ),
+                                                                    label: f.nama_fakultas,
+                                                                }),
+                                                            )}
                                                             value={
                                                                 author.fakultasId
                                                             }
@@ -682,40 +757,20 @@ export default function FormHki({ fakultas, hki }: Props) {
                                                                     value,
                                                                 )
                                                             }
-                                                        >
-                                                            <SelectTrigger className="h-11 bg-background text-base">
-                                                                <SelectValue placeholder="Pilih fakultas" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {fakultas.map(
-                                                                    (f) => (
-                                                                        <SelectItem
-                                                                            key={
-                                                                                f.id
-                                                                            }
-                                                                            value={String(
-                                                                                f.id,
-                                                                            )}
-                                                                        >
-                                                                            {
-                                                                                f.nama_fakultas
-                                                                            }
-                                                                        </SelectItem>
-                                                                    ),
-                                                                )}
-                                                            </SelectContent>
-                                                            {errors[
-                                                                `authors.${index}.fakultas_id`
-                                                            ] && (
-                                                                <p className="text-sm text-red-500">
-                                                                    {
-                                                                        errors[
-                                                                            `authors.${index}.fakultas_id`
-                                                                        ]
-                                                                    }
-                                                                </p>
-                                                            )}
-                                                        </Select>
+                                                            placeholder="Pilih fakultas"
+                                                            searchPlaceholder="Cari fakultas..."
+                                                        />
+                                                        {errors[
+                                                            `authors.${index}.fakultas_id`
+                                                        ] && (
+                                                            <p className="text-sm text-red-500">
+                                                                {
+                                                                    errors[
+                                                                        `authors.${index}.fakultas_id`
+                                                                    ]
+                                                                }
+                                                            </p>
+                                                        )}
                                                     </Field>
                                                 </FieldGroup>
                                             </div>
@@ -726,7 +781,15 @@ export default function FormHki({ fakultas, hki }: Props) {
                                                         <Label className="text-sm text-muted-foreground">
                                                             Nama Dosen
                                                         </Label>
-                                                        <Select
+                                                        <Combobox
+                                                            options={author.dosenOptions.map(
+                                                                (d) => ({
+                                                                    value: String(
+                                                                        d.id,
+                                                                    ),
+                                                                    label: d.nama_dosen,
+                                                                }),
+                                                            )}
                                                             value={
                                                                 author.dosenId
                                                             }
@@ -738,63 +801,39 @@ export default function FormHki({ fakultas, hki }: Props) {
                                                                     value,
                                                                 )
                                                             }
+                                                            placeholder={
+                                                                !author.fakultasId
+                                                                    ? "Pilih fakultas dulu"
+                                                                    : author.loadingDosen
+                                                                      ? "Memuat dosen..."
+                                                                      : author
+                                                                              .dosenOptions
+                                                                              .length ===
+                                                                          0
+                                                                        ? "Tidak ada data dosen"
+                                                                        : "Pilih dosen"
+                                                            }
+                                                            searchPlaceholder="Cari dosen..."
                                                             disabled={
                                                                 !author.fakultasId ||
                                                                 author.loadingDosen ||
-                                                                (author
+                                                                author
                                                                     .dosenOptions
                                                                     .length ===
-                                                                    0 &&
-                                                                    !author.loadingDosen &&
-                                                                    !!author.fakultasId)
+                                                                    0
                                                             }
-                                                        >
-                                                            <SelectTrigger className="h-11 bg-background text-base">
-                                                                <SelectValue
-                                                                    placeholder={
-                                                                        !author.fakultasId
-                                                                            ? "Pilih fakultas dulu"
-                                                                            : author.loadingDosen
-                                                                              ? "Memuat dosen..."
-                                                                              : author
-                                                                                      .dosenOptions
-                                                                                      .length ===
-                                                                                  0
-                                                                                ? "Tidak ada data dosen"
-                                                                                : "Pilih dosen"
-                                                                    }
-                                                                />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {author.dosenOptions.map(
-                                                                    (d) => (
-                                                                        <SelectItem
-                                                                            key={
-                                                                                d.id
-                                                                            }
-                                                                            value={String(
-                                                                                d.id,
-                                                                            )}
-                                                                        >
-                                                                            {
-                                                                                d.nama_dosen
-                                                                            }
-                                                                        </SelectItem>
-                                                                    ),
-                                                                )}
-                                                            </SelectContent>
-                                                            {errors[
-                                                                `authors.${index}.dosen_id`
-                                                            ] && (
-                                                                <p className="text-sm text-red-500">
-                                                                    {
-                                                                        errors[
-                                                                            `authors.${index}.dosen_id`
-                                                                        ]
-                                                                    }
-                                                                </p>
-                                                            )}
-                                                        </Select>
+                                                        />
+                                                        {errors[
+                                                            `authors.${index}.dosen_id`
+                                                        ] && (
+                                                            <p className="text-sm text-red-500">
+                                                                {
+                                                                    errors[
+                                                                        `authors.${index}.dosen_id`
+                                                                    ]
+                                                                }
+                                                            </p>
+                                                        )}
                                                     </Field>
                                                 </FieldGroup>
                                             </div>

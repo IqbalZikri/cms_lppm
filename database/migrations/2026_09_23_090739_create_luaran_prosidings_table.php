@@ -13,11 +13,11 @@ return new class extends Migration {
         Schema::create('luaran_prosidings', function (Blueprint $table) {
             $table->id();
             $table->string('judul');
+            $table->string('slug');
             $table->string('abstrak');
             $table->string('semester');
             $table->year('tahun');
             $table->string('link_berkas');
-            $table->text('penulis');
             $table->timestamps();
         });
     }

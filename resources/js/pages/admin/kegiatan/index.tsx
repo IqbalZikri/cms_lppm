@@ -2,13 +2,12 @@ import { DialogDelete } from "@/components/dialog-form";
 import Header from "@/components/header";
 import StatisticsCard from "@/components/statistic-card";
 import TablePage from "@/components/table-page";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Fakultas } from "@/interface/fakultas";
 import { Kegiatan as KegiatanInterface } from "@/interface/kegiatan";
 import { PaginatedData } from "@/interface/pagination";
-import kegiatan from "@/routes/admin/kegiatan";
-import { Dosen } from "@/types/dosen";
 import { Head, Link } from "@inertiajs/react";
 import { Activity, Plus } from "lucide-react";
 import { route } from "ziggy-js";
@@ -16,12 +15,16 @@ import { route } from "ziggy-js";
 interface Props {
     data: PaginatedData<KegiatanInterface>;
     fakultas: Fakultas[];
-    dosen: Dosen[];
 }
 
-export default function Kegiatan({ data, fakultas, dosen }: Props) {
+export default function Kegiatan({ data, fakultas }: Props) {
     const totalKegiatan = data.total;
-    console.log(data.data);
+    const statistikFakultas = fakultas.map((item) => ({
+        label: item.nama_fakultas,
+        count: data.data.filter((kegiatan) =>
+            kegiatan.penulis.some((penulis) => penulis.fakultas_id === item.id),
+        ).length,
+    }));
 
     return (
         <>
@@ -37,31 +40,15 @@ export default function Kegiatan({ data, fakultas, dosen }: Props) {
                     ]}
                 />
 
-                {fakultas.map((item) => {
-                    const totalKegiatanFakultas = data.data.filter((kegiatan) =>
-                        kegiatan.penulis.some(
-                            (penulis) => penulis.fakultas_id === item.id,
-                        ),
-                    );
-
-                    return (
-                        <StatisticsCard
-                            key={item.id}
-                            dataCard={[
-                                {
-                                    label: "Kegiatan",
-                                    count: totalKegiatan,
-                                },
-                                {
-                                    label:
-                                        "Penelitian Kegiatan Fakultas " +
-                                        item.nama_fakultas,
-                                    count: totalKegiatanFakultas.length ?? 0,
-                                },
-                            ]}
-                        />
-                    );
-                })}
+                <StatisticsCard
+                    dataCard={[
+                        {
+                            label: "Kegiatan",
+                            count: totalKegiatan,
+                        },
+                        ...statistikFakultas,
+                    ]}
+                />
 
                 <Card>
                     <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
@@ -97,40 +84,52 @@ export default function Kegiatan({ data, fakultas, dosen }: Props) {
                             data={data}
                             columns={[
                                 {
-                                    id: "fakultas",
+                                    key: "judul",
+                                    label: "Judul Kegiatan",
+                                },
+                                {
+                                    id: "fakuktas",
                                     key: "penulis",
                                     label: "Fakultas",
-                                    render: (_, item) =>
-                                        item.penulis
-                                            .map(
-                                                (penulis) =>
-                                                    fakultas.find(
-                                                        (f) =>
-                                                            f.id ===
-                                                            penulis.fakultas_id,
-                                                    )?.nama_fakultas ?? "-",
-                                            )
-                                            .join(", "),
+                                    render: (_, item) => (
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {item.penulis.map((penulis, i) => (
+                                                <div
+                                                    key={i}
+                                                    className="flex flex-wrap items-center gap-1.5"
+                                                >
+                                                    <Badge className="whitespace-nowrap text-[13px]">
+                                                        {
+                                                            penulis.fakultas
+                                                                .nama_fakultas
+                                                        }
+                                                    </Badge>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ),
                                 },
                                 {
                                     id: "dosen",
                                     key: "penulis",
                                     label: "Dosen",
-                                    render: (_, item) =>
-                                        item.penulis
-                                            .map(
-                                                (penulis) =>
-                                                    dosen.find(
-                                                        (d) =>
-                                                            d.id ===
-                                                            penulis.dosen_id,
-                                                    )?.nama_dosen ?? "-",
-                                            )
-                                            .join(", "),
-                                },
-                                {
-                                    key: "judul_kegiatan",
-                                    label: "Judul Kegiatan",
+                                    render: (_, item) => (
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {item.penulis.map((penulis, i) => (
+                                                <div
+                                                    key={i}
+                                                    className="flex flex-wrap items-center gap-1.5"
+                                                >
+                                                    <Badge className="whitespace-nowrap text-[13px]">
+                                                        {
+                                                            penulis.dosen
+                                                                .nama_dosen
+                                                        }
+                                                    </Badge>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ),
                                 },
                             ]}
                             renderActions={(item) => (
@@ -142,7 +141,7 @@ export default function Kegiatan({ data, fakultas, dosen }: Props) {
                                         )}
                                         viewTransition
                                     >
-                                        <Button variant="outline" size="sm">
+                                        <Button variant="outline">
                                             Edit
                                         </Button>
                                     </Link>
@@ -153,12 +152,12 @@ export default function Kegiatan({ data, fakultas, dosen }: Props) {
                                         )}
                                         viewTransition
                                     >
-                                        <Button variant="default" size="sm">
+                                        <Button variant="default">
                                             Show
                                         </Button>
                                     </Link>
                                     <DialogDelete
-                                        label={item.judul_kegiatan}
+                                        label={item.judul}
                                         actionUrl={route(
                                             "admin.kegiatan.destroy",
                                             item.id,

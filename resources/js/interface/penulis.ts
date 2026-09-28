@@ -1,10 +1,13 @@
+import { Dosen } from "@/types/dosen";
+import { Fakultas } from "./fakultas";
+
 export interface Penulis {
     id: number;
     penulisable_type: number;
     penulisable_id: number;
     fakultas_id: number;
+    fakultas: Fakultas;
     dosen_id: number;
-    nama_fakultas: string;
-    nama_dosen: string;
+    dosen: Dosen;
     urutan: number;
 }

@@ -10,6 +10,7 @@ class LuaranJurnal extends Model
     protected $fillable = [
         'jenis_luaran_jurnal',
         'judul',
+        'slug',
         'abstrak',
         'semester',
         'tahun',

@@ -108,7 +108,7 @@ export default function LuaranJurnal({ data, fakultas }: Props) {
                                                     className="flex flex-wrap items-center gap-1.5"
                                                 >
                                                     <Badge className="whitespace-nowrap text-[13px]">
-                                                        {penulis.nama_fakultas}
+                                                        {penulis.fakultas.nama_fakultas}
                                                     </Badge>
                                                 </div>
                                             ))}
@@ -127,7 +127,7 @@ export default function LuaranJurnal({ data, fakultas }: Props) {
                                                     className="flex flex-wrap items-center gap-1.5"
                                                 >
                                                     <Badge className="whitespace-nowrap text-[13px]">
-                                                        {penulis.nama_dosen}
+                                                        {penulis.dosen.nama_dosen}
                                                     </Badge>
                                                 </div>
                                             ))}

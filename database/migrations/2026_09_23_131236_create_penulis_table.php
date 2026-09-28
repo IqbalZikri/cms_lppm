@@ -13,10 +13,8 @@ return new class extends Migration {
         Schema::create('penulis', function (Blueprint $table) {
             $table->id();
             $table->morphs('penulisable');
-            $table->foreignId('fakultas_id')->constrained()->nullOnDelete();
-            $table->foreignId('dosen_id')->constrained()->nullOnDelete();
-            $table->string('nama_fakultas');
-            $table->string('nama_dosen');
+            $table->foreignId('fakultas_id')->constrained()->restrictOnUpdate();
+            $table->foreignId('dosen_id')->constrained()->restrictOnDelete();
             $table->unsignedTinyInteger('urutan')->default(1);
             $table->unique(['penulisable_type', 'penulisable_id', 'dosen_id']);
             $table->timestamps();

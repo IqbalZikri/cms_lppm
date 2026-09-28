@@ -19,13 +19,13 @@ class KegiatanController extends Controller
      */
     public function index()
     {
+        // $data = Kegiatan::latest()->paginate(10);
         $data = Kegiatan::latest()->paginate(10);
+        $data->load('penulis.fakultas', 'penulis.dosen');
         $fakultas = Fakultas::get();
-        $dosen = Dosen::get();
         return Inertia::render('admin/kegiatan/index', [
             'data' => $data,
             'fakultas' => $fakultas,
-            'dosen' => $dosen
         ]);
     }
 
@@ -46,7 +46,8 @@ class KegiatanController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'judul_kegiatan' => 'required',
+            'judul' => 'required',
+            'slug' => 'required',
             'abstrak' => 'required',
             'semester' => 'required',
             'tahun' => 'required',
@@ -57,7 +58,8 @@ class KegiatanController extends Controller
             'authors.*.fakultas_id' => 'required|exists:fakultas,id',
             'authors.*.dosen_id' => 'required|exists:dosens,id',
         ], [
-            'judul_kegiatan.required' => 'Silahkan isi judul kegiatan',
+            'judul.required' => 'Silahkan isi judul kegiatan',
+            'slug.required' => 'Silahkan isi slug',
             'abstrak.required' => 'Silahkan isi abstrak',
             'semester.required' => 'Silahkan isi semester',
             'tahun.required' => 'Silahkan isi tahun',
@@ -74,7 +76,8 @@ class KegiatanController extends Controller
 
         try {
             $kegiatan = Kegiatan::create([
-                'judul_kegiatan' => $validated['judul_kegiatan'],
+                'judul' => $validated['judul'],
+                'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],
@@ -83,12 +86,10 @@ class KegiatanController extends Controller
                 'jumlah_dana' => $validated['jumlah_dana'],
             ]);
 
-            foreach ($validated as $i => $author) {
+            foreach ($validated['authors'] as $i => $author) {
                 $kegiatan->penulis()->create([
                     'fakultas_id' => $author['fakultas_id'],
                     'dosen_id' => $author['dosen_id'],
-                    'nama_fakultas' => $author['nama_fakultas'],
-                    'nama_dosen' => $author['nama_dosen'],
                     'urutan' => $i + 1,
                 ]);
             }
@@ -109,6 +110,7 @@ class KegiatanController extends Controller
     public function show(string $id)
     {
         $data = Kegiatan::findOrFail($id);
+        $data->load('penulis.fakultas','penulis.dosen');
         $fakultas = Fakultas::get();
         return Inertia::render('admin/kegiatan/show', [
             'data' => $data,
@@ -122,6 +124,7 @@ class KegiatanController extends Controller
     public function edit(string $id)
     {
         $kegiatan = Kegiatan::findOrFail($id);
+        $kegiatan->load('penulis');
         $fakultas = Fakultas::get();
         $dosen = Dosen::get();
         return Inertia::render('admin/kegiatan/edit', [
@@ -139,7 +142,7 @@ class KegiatanController extends Controller
         $kegiatan = Kegiatan::findOrFail($id);
 
         $validated = $request->validate([
-            'judul_kegiatan' => 'required',
+            'judul' => 'required',
             'abstrak' => 'required',
             'semester' => 'required',
             'tahun' => 'required',
@@ -148,9 +151,9 @@ class KegiatanController extends Controller
             'jumlah_dana' => 'required|numeric',
             'authors' => 'required|array|min:1',
             'authors.*.fakultas_id' => 'required|exists:fakultas,id',
-            'authors.*.dosen_id' => 'required|exists:dosens,id',
+            'authors.*.dosen_id' => 'required|exists:dosens,id|distinct',
         ], [
-            'judul_kegiatan.required' => 'Silahkan isi judul kegiatan',
+            'judul.required' => 'Silahkan isi judul kegiatan',
             'abstrak.required' => 'Silahkan isi abstrak',
             'semester.required' => 'Silahkan isi semester',
             'tahun.required' => 'Silahkan isi tahun',
@@ -162,36 +165,31 @@ class KegiatanController extends Controller
             'authors.required' => 'Silahkan tambahkan minimal satu penulis',
             'authors.*.fakultas_id.required' => 'Silahkan pilih fakultas untuk setiap penulis',
             'authors.*.dosen_id.required' => 'Silahkan pilih dosen untuk setiap penulis',
+            'authors.*.dosen_id.distinct' => 'Duplikat nama dosen',
         ]);
 
         DB::beginTransaction();
 
         try {
-            $dosenIds = collect($validated['authors'])->pluck('dosen_id');
-            $dosenMap = Dosen::whereIn('id', $dosenIds)->pluck('nama_dosen', 'id');
-
-            $fakultasIds = collect($validated['authors'])->pluck('fakultas_id');
-            $fakultasMap = Fakultas::whereIn('id', $fakultasIds)->pluck('nama_fakultas', 'id');
-
-            $penulisJson = collect($validated['authors'])->map(function ($author) use ($dosenMap, $fakultasMap) {
-                return [
-                    'fakultas_id' => (int) $author['fakultas_id'],
-                    'dosen_id' => (int) $author['dosen_id'],
-                    'nama_fakultas' => $fakultasMap[$author['fakultas_id']] ?? null,
-                    'nama_dosen' => $dosenMap[$author['dosen_id']] ?? null,
-                ];
-            })->values()->all();
-
             $kegiatan->update([
-                'judul_kegiatan' => $validated['judul_kegiatan'],
+                'judul' => $validated['judul'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],
                 'link_berkas' => $validated['link_berkas'],
                 'sumber_dana' => $validated['sumber_dana'],
                 'jumlah_dana' => $validated['jumlah_dana'],
-                'penulis' => $penulisJson,
             ]);
+
+            $kegiatan->penulis()->delete();
+
+            foreach ($validated['authors'] as $i => $author) {
+                $kegiatan->penulis()->create([
+                    'fakultas_id' => $author['fakultas_id'],
+                    'dosen_id' => $author['dosen_id'],
+                    'urutan' => $i + 1,
+                ]);
+            }
 
             DB::commit();
 
@@ -210,6 +208,7 @@ class KegiatanController extends Controller
     {
         $data = Kegiatan::findOrFail($id);
         try {
+            $data->penulis()->delete();
             $data->delete();
             return back()->with('success', 'Berhasil menghapus kegiatan penelitian');
         } catch (\Throwable $th) {

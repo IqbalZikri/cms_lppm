@@ -47,7 +47,7 @@ interface Props {
     berita?: Berita; // ada isinya = mode edit, undefined = mode create
 }
 
-function generateSlug(text: string) {
+export function generateSlug(text: string) {
     return text
         .toLowerCase()
         .trim()

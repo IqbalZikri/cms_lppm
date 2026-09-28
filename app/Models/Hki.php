@@ -10,6 +10,7 @@ class Hki extends Model
     protected $fillable = [
         'jenis_hki',
         'judul',
+        'slug',
         'abstrak',
         'semester',
         'tahun',

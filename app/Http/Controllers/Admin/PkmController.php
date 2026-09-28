@@ -17,6 +17,7 @@ class PkmController extends Controller
     public function index()
     {
         $data = Pkm::latest()->paginate(10);
+        $data->load('penulis.fakultas', 'penulis.dosen');
         $fakultas = Fakultas::get();
         return Inertia::render('admin/pkm/index', [
             'data' => $data,
@@ -34,10 +35,11 @@ class PkmController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
         $validated = $request->validate([
             'jenis_pkm' => ['required', Rule::in(['pelaksanaan', 'jurnal'])],
             'judul' => 'required',
+            'slug' => 'required',
+            'gambar' => 'nullable|max:2048|mimes:png,jpg,jpeg',
             'abstrak' => 'required',
             'semester' => 'required',
             'tahun' => 'required',
@@ -46,10 +48,13 @@ class PkmController extends Controller
             'jumlah_dana' => 'required|numeric',
             'authors' => 'required|array|min:1',
             'authors.*.fakultas_id' => 'required|exists:fakultas,id',
-            'authors.*.dosen_id' => 'required|exists:dosens,id',
+            'authors.*.dosen_id' => 'required|exists:dosens,id|distinct',
         ], [
             'jenis_pkm.required' => 'Silahkan pilih jenis pkm',
             'judul.required' => 'Silahkan isi judul',
+            'slug.required' => 'Silahkan isi slug',
+            'gambar.max' => 'Gambar tidak bisa lebih dari 2 MB',
+            'gambar.mimes' => 'Format file harus berupa jpg / jpeg / png',
             'abstrak.required' => 'Silahkan isi abstrak',
             'semester.required' => 'Silahkan isi semester',
             'tahun.required' => 'Silahkan isi tahun',
@@ -61,37 +66,31 @@ class PkmController extends Controller
             'authors.required' => 'Silahkan tambahkan minimal satu  / pelaksana',
             'authors.*.fakultas_id.required' => 'Silahkan pilih fakultas untuk setiap  / pelaksana',
             'authors.*.dosen_id.required' => 'Silahkan pilih dosen untuk setiap  / pelaksana',
+            'authors.*.dosen_id.distinct' => 'Duplikat dosen yang sama',
         ]);
 
         DB::beginTransaction();
 
         try {
-            $dosenIds = collect($validated['authors'])->pluck('dosen_id');
-            $dosenMap = Dosen::whereIn('id', $dosenIds)->pluck('nama_dosen', 'id');
-
-            $fakultasIds = collect($validated['authors'])->pluck('fakultas_id');
-            $fakultasMap = Fakultas::whereIn('id', $fakultasIds)->pluck('nama_fakultas', 'id');
-
-            $penulisJson = collect($validated['authors'])->map(function ($author) use ($dosenMap, $fakultasMap) {
-                return [
-                    'fakultas_id' => (int) $author['fakultas_id'],
-                    'dosen_id' => (int) $author['dosen_id'],
-                    'nama_fakultas' => $fakultasMap[$author['fakultas_id']] ?? null,
-                    'nama_dosen' => $dosenMap[$author['dosen_id']] ?? null,
-                ];
-            })->values()->all();
-
-            Pkm::create([
+            $pkm = Pkm::create([
                 'jenis_pkm' => $validated['jenis_pkm'],
                 'judul' => $validated['judul'],
+                'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],
                 'link_berkas' => $validated['link_berkas'],
                 'sumber_dana' => $validated['sumber_dana'],
                 'jumlah_dana' => $validated['jumlah_dana'],
-                'penulis' => $penulisJson,
             ]);
+
+            foreach ($validated['authors'] as $i => $author) {
+                $pkm->penulis()->create([
+                    'fakultas_id' => $author['fakultas_id'],
+                    'dosen_id' => $author['dosen_id'],
+                    'urutan' => $i + 1,
+                ]);
+            }
 
             DB::commit();
 
@@ -106,6 +105,7 @@ class PkmController extends Controller
     public function show($id)
     {
         $data = Pkm::findOrFail($id);
+        $data->load('penulis.fakultas', 'penulis.dosen');
         return Inertia::render('admin/pkm/show', [
             'data' => $data
         ]);
@@ -114,6 +114,7 @@ class PkmController extends Controller
     public function edit($id)
     {
         $data = Pkm::findOrFail($id);
+        $data->load('penulis');
         $fakultas = Fakultas::get();
         return Inertia::render('admin/pkm/edit', [
             'data' => $data,
@@ -155,21 +156,6 @@ class PkmController extends Controller
 
         try {
             $pkm = Pkm::findOrFail($id);
-            $dosenIds = collect($validated['authors'])->pluck('dosen_id');
-            $dosenMap = Dosen::whereIn('id', $dosenIds)->pluck('nama_dosen', 'id');
-
-            $fakultasIds = collect($validated['authors'])->pluck('fakultas_id');
-            $fakultasMap = Fakultas::whereIn('id', $fakultasIds)->pluck('nama_fakultas', 'id');
-
-            $penulisJson = collect($validated['authors'])->map(function ($author) use ($dosenMap, $fakultasMap) {
-                return [
-                    'fakultas_id' => (int) $author['fakultas_id'],
-                    'dosen_id' => (int) $author['dosen_id'],
-                    'nama_fakultas' => $fakultasMap[$author['fakultas_id']] ?? null,
-                    'nama_dosen' => $dosenMap[$author['dosen_id']] ?? null,
-                ];
-            })->values()->all();
-
             $pkm->update([
                 'jenis_pkm' => $validated['jenis_pkm'],
                 'judul' => $validated['judul'],
@@ -179,8 +165,16 @@ class PkmController extends Controller
                 'link_berkas' => $validated['link_berkas'],
                 'sumber_dana' => $validated['sumber_dana'],
                 'jumlah_dana' => $validated['jumlah_dana'],
-                'penulis' => $penulisJson,
             ]);
+
+            $pkm->penulis()->delete();
+            foreach ($validated['authors'] as $i => $author) {
+                $pkm->penulis()->create([
+                    'fakultas_id' => $author['fakultas_id'],
+                    'dosen_id' => $author['dosen_id'],
+                    'urutan' => $i++,
+                ]);
+            }
 
             DB::commit();
 
@@ -197,6 +191,7 @@ class PkmController extends Controller
         $data = Pkm::findOrFail($id);
 
         try {
+            $data->penulis()->delete();
             $data->delete();
             return back()->with('success', 'Berhasil menghapus pkm');
         } catch (\Throwable $th) {

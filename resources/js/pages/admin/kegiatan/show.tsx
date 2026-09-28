@@ -39,7 +39,7 @@ export default function Show({ data }: Props) {
 
     return (
         <>
-            <Head title={`Detail - ${data.judul_kegiatan}`} />
+            <Head title={`Detail - ${data.judul}`} />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
                     <Link href={route("admin.kegiatan.index")} viewTransition>
@@ -49,7 +49,10 @@ export default function Show({ data }: Props) {
                         </Button>
                     </Link>
 
-                    <Link href={route("admin.kegiatan.edit", data.id)} viewTransition>
+                    <Link
+                        href={route("admin.kegiatan.edit", data.id)}
+                        viewTransition
+                    >
                         <Button size="sm">
                             <Pencil className="mr-1 h-4 w-4" />
                             Edit
@@ -57,10 +60,11 @@ export default function Show({ data }: Props) {
                     </Link>
                 </div>
 
-                <Card className="mx-auto w-full max-w-3xl">
+                <Card className="w-full">
                     <CardHeader>
-                        <CardTitle className="text-xl">
-                            {data.judul_kegiatan}
+                        <CardTitle className="text-xl flex justify-between">
+                            {data.judul}
+                            <small className="text-base font-thin">slug: {data.slug}</small>
                         </CardTitle>
                         <CardDescription>
                             Detail kegiatan penelitian
@@ -159,10 +163,11 @@ export default function Show({ data }: Props) {
                                                     {index + 1}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {p.nama_dosen ?? "-"}
+                                                    {p.dosen.nama_dosen ?? "-"}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {p.nama_fakultas ?? "-"}
+                                                    {p.fakultas.nama_fakultas ??
+                                                        "-"}
                                                 </TableCell>
                                             </TableRow>
                                         ))}

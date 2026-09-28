@@ -1,6 +1,16 @@
 import axios from "axios";
 import { useEffect } from "react";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import {
+    ArrowLeft,
+    BookText,
+    FileText,
+    Hash,
+    Link2,
+    Plus,
+    Trash2,
+    Users,
+    Wallet,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -12,6 +22,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import {
     Select,
     SelectContent,
@@ -21,21 +32,32 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Fakultas } from "@/interface/fakultas";
-import { Kegiatan, Penulis } from "@/interface/kegiatan";
 import { Dosen } from "@/types/dosen";
 import { Form, Link } from "@inertiajs/react";
 import { useState } from "react";
 import { route } from "ziggy-js";
+import { Penulis } from "@/interface/penulis";
+import { Field, FieldGroup } from "@/components/ui/field";
+import { Kegiatan } from "@/interface/kegiatan";
+import { generateSlug } from "../berita/form";
+import {
+    InputGroup,
+    InputGroupAddon,
+    InputGroupInput,
+} from "@/components/ui/input-group";
+import { formatRupiah } from "../pkm/form";
+import { Combobox } from "@/components/ui/combobox";
 
 interface Props {
     fakultas: Fakultas[];
-    kegiatan?: Kegiatan; // kalau ada berarti mode edit
+    kegiatan?: Kegiatan;
 }
 
 interface AuthorRow {
     key: string;
     fakultasId: string;
     dosenId: string;
+    fakultasOptions: Fakultas[];
     dosenOptions: Dosen[];
     loadingDosen: boolean;
 }
@@ -51,6 +73,7 @@ function buildInitialAuthors(penulis: Penulis[] | undefined): AuthorRow[] {
                 key: makeKey(),
                 fakultasId: "",
                 dosenId: "",
+                fakultasOptions: [],
                 dosenOptions: [],
                 loadingDosen: false,
             },
@@ -61,6 +84,7 @@ function buildInitialAuthors(penulis: Penulis[] | undefined): AuthorRow[] {
         key: makeKey(),
         fakultasId: String(p.fakultas_id),
         dosenId: String(p.dosen_id),
+        fakultasOptions: [],
         dosenOptions: [],
         loadingDosen: false,
     }));
@@ -70,10 +94,47 @@ function RequiredMark() {
     return <span className="ml-0.5 text-red-500">*</span>;
 }
 
+/** Small section heading used to break the long form into readable groups. */
+function SectionHeading({
+    icon: Icon,
+    title,
+    description,
+}: {
+    icon: React.ElementType;
+    title: string;
+    description?: string;
+}) {
+    return (
+        <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <Icon className="h-4 w-4" />
+            </div>
+            <div>
+                <h3 className="text-base font-semibold leading-none">
+                    {title}
+                </h3>
+                {description && (
+                    <p className="mt-1 text-sm text-muted-foreground">
+                        {description}
+                    </p>
+                )}
+            </div>
+        </div>
+    );
+}
+
 export default function FormKegiatan({ fakultas, kegiatan }: Props) {
     const isEdit = !!kegiatan;
     const [semester, setSemester] = useState(kegiatan?.semester ?? "");
     const [sumberDana, setSumberDana] = useState(kegiatan?.sumber_dana ?? "");
+    const [jumlahDana, setJumlahDana] = useState(
+        kegiatan?.jumlah_dana ? String(kegiatan?.jumlah_dana) : "",
+    );
+    const [slug, setSlug] = useState(kegiatan?.slug ?? "");
+
+    const handleJudulChange = (value: string) => {
+        setSlug(generateSlug(value));
+    };
 
     const action = isEdit
         ? route("admin.kegiatan.update", kegiatan!.id)
@@ -108,6 +169,7 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
                 key: makeKey(),
                 fakultasId: "",
                 dosenId: "",
+                fakultasOptions: [],
                 dosenOptions: [],
                 loadingDosen: false,
             },
@@ -162,327 +224,493 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
         );
     }
 
-    // Untuk edit mode, nama dosen terpilih diambil dari dosenOptions baris itu sendiri
-    // const penulisValue = authors
-    //     .map(
-    //         (a) =>
-    //             a.dosenOptions.find((d) => String(d.id) === a.dosenId)
-    //                 ?.nama_dosen,
-    //     )
-    //     .filter(Boolean)
-    //     .join(", ");
-
     return (
         <Form action={action} method={isEdit ? "put" : "post"}>
             {({ errors, processing }) => (
-                <Card className="mx-auto w-full max-w-3xl">
-                    <CardHeader>
-                        <CardTitle className="text-xl">
-                            {isEdit ? "Edit Kegiatan" : "Tambah Kegiatan"}
-                        </CardTitle>
-                        <CardDescription>
-                            {isEdit
-                                ? "Perbarui data kegiatan penelitian di bawah ini."
-                                : "Isi data kegiatan penelitian dengan lengkap dan benar."}
-                        </CardDescription>
-                    </CardHeader>
+                <Card className="w-full shadow-sm">
+                    <CardContent className="grid grid-cols-1 gap-8 pt-6 lg:grid-cols-3 lg:gap-10">
+                        {/* Kolom kiri: Informasi Publikasi + Detail kegiatan */}
+                        <div className="space-y-8 lg:col-span-2">
+                            <div className="space-y-5">
+                                <SectionHeading
+                                    icon={BookText}
+                                    title="Informasi Publikasi"
+                                    description="Judul dan ringkasan singkat dari hak kekayaan intelektual."
+                                />
 
-                    <CardContent className="space-y-6">
-                        {/* Judul Kegiatan */}
-                        <div className="space-y-2">
-                            <Label
-                                htmlFor="judul_kegiatan"
-                                className="text-base"
-                            >
-                                Judul Kegiatan
-                                <RequiredMark />
-                            </Label>
-                            <Input
-                                id="judul_kegiatan"
-                                name="judul_kegiatan"
-                                defaultValue={kegiatan?.judul_kegiatan}
-                                placeholder="Contoh: Analisis Implementasi..."
-                                className="h-11 text-base"
+                                <div className="space-y-2 sm:pl-12">
+                                    <FieldGroup>
+                                        <Field>
+                                            <Label
+                                                htmlFor="judul"
+                                                className="text-base"
+                                            >
+                                                Judul
+                                                <RequiredMark />
+                                            </Label>
+                                            <Input
+                                                id="judul"
+                                                name="judul"
+                                                defaultValue={kegiatan?.judul}
+                                                placeholder="Contoh: Analisis Implementasi..."
+                                                onChange={(e) =>
+                                                    handleJudulChange(
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                className="h-11 text-base"
+                                                aria-invalid={!!errors.judul}
+                                            />
+                                            {errors.judul && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.judul}
+                                                </p>
+                                            )}
+                                        </Field>
+                                    </FieldGroup>
+                                </div>
+
+                                <div className="space-y-2 sm:pl-12">
+                                    <FieldGroup>
+                                        <Field>
+                                            <Label
+                                                htmlFor="slug"
+                                                className="text-base"
+                                            >
+                                                Slug
+                                                <RequiredMark />
+                                            </Label>
+                                            <Input
+                                                id="slug"
+                                                name="slug"
+                                                value={slug}
+                                                onChange={(e) =>
+                                                    setSlug(
+                                                        generateSlug(
+                                                            e.target.value,
+                                                        ),
+                                                    )
+                                                }
+                                                placeholder="judul-penelitian-otomatis"
+                                                className="h-11 text-base"
+                                                aria-invalid={!!errors.slug}
+                                            />
+                                            {errors.slug && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.slug}
+                                                </p>
+                                            )}
+                                        </Field>
+                                    </FieldGroup>
+                                </div>
+
+                                <div className="space-y-2 sm:pl-12">
+                                    <FieldGroup>
+                                        <Field>
+                                            <Label
+                                                htmlFor="abstrak"
+                                                className="text-base"
+                                            >
+                                                Abstrak
+                                                <RequiredMark />
+                                            </Label>
+                                            <Textarea
+                                                id="abstrak"
+                                                name="abstrak"
+                                                defaultValue={kegiatan?.abstrak}
+                                                placeholder="Ringkasan singkat hak kekayaan intelektual"
+                                                rows={6}
+                                                className="text-base"
+                                                aria-invalid={!!errors.abstrak}
+                                            />
+                                            {errors.abstrak && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.abstrak}
+                                                </p>
+                                            )}
+                                        </Field>
+                                    </FieldGroup>
+                                </div>
+                            </div>
+
+                            <Separator />
+
+                            <div className="space-y-5">
+                                <SectionHeading
+                                    icon={FileText}
+                                    title="Detail kegiatan"
+                                    description="Waktu terbit dan berkas pendukung."
+                                />
+
+                                <div className="grid grid-cols-1 gap-6 sm:pl-12 sm:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <FieldGroup>
+                                            <Field>
+                                                <Label
+                                                    htmlFor="semester"
+                                                    className="text-base"
+                                                >
+                                                    Semester
+                                                    <RequiredMark />
+                                                </Label>
+                                                <Select
+                                                    value={semester}
+                                                    onValueChange={setSemester}
+                                                >
+                                                    <SelectTrigger
+                                                        id="semester"
+                                                        className="h-11 text-base"
+                                                        aria-invalid={
+                                                            !!errors.semester
+                                                        }
+                                                    >
+                                                        <SelectValue placeholder="Pilih semester" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="Ganjil">
+                                                            Ganjil
+                                                        </SelectItem>
+                                                        <SelectItem value="Genap">
+                                                            Genap
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                <input
+                                                    type="hidden"
+                                                    name="semester"
+                                                    value={semester}
+                                                />
+                                                {errors.semester && (
+                                                    <p className="text-sm text-red-500">
+                                                        {errors.semester}
+                                                    </p>
+                                                )}
+                                            </Field>
+                                        </FieldGroup>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <FieldGroup>
+                                            <Field>
+                                                <Label
+                                                    htmlFor="tahun"
+                                                    className="text-base"
+                                                >
+                                                    Tahun
+                                                    <RequiredMark />
+                                                </Label>
+                                                <Input
+                                                    id="tahun"
+                                                    name="tahun"
+                                                    type="number"
+                                                    defaultValue={
+                                                        kegiatan?.tahun
+                                                    }
+                                                    placeholder="2026"
+                                                    className="h-11 text-base"
+                                                    aria-invalid={
+                                                        !!errors.tahun
+                                                    }
+                                                />
+                                                {errors.tahun && (
+                                                    <p className="text-sm text-red-500">
+                                                        {errors.tahun}
+                                                    </p>
+                                                )}
+                                            </Field>
+                                        </FieldGroup>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2 sm:pl-12">
+                                    <FieldGroup>
+                                        <Field>
+                                            <Label
+                                                htmlFor="link_berkas"
+                                                className="text-base"
+                                            >
+                                                <span className="inline-flex items-center gap-1.5">
+                                                    <Link2 className="h-3.5 w-3.5" />
+                                                    Link Berkas
+                                                </span>
+                                                <RequiredMark />
+                                            </Label>
+                                            <Input
+                                                id="link_berkas"
+                                                name="link_berkas"
+                                                type="url"
+                                                defaultValue={
+                                                    kegiatan?.link_berkas
+                                                }
+                                                placeholder="https://drive.google.com/..."
+                                                className="h-11 text-base"
+                                                aria-invalid={
+                                                    !!errors.link_berkas
+                                                }
+                                            />
+                                            {errors.link_berkas && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.link_berkas}
+                                                </p>
+                                            )}
+                                        </Field>
+                                    </FieldGroup>
+                                </div>
+                            </div>
+
+                            <Separator />
+
+                            <div className="space-y-5">
+                                <SectionHeading
+                                    icon={Wallet}
+                                    title="Dana"
+                                    description="Jumlah dan sumber dana."
+                                />
+
+                                <div className="grid grid-cols-1 gap-6 sm:pl-12 sm:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <FieldGroup>
+                                            <Field>
+                                                <Label
+                                                    htmlFor="jumlah_dana"
+                                                    className="text-base"
+                                                >
+                                                    Jumlah Dana
+                                                    <RequiredMark />
+                                                </Label>
+                                                <InputGroup>
+                                                    <InputGroupInput
+                                                        id="jumlah_dana"
+                                                        inputMode="numeric"
+                                                        placeholder="Jumlah Dana"
+                                                        value={
+                                                            jumlahDana
+                                                                ? formatRupiah(
+                                                                      Number(
+                                                                          jumlahDana,
+                                                                      ),
+                                                                  )
+                                                                : ""
+                                                        }
+                                                        onChange={(e) =>
+                                                            setJumlahDana(
+                                                                e.target.value.replace(
+                                                                    /\D/g,
+                                                                    "",
+                                                                ),
+                                                            )
+                                                        }
+                                                        aria-invalid={
+                                                            !!errors.jumlah_dana
+                                                        }
+                                                    />
+                                                    <InputGroupAddon>
+                                                        Rp.
+                                                    </InputGroupAddon>
+                                                </InputGroup>
+                                                <input
+                                                    type="hidden"
+                                                    name="jumlah_dana"
+                                                    value={jumlahDana}
+                                                />
+                                                {errors.jumlah_dana && (
+                                                    <p className="text-sm text-red-500">
+                                                        {errors.jumlah_dana}
+                                                    </p>
+                                                )}
+                                            </Field>
+                                        </FieldGroup>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <FieldGroup>
+                                            <Field>
+                                                <Label
+                                                    htmlFor="sumber_dana"
+                                                    className="text-base"
+                                                >
+                                                    Sumber Dana
+                                                    <RequiredMark />
+                                                </Label>
+                                                <Select
+                                                    name="sumber_dana"
+                                                    value={sumberDana}
+                                                    onValueChange={
+                                                        setSumberDana
+                                                    }
+                                                >
+                                                    <SelectTrigger
+                                                        id="sumber_dana"
+                                                        className="h-11 text-base"
+                                                        aria-invalid={
+                                                            !!errors.sumber_dana
+                                                        }
+                                                    >
+                                                        <SelectValue placeholder="Pilih Sumber Dana" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="internal">
+                                                            Internal
+                                                        </SelectItem>
+                                                        <SelectItem value="eksternal">
+                                                            Eksternal
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                {errors.sumber_dana && (
+                                                    <p className="text-sm text-red-500">
+                                                        {errors.sumber_dana}
+                                                    </p>
+                                                )}
+                                            </Field>
+                                        </FieldGroup>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Kolom kanan: Penulis — panel terpisah agar ruang lebar dashboard tidak kosong */}
+                        <div className="space-y-5 rounded-xl border bg-muted/20 p-5 lg:col-span-1 lg:self-start">
+                            <SectionHeading
+                                icon={Users}
+                                title="Penulis"
+                                description="Tambahkan satu atau lebih dosen sebagai penulis."
                             />
-                            {errors.judul_kegiatan && (
-                                <p className="text-sm text-red-500">
-                                    {errors.judul_kegiatan}
-                                </p>
-                            )}
-                        </div>
-
-                        {/* Abstrak */}
-                        <div className="space-y-2">
-                            <Label htmlFor="abstrak" className="text-base">
-                                Abstrak
-                                <RequiredMark />
-                            </Label>
-                            <Textarea
-                                id="abstrak"
-                                name="abstrak"
-                                defaultValue={kegiatan?.abstrak}
-                                placeholder="Ringkasan singkat kegiatan penelitian"
-                                rows={5}
-                                className="text-base"
-                            />
-                            {errors.abstrak && (
-                                <p className="text-sm text-red-500">
-                                    {errors.abstrak}
-                                </p>
-                            )}
-                        </div>
-
-                        {/* Semester & Tahun */}
-                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                            <div className="space-y-2">
-                                <Label htmlFor="semester" className="text-base">
-                                    Semester
-                                    <RequiredMark />
-                                </Label>
-                                <Select
-                                    value={semester}
-                                    onValueChange={setSemester}
-                                >
-                                    <SelectTrigger
-                                        id="semester"
-                                        className="h-11 text-base"
-                                    >
-                                        <SelectValue placeholder="Pilih semester" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="Ganjil">
-                                            Ganjil
-                                        </SelectItem>
-                                        <SelectItem value="Genap">
-                                            Genap
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <input
-                                    type="hidden"
-                                    name="semester"
-                                    value={semester}
-                                />
-                                {errors.semester && (
-                                    <p className="text-sm text-red-500">
-                                        {errors.semester}
-                                    </p>
-                                )}
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="tahun" className="text-base">
-                                    Tahun
-                                    <RequiredMark />
-                                </Label>
-                                <Input
-                                    id="tahun"
-                                    name="tahun"
-                                    type="number"
-                                    defaultValue={kegiatan?.tahun}
-                                    placeholder="2026"
-                                    className="h-11 text-base"
-                                />
-                                {errors.tahun && (
-                                    <p className="text-sm text-red-500">
-                                        {errors.tahun}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Sumber Dana & Dana */}
-                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                            <div className="space-y-2">
-                                <Label
-                                    htmlFor="sumber_dana"
-                                    className="text-base"
-                                >
-                                    Sumber Dana
-                                    <RequiredMark />
-                                </Label>
-                                <Select
-                                    value={sumberDana}
-                                    onValueChange={setSumberDana}
-                                >
-                                    <SelectTrigger
-                                        id="sumber_dana"
-                                        className="h-11 text-base"
-                                    >
-                                        <SelectValue placeholder="Pilih sumber dana" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="internal">
-                                            Internal
-                                        </SelectItem>
-                                        <SelectItem value="eksternal">
-                                            Eksternal
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <input
-                                    type="hidden"
-                                    name="sumber_dana"
-                                    value={sumberDana}
-                                />
-                                {errors.sumber_dana && (
-                                    <p className="text-sm text-red-500">
-                                        {errors.sumber_dana}
-                                    </p>
-                                )}
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="dana" className="text-base">
-                                    Jumlah Dana (Rp)
-                                    <RequiredMark />
-                                </Label>
-                                <Input
-                                    id="dana"
-                                    name="jumlah_dana"
-                                    type="number"
-                                    defaultValue={kegiatan?.jumlah_dana}
-                                    placeholder="5000000"
-                                    className="h-11 text-base"
-                                />
-                                {errors.jumlah_dana && (
-                                    <p className="text-sm text-red-500">
-                                        {errors.jumlah_dana}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Link Berkas */}
-                        <div className="space-y-2">
-                            <Label htmlFor="link_berkas" className="text-base">
-                                Link Berkas
-                                <RequiredMark />
-                            </Label>
-                            <Input
-                                id="link_berkas"
-                                name="link_berkas"
-                                type="url"
-                                defaultValue={kegiatan?.link_berkas}
-                                placeholder="https://drive.google.com/..."
-                                className="h-11 text-base"
-                            />
-                            {errors.link_berkas && (
-                                <p className="text-sm text-red-500">
-                                    {errors.link_berkas}
-                                </p>
-                            )}
-                        </div>
-
-                        {/* Penulis */}
-                        <div className="space-y-3">
-                            <Label className="text-base">
-                                Penulis
-                                <RequiredMark />
-                            </Label>
 
                             <div className="space-y-4">
                                 {authors.map((author, index) => (
                                     <div
                                         key={author.key}
-                                        className="grid grid-cols-1 gap-3 rounded-md border p-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end"
+                                        className="relative rounded-lg border bg-muted/30 p-4"
                                     >
-                                        <div className="space-y-2">
-                                            <Label className="text-sm text-muted-foreground">
-                                                Fakultas Penulis {index + 1}
-                                            </Label>
-                                            <Select
-                                                value={author.fakultasId}
-                                                onValueChange={(value) =>
-                                                    handleFakultasChange(
-                                                        author.key,
-                                                        value,
-                                                    )
-                                                }
-                                            >
-                                                <SelectTrigger className="h-11 text-base">
-                                                    <SelectValue placeholder="Pilih fakultas" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {fakultas.map((f) => (
-                                                        <SelectItem
-                                                            key={f.id}
-                                                            value={String(f.id)}
-                                                        >
-                                                            {f.nama_fakultas}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
+                                        <div className="mb-3 flex items-center justify-between">
+                                            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-sm font-medium text-primary-foreground">
+                                                {index + 1}
+                                            </span>
+                                            {authors.length > 1 && (
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 rounded-full text-red-500 hover:bg-red-50 hover:text-red-600"
+                                                    onClick={() =>
+                                                        removeAuthor(author.key)
+                                                    }
+                                                    aria-label={`Hapus penulis ${index + 1}`}
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            )}
                                         </div>
 
-                                        <div className="space-y-2">
-                                            <Label className="text-sm text-muted-foreground">
-                                                Nama Dosen
-                                            </Label>
-                                            <Select
-                                                value={author.dosenId}
-                                                onValueChange={(value) =>
-                                                    updateAuthorDosen(
-                                                        author.key,
-                                                        value,
-                                                    )
-                                                }
-                                                disabled={
-                                                    !author.fakultasId ||
-                                                    author.loadingDosen ||
-                                                    (author.dosenOptions
-                                                        .length === 0 &&
-                                                        !author.loadingDosen &&
-                                                        !!author.fakultasId)
-                                                }
-                                            >
-                                                <SelectTrigger className="h-11 text-base">
-                                                    <SelectValue
-                                                        placeholder={
-                                                            !author.fakultasId
-                                                                ? "Pilih fakultas dulu"
-                                                                : author.loadingDosen
-                                                                  ? "Memuat dosen..."
-                                                                  : author
-                                                                          .dosenOptions
-                                                                          .length ===
-                                                                      0
-                                                                    ? "Tidak ada data dosen"
-                                                                    : "Pilih dosen"
-                                                        }
-                                                    />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {author.dosenOptions.map(
-                                                        (d) => (
-                                                            <SelectItem
-                                                                key={d.id}
-                                                                value={String(
-                                                                    d.id,
-                                                                )}
-                                                            >
-                                                                {d.nama_dosen}
-                                                            </SelectItem>
-                                                        ),
-                                                    )}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
+                                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                            <div className="space-y-2">
+                                                <FieldGroup>
+                                                    <Field>
+                                                        <Label className="text-sm text-muted-foreground">
+                                                            Fakultas
+                                                        </Label>
+                                                        <Combobox
+                                                            options={fakultas.map(
+                                                                (f) => ({
+                                                                    value: String(
+                                                                        f.id,
+                                                                    ),
+                                                                    label: f.nama_fakultas,
+                                                                }),
+                                                            )}
+                                                            value={
+                                                                author.fakultasId
+                                                            }
+                                                            onValueChange={(
+                                                                value,
+                                                            ) =>
+                                                                handleFakultasChange(
+                                                                    author.key,
+                                                                    value,
+                                                                )
+                                                            }
+                                                            placeholder="Pilih fakultas"
+                                                            searchPlaceholder="Cari fakultas..."
+                                                        />
+                                                        {errors[
+                                                            `authors.${index}.fakultas_id`
+                                                        ] && (
+                                                            <p className="text-sm text-red-500">
+                                                                {
+                                                                    errors[
+                                                                        `authors.${index}.fakultas_id`
+                                                                    ]
+                                                                }
+                                                            </p>
+                                                        )}
+                                                    </Field>
+                                                </FieldGroup>
+                                            </div>
 
-                                        {authors.length > 1 && (
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="icon"
-                                                className="text-red-500 hover:bg-red-50 hover:text-red-600"
-                                                onClick={() =>
-                                                    removeAuthor(author.key)
-                                                }
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        )}
+                                            <div className="space-y-2">
+                                                <FieldGroup>
+                                                    <Field>
+                                                        <Label className="text-sm text-muted-foreground">
+                                                            Nama Dosen
+                                                        </Label>
+                                                        <Combobox
+                                                            options={author.dosenOptions.map(
+                                                                (d) => ({
+                                                                    value: String(
+                                                                        d.id,
+                                                                    ),
+                                                                    label: d.nama_dosen,
+                                                                }),
+                                                            )}
+                                                            value={
+                                                                author.dosenId
+                                                            }
+                                                            onValueChange={(
+                                                                value,
+                                                            ) =>
+                                                                updateAuthorDosen(
+                                                                    author.key,
+                                                                    value,
+                                                                )
+                                                            }
+                                                            placeholder={
+                                                                !author.fakultasId
+                                                                    ? "Pilih fakultas dulu"
+                                                                    : author.loadingDosen
+                                                                      ? "Memuat dosen..."
+                                                                      : author
+                                                                              .dosenOptions
+                                                                              .length ===
+                                                                          0
+                                                                        ? "Tidak ada data dosen"
+                                                                        : "Pilih dosen"
+                                                            }
+                                                            searchPlaceholder="Cari dosen..."
+                                                            disabled={
+                                                                !author.fakultasId ||
+                                                                author.loadingDosen ||
+                                                                author
+                                                                    .dosenOptions
+                                                                    .length ===
+                                                                    0
+                                                            }
+                                                        />
+                                                        {errors[
+                                                            `authors.${index}.dosen_id`
+                                                        ] && (
+                                                            <p className="text-sm text-red-500">
+                                                                {
+                                                                    errors[
+                                                                        `authors.${index}.dosen_id`
+                                                                    ]
+                                                                }
+                                                            </p>
+                                                        )}
+                                                    </Field>
+                                                </FieldGroup>
+                                            </div>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -498,6 +726,17 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
                                         type="hidden"
                                         name={`authors[${index}][dosen_id]`}
                                         value={author.dosenId}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name={`authors[${index}][nama_fakultas]`}
+                                        value={
+                                            fakultas.find(
+                                                (f) =>
+                                                    String(f.id) ===
+                                                    author.fakultasId,
+                                            )?.nama_fakultas ?? ""
+                                        }
                                     />
                                     <input
                                         type="hidden"
@@ -517,26 +756,24 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
                                 type="button"
                                 variant="outline"
                                 onClick={addAuthor}
-                                className="h-10 text-sm"
+                                className="h-10 w-full text-sm"
                             >
                                 <Plus className="mr-1 h-4 w-4" />
                                 Tambah Penulis
                             </Button>
-
-                            {errors.authors && (
-                                <p className="text-sm text-red-500">
-                                    {errors.authors}
-                                </p>
-                            )}
                         </div>
                     </CardContent>
 
-                    <CardFooter className="flex justify-end gap-3">
+                    <CardFooter className="flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-end">
                         <Link
                             href={route("admin.kegiatan.index")}
                             viewTransition
+                            className="w-full sm:w-auto"
                         >
-                            <Button className="h-11 px-6 text-base" variant={"outline"}>
+                            <Button
+                                className="h-11 w-full px-6 text-base sm:w-auto"
+                                variant="outline"
+                            >
                                 <ArrowLeft />
                                 Kembali
                             </Button>
@@ -544,9 +781,9 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
                         <Button
                             type="submit"
                             disabled={processing}
-                            className="h-11 px-6 text-base"
+                            className="h-11 w-full px-6 text-base sm:w-auto"
                         >
-                            {isEdit ? "Simpan Perubahan" : "Simpan Kegiatan"}
+                            {isEdit ? "Simpan Perubahan" : "Simpan kegiatan"}
                         </Button>
                     </CardFooter>
                 </Card>

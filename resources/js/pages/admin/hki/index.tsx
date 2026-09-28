@@ -21,9 +21,7 @@ export default function Hki({ data, fakultas }: Props) {
     const statistikFakultas = fakultas.map((item) => ({
         label: item.nama_fakultas,
         count: data.data.filter((hki) =>
-            hki.penulis.some(
-                (penulis) => penulis.fakultas_id === item.id,
-            ),
+            hki.penulis.some((penulis) => penulis.fakultas_id === item.id),
         ).length,
     }));
     return (
@@ -40,17 +38,15 @@ export default function Hki({ data, fakultas }: Props) {
                     ]}
                 />
 
-                {fakultas.map((item) => (
-                    <StatisticsCard
-                        dataCard={[
-                            {
-                                label: "Hak Kekayaan Intelektual",
-                                count: data.total,
-                            },
-                           ...statistikFakultas
-                        ]}
-                    />
-                ))}
+                <StatisticsCard
+                    dataCard={[
+                        {
+                            label: "Hak Kekayaan Intelektual",
+                            count: data.total,
+                        },
+                        ...statistikFakultas,
+                    ]}
+                />
 
                 <Card className="shadow-sm">
                     <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
@@ -100,7 +96,7 @@ export default function Hki({ data, fakultas }: Props) {
                                     ),
                                 },
                                 {
-                                    id: "penulis",
+                                    id: "fakultas",
                                     key: "penulis",
                                     label: "Fakultas",
                                     render: (_, item) => (
@@ -111,7 +107,7 @@ export default function Hki({ data, fakultas }: Props) {
                                                     className="flex flex-wrap items-center gap-1.5"
                                                 >
                                                     <Badge className="whitespace-nowrap text-[13px]">
-                                                        {penulis.nama_fakultas}
+                                                        {penulis.fakultas.nama_fakultas}
                                                     </Badge>
                                                 </div>
                                             ))}
@@ -119,7 +115,7 @@ export default function Hki({ data, fakultas }: Props) {
                                     ),
                                 },
                                 {
-                                    id: "penulis",
+                                    id: "dosen",
                                     key: "penulis",
                                     label: "Penulis",
                                     render: (_, item) => (
@@ -130,7 +126,7 @@ export default function Hki({ data, fakultas }: Props) {
                                                     className="flex flex-wrap items-center gap-1.5"
                                                 >
                                                     <Badge className="whitespace-nowrap text-[13px]">
-                                                        {penulis.nama_dosen}
+                                                        {penulis.dosen.nama_dosen}
                                                     </Badge>
                                                 </div>
                                             ))}

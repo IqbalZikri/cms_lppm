@@ -8,14 +8,14 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 class Kegiatan extends Model
 {
     protected $fillable = [
-        'judul_kegiatan',
+        'judul',
+        'slug',
         'abstrak',
         'semester',
         'tahun',
         'link_berkas',
         'sumber_dana',
         'jumlah_dana',
-        'penulis',
     ];
 
     public function penulis(): MorphMany

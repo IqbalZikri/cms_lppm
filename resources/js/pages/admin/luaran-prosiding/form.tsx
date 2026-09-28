@@ -1,6 +1,14 @@
 import axios from "axios";
 import { useEffect } from "react";
-import { ArrowLeft, BookText, FileText, Link2, Plus, Trash2, Users } from "lucide-react";
+import {
+    ArrowLeft,
+    BookText,
+    FileText,
+    Link2,
+    Plus,
+    Trash2,
+    Users,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -26,7 +34,11 @@ import { Dosen } from "@/types/dosen";
 import { Form, Link } from "@inertiajs/react";
 import { useState } from "react";
 import { route } from "ziggy-js";
-import { LuaranProsiding, Penulis } from "@/interface/luaran-prosiding";
+import { LuaranProsiding } from "@/interface/luaran-prosiding";
+import { Field, FieldGroup } from "@/components/ui/field";
+import { Combobox } from "@/components/ui/combobox";
+import { generateSlug } from "../berita/form";
+import { Penulis } from "@/interface/penulis";
 
 interface Props {
     fakultas: Fakultas[];
@@ -87,7 +99,9 @@ function SectionHeading({
                 <Icon className="h-4 w-4" />
             </div>
             <div>
-                <h3 className="text-base font-semibold leading-none">{title}</h3>
+                <h3 className="text-base font-semibold leading-none">
+                    {title}
+                </h3>
                 {description && (
                     <p className="mt-1 text-sm text-muted-foreground">
                         {description}
@@ -98,9 +112,17 @@ function SectionHeading({
     );
 }
 
-export default function FormLuaranProsiding({ fakultas, luaranProsiding }: Props) {
+export default function FormLuaranProsiding({
+    fakultas,
+    luaranProsiding,
+}: Props) {
     const isEdit = !!luaranProsiding;
     const [semester, setSemester] = useState(luaranProsiding?.semester ?? "");
+    const [slug, setSlug] = useState(luaranProsiding?.slug ?? "");
+
+    const handleJudulChange = (value: string) => {
+        setSlug(generateSlug(value));
+    };
 
     const action = isEdit
         ? route("admin.luaran_prosiding.update", luaranProsiding!.id)
@@ -193,7 +215,6 @@ export default function FormLuaranProsiding({ fakultas, luaranProsiding }: Props
         <Form action={action} method={isEdit ? "put" : "post"}>
             {({ errors, processing }) => (
                 <Card className="w-full shadow-sm">
-
                     <CardContent className="grid grid-cols-1 gap-8 pt-6 lg:grid-cols-3 lg:gap-10">
                         {/* Kolom kiri: Informasi Publikasi + Detail Prosiding */}
                         <div className="space-y-8 lg:col-span-2">
@@ -205,26 +226,76 @@ export default function FormLuaranProsiding({ fakultas, luaranProsiding }: Props
                                 />
 
                                 <div className="space-y-2 sm:pl-12">
-                                    <Label htmlFor="judul" className="text-base">
-                                        Judul
-                                        <RequiredMark />
-                                    </Label>
-                                    <Input
-                                        id="judul"
-                                        name="judul"
-                                        defaultValue={luaranProsiding?.judul}
-                                        placeholder="Contoh: Analisis Implementasi..."
-                                        className="h-11 text-base"
-                                    />
-                                    {errors.judul && (
-                                        <p className="text-sm text-red-500">
-                                            {errors.judul}
-                                        </p>
-                                    )}
+                                    <FieldGroup>
+                                        <Field>
+                                            <Label
+                                                htmlFor="judul"
+                                                className="text-base"
+                                            >
+                                                Judul
+                                                <RequiredMark />
+                                            </Label>
+                                            <Input
+                                                id="judul"
+                                                name="judul"
+                                                defaultValue={luaranProsiding?.judul}
+                                                placeholder="Contoh: Analisis Implementasi..."
+                                                onChange={(e) =>
+                                                    handleJudulChange(
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                className="h-11 text-base"
+                                                aria-invalid={!!errors.judul}
+                                            />
+                                            {errors.judul && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.judul}
+                                                </p>
+                                            )}
+                                        </Field>
+                                    </FieldGroup>
                                 </div>
 
                                 <div className="space-y-2 sm:pl-12">
-                                    <Label htmlFor="abstrak" className="text-base">
+                                    <FieldGroup>
+                                        <Field>
+                                            <Label
+                                                htmlFor="slug"
+                                                className="text-base"
+                                            >
+                                                Slug
+                                                <RequiredMark />
+                                            </Label>
+                                            <Input
+                                                id="slug"
+                                                name="slug"
+                                                value={slug}
+                                                onChange={(e) =>
+                                                    setSlug(
+                                                        generateSlug(
+                                                            e.target.value,
+                                                        ),
+                                                    )
+                                                }
+                                                placeholder="judul-penelitian-otomatis"
+                                                className="h-11 text-base"
+                                                aria-invalid={!!errors.slug}
+                                            />
+                                            {errors.slug && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.slug}
+                                                </p>
+                                            )}
+                                        </Field>
+                                    </FieldGroup>
+                                </div>
+
+                                <div className="space-y-2 sm:pl-12">
+                                    <Label
+                                        htmlFor="abstrak"
+                                        className="text-base"
+                                    >
                                         Abstrak
                                         <RequiredMark />
                                     </Label>
@@ -255,43 +326,53 @@ export default function FormLuaranProsiding({ fakultas, luaranProsiding }: Props
 
                                 <div className="grid grid-cols-1 gap-6 sm:pl-12 sm:grid-cols-2">
                                     <div className="space-y-2">
-                                        <Label htmlFor="semester" className="text-base">
-                                            Semester
-                                            <RequiredMark />
-                                        </Label>
-                                        <Select
-                                            value={semester}
-                                            onValueChange={setSemester}
-                                        >
-                                            <SelectTrigger
-                                                id="semester"
-                                                className="h-11 text-base"
-                                            >
-                                                <SelectValue placeholder="Pilih semester" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="Ganjil">
-                                                    Ganjil
-                                                </SelectItem>
-                                                <SelectItem value="Genap">
-                                                    Genap
-                                                </SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <input
-                                            type="hidden"
-                                            name="semester"
-                                            value={semester}
-                                        />
-                                        {errors.semester && (
-                                            <p className="text-sm text-red-500">
-                                                {errors.semester}
-                                            </p>
-                                        )}
+                                        <FieldGroup>
+                                            <Field>
+                                                <Label
+                                                    htmlFor="semester"
+                                                    className="text-base"
+                                                >
+                                                    Semester
+                                                    <RequiredMark />
+                                                </Label>
+                                                <Select
+                                                    value={semester}
+                                                    onValueChange={setSemester}
+                                                >
+                                                    <SelectTrigger
+                                                        id="semester"
+                                                        className="h-11 text-base"
+                                                    >
+                                                        <SelectValue placeholder="Pilih semester" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="Ganjil">
+                                                            Ganjil
+                                                        </SelectItem>
+                                                        <SelectItem value="Genap">
+                                                            Genap
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                <input
+                                                    type="hidden"
+                                                    name="semester"
+                                                    value={semester}
+                                                />
+                                                {errors.semester && (
+                                                    <p className="text-sm text-red-500">
+                                                        {errors.semester}
+                                                    </p>
+                                                )}
+                                            </Field>
+                                        </FieldGroup>
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="tahun" className="text-base">
+                                        <Label
+                                            htmlFor="tahun"
+                                            className="text-base"
+                                        >
                                             Tahun
                                             <RequiredMark />
                                         </Label>
@@ -299,7 +380,9 @@ export default function FormLuaranProsiding({ fakultas, luaranProsiding }: Props
                                             id="tahun"
                                             name="tahun"
                                             type="number"
-                                            defaultValue={luaranProsiding?.tahun}
+                                            defaultValue={
+                                                luaranProsiding?.tahun
+                                            }
                                             placeholder="2026"
                                             className="h-11 text-base"
                                         />
@@ -312,7 +395,10 @@ export default function FormLuaranProsiding({ fakultas, luaranProsiding }: Props
                                 </div>
 
                                 <div className="space-y-2 sm:pl-12">
-                                    <Label htmlFor="link_berkas" className="text-base">
+                                    <Label
+                                        htmlFor="link_berkas"
+                                        className="text-base"
+                                    >
                                         <span className="inline-flex items-center gap-1.5">
                                             <Link2 className="h-3.5 w-3.5" />
                                             Link Berkas
@@ -323,7 +409,9 @@ export default function FormLuaranProsiding({ fakultas, luaranProsiding }: Props
                                         id="link_berkas"
                                         name="link_berkas"
                                         type="url"
-                                        defaultValue={luaranProsiding?.link_berkas}
+                                        defaultValue={
+                                            luaranProsiding?.link_berkas
+                                        }
                                         placeholder="https://drive.google.com/..."
                                         className="h-11 text-base"
                                     />
@@ -372,57 +460,75 @@ export default function FormLuaranProsiding({ fakultas, luaranProsiding }: Props
 
                                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                             <div className="space-y-2">
-                                                <Label className="text-sm text-muted-foreground">
-                                                    Fakultas
-                                                </Label>
-                                                <Select
-                                                    value={author.fakultasId}
-                                                    onValueChange={(value) =>
-                                                        handleFakultasChange(
-                                                            author.key,
-                                                            value,
-                                                        )
-                                                    }
-                                                >
-                                                    <SelectTrigger className="h-11 bg-background text-base">
-                                                        <SelectValue placeholder="Pilih fakultas" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {fakultas.map((f) => (
-                                                            <SelectItem
-                                                                key={f.id}
-                                                                value={String(f.id)}
-                                                            >
-                                                                {f.nama_fakultas}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
+                                                <FieldGroup>
+                                                    <Field>
+                                                        <Label className="text-sm text-muted-foreground">
+                                                            Fakultas
+                                                        </Label>
+                                                        <Combobox
+                                                            options={fakultas.map(
+                                                                (f) => ({
+                                                                    value: String(
+                                                                        f.id,
+                                                                    ),
+                                                                    label: f.nama_fakultas,
+                                                                }),
+                                                            )}
+                                                            value={
+                                                                author.fakultasId
+                                                            }
+                                                            onValueChange={(
+                                                                value,
+                                                            ) =>
+                                                                handleFakultasChange(
+                                                                    author.key,
+                                                                    value,
+                                                                )
+                                                            }
+                                                            placeholder="Pilih fakultas"
+                                                            searchPlaceholder="Cari fakultas..."
+                                                        />
+                                                        {errors[
+                                                            `authors.${index}.fakultas_id`
+                                                        ] && (
+                                                            <p className="text-sm text-red-500">
+                                                                {
+                                                                    errors[
+                                                                        `authors.${index}.fakultas_id`
+                                                                    ]
+                                                                }
+                                                            </p>
+                                                        )}
+                                                    </Field>
+                                                </FieldGroup>
                                             </div>
 
                                             <div className="space-y-2">
-                                                <Label className="text-sm text-muted-foreground">
-                                                    Nama Dosen
-                                                </Label>
-                                                <Select
-                                                    value={author.dosenId}
-                                                    onValueChange={(value) =>
-                                                        updateAuthorDosen(
-                                                            author.key,
-                                                            value,
-                                                        )
-                                                    }
-                                                    disabled={
-                                                        !author.fakultasId ||
-                                                        author.loadingDosen ||
-                                                        (author.dosenOptions
-                                                            .length === 0 &&
-                                                            !author.loadingDosen &&
-                                                            !!author.fakultasId)
-                                                    }
-                                                >
-                                                    <SelectTrigger className="h-11 bg-background text-base">
-                                                        <SelectValue
+                                                <FieldGroup>
+                                                    <Field>
+                                                        <Label className="text-sm text-muted-foreground">
+                                                            Nama Dosen
+                                                        </Label>
+                                                        <Combobox
+                                                            options={author.dosenOptions.map(
+                                                                (d) => ({
+                                                                    value: String(
+                                                                        d.id,
+                                                                    ),
+                                                                    label: d.nama_dosen,
+                                                                }),
+                                                            )}
+                                                            value={
+                                                                author.dosenId
+                                                            }
+                                                            onValueChange={(
+                                                                value,
+                                                            ) =>
+                                                                updateAuthorDosen(
+                                                                    author.key,
+                                                                    value,
+                                                                )
+                                                            }
                                                             placeholder={
                                                                 !author.fakultasId
                                                                     ? "Pilih fakultas dulu"
@@ -435,23 +541,29 @@ export default function FormLuaranProsiding({ fakultas, luaranProsiding }: Props
                                                                         ? "Tidak ada data dosen"
                                                                         : "Pilih dosen"
                                                             }
+                                                            searchPlaceholder="Cari dosen..."
+                                                            disabled={
+                                                                !author.fakultasId ||
+                                                                author.loadingDosen ||
+                                                                author
+                                                                    .dosenOptions
+                                                                    .length ===
+                                                                    0
+                                                            }
                                                         />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {author.dosenOptions.map(
-                                                            (d) => (
-                                                                <SelectItem
-                                                                    key={d.id}
-                                                                    value={String(
-                                                                        d.id,
-                                                                    )}
-                                                                >
-                                                                    {d.nama_dosen}
-                                                                </SelectItem>
-                                                            ),
+                                                        {errors[
+                                                            `authors.${index}.dosen_id`
+                                                        ] && (
+                                                            <p className="text-sm text-red-500">
+                                                                {
+                                                                    errors[
+                                                                        `authors.${index}.dosen_id`
+                                                                    ]
+                                                                }
+                                                            </p>
                                                         )}
-                                                    </SelectContent>
-                                                </Select>
+                                                    </Field>
+                                                </FieldGroup>
                                             </div>
                                         </div>
                                     </div>
@@ -521,7 +633,9 @@ export default function FormLuaranProsiding({ fakultas, luaranProsiding }: Props
                             disabled={processing}
                             className="h-11 w-full px-6 text-base sm:w-auto"
                         >
-                            {isEdit ? "Simpan Perubahan" : "Simpan Luaran Prosiding"}
+                            {isEdit
+                                ? "Simpan Perubahan"
+                                : "Simpan Luaran Prosiding"}
                         </Button>
                     </CardFooter>
                 </Card>

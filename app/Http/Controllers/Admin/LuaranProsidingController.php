@@ -19,6 +19,7 @@ class LuaranProsidingController extends Controller
     public function index()
     {
         $data = LuaranProsiding::latest()->paginate(10);
+        $data->load('penulis.fakultas', 'penulis.dosen');
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
         return Inertia::render('admin/luaran-prosiding/index', [
             'data' => $data,
@@ -44,6 +45,7 @@ class LuaranProsidingController extends Controller
     {
         $validated = $request->validate([
             'judul' => 'required',
+            'slug' => 'required',
             'abstrak' => 'required',
             'semester' => 'required',
             'tahun' => 'required',
@@ -65,29 +67,22 @@ class LuaranProsidingController extends Controller
         DB::beginTransaction();
 
         try {
-            $dosenIds = collect($validated['authors'])->pluck('dosen_id');
-            $dosenMap = Dosen::whereIn('id', $dosenIds)->pluck('nama_dosen', 'id');
-
-            $fakultasIds = collect($validated['authors'])->pluck('fakultas_id');
-            $fakultasMap = Fakultas::whereIn('id', $fakultasIds)->pluck('nama_fakultas', 'id');
-
-            $penulisJson = collect($validated['authors'])->map(function ($author) use ($dosenMap, $fakultasMap) {
-                return [
-                    'fakultas_id' => (int) $author['fakultas_id'],
-                    'dosen_id' => (int) $author['dosen_id'],
-                    'nama_fakultas' => $fakultasMap[$author['fakultas_id']] ?? null,
-                    'nama_dosen' => $dosenMap[$author['dosen_id']] ?? null,
-                ];
-            })->values()->all();
-
-            LuaranProsiding::create([
+            $data = LuaranProsiding::create([
                 'judul' => $validated['judul'],
+                'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],
                 'link_berkas' => $validated['link_berkas'],
-                'penulis' => $penulisJson,
             ]);
+
+            foreach ($validated['authors'] as $i => $author) {
+                $data->penulis()->create([
+                    'fakultas_id' => $author['fakultas_id'],
+                    'dosen_id' => $author['dosen_id'],
+                    'urutan' => $i++,
+                ]);
+            }
 
             DB::commit();
 
@@ -104,8 +99,9 @@ class LuaranProsidingController extends Controller
      */
     public function show(LuaranProsiding $luaranProsiding)
     {
+        $luaranProsiding->load('penulis.fakultas', 'penulis.dosen');
         return Inertia::render('admin/luaran-prosiding/show', [
-            'luaranProsiding' => $luaranProsiding
+            'data' => $luaranProsiding
         ]);
     }
 
@@ -114,6 +110,7 @@ class LuaranProsidingController extends Controller
      */
     public function edit(LuaranProsiding $luaranProsiding)
     {
+        $luaranProsiding->load('penulis');
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
         return Inertia::render('admin/luaran-prosiding/edit', [
             'data' => $luaranProsiding,
@@ -128,6 +125,7 @@ class LuaranProsidingController extends Controller
     {
         $validated = $request->validate([
             'judul' => 'required',
+            'slug' => 'required',
             'abstrak' => 'required',
             'semester' => 'required',
             'tahun' => 'required',
@@ -149,29 +147,23 @@ class LuaranProsidingController extends Controller
         DB::beginTransaction();
 
         try {
-            $dosenIds = collect($validated['authors'])->pluck('dosen_id');
-            $dosenMap = Dosen::whereIn('id', $dosenIds)->pluck('nama_dosen', 'id');
-
-            $fakultasIds = collect($validated['authors'])->pluck('fakultas_id');
-            $fakultasMap = Fakultas::whereIn('id', $fakultasIds)->pluck('nama_fakultas', 'id');
-
-            $penulisJson = collect($validated['authors'])->map(function ($author) use ($dosenMap, $fakultasMap) {
-                return [
-                    'fakultas_id' => (int) $author['fakultas_id'],
-                    'dosen_id' => (int) $author['dosen_id'],
-                    'nama_fakultas' => $fakultasMap[$author['fakultas_id']] ?? null,
-                    'nama_dosen' => $dosenMap[$author['dosen_id']] ?? null,
-                ];
-            })->values()->all();
-
             $luaranProsiding->update([
                 'judul' => $validated['judul'],
+                'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],
                 'link_berkas' => $validated['link_berkas'],
-                'penulis' => $penulisJson,
             ]);
+
+            $luaranProsiding->penulis()->delete();
+            foreach ($validated['authors'] as $i => $author) {
+                $luaranProsiding->penulis()->create([
+                    'fakultas_id' => $author['fakultas_id'],
+                    'dosen_id' => $author['dosen_id'],
+                    'urutan' => $i + 1,
+                ]);
+            }
 
             DB::commit();
 

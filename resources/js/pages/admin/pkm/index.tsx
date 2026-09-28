@@ -24,6 +24,13 @@ interface Props {
 }
 
 export default function Pkm({ data, fakultas }: Props) {
+    const statistikFakultas = fakultas.map((item) => ({
+        label: item.nama_fakultas,
+        count: data.data.filter((pkm) =>
+            pkm.penulis.some((penulis) => penulis.fakultas_id === item.id),
+        ).length,
+    }));
+    
     return (
         <>
             <Head title="Pengabdian Kepaga Masyarakat" />
@@ -37,30 +44,15 @@ export default function Pkm({ data, fakultas }: Props) {
                         },
                     ]}
                 />
-                {fakultas.map((item) => {
-                    const totalPkmFakultas = data.data.filter((pkm) =>
-                        pkm.penulis.some(
-                            (penulis) => penulis.fakultas_id === item.id,
-                        ),
-                    );
-                    return (
-                        <StatisticsCard
-                            key={item.id}
-                            dataCard={[
-                                {
-                                    label: "Total PKM",
-                                    count: data.total,
-                                },
-                                {
-                                    label:
-                                        "Total PKM Fakultas" +
-                                        item.nama_fakultas,
-                                    count: totalPkmFakultas.length,
-                                },
-                            ]}
-                        />
-                    );
-                })}
+                <StatisticsCard
+                    dataCard={[
+                        {
+                            label: "Total PKM",
+                            count: data.total,
+                        },
+                        ...statistikFakultas,
+                    ]}
+                />
 
                 <Card>
                     <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
@@ -103,7 +95,7 @@ export default function Pkm({ data, fakultas }: Props) {
                                     render: (_, item) =>
                                         item.penulis.map((penulis, i) => (
                                             <Badge key={i} className="mr-2">
-                                                {penulis.nama_fakultas}
+                                                {penulis.fakultas.nama_fakultas}
                                             </Badge>
                                         )),
                                 },
@@ -117,7 +109,7 @@ export default function Pkm({ data, fakultas }: Props) {
                                                 key={i}
                                                 className="mr-2 rounded-md px-2 py-1 text-xs"
                                             >
-                                                {penulis.nama_dosen}
+                                                {penulis.dosen.nama_dosen}
                                             </Badge>
                                         )),
                                 },

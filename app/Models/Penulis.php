@@ -12,8 +12,6 @@ class Penulis extends Model
     protected $fillable = [
         'fakultas_id',
         'dosen_id',
-        'nama_fakultas',
-        'nama_dosen',
         'urutan',
     ];
 

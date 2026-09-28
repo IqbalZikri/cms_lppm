@@ -12,14 +12,14 @@ return new class extends Migration {
     {
         Schema::create('kegiatans', function (Blueprint $table) {
             $table->id();
-            $table->string('judul_kegiatan');
+            $table->string('judul');
+            $table->string('slug');
             $table->text('abstrak');
             $table->string('semester');
             $table->year('tahun');
             $table->string('link_berkas');
             $table->enum('sumber_dana', ['internal', 'eksternal']);
             $table->decimal('jumlah_dana', 15, 2);
-            $table->text('penulis');
             $table->timestamps();
         });
     }

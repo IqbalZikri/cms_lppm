@@ -39,6 +39,8 @@ import { route } from "ziggy-js";
 import { Penulis } from "@/interface/penulis";
 import { Field, FieldGroup } from "@/components/ui/field";
 import { LuaranJurnal } from "@/interface/luaran-jurnal";
+import { Combobox } from "@/components/ui/combobox";
+import { generateSlug } from "../berita/form";
 
 interface Props {
     fakultas: Fakultas[];
@@ -82,14 +84,6 @@ function buildInitialAuthors(penulis: Penulis[] | undefined): AuthorRow[] {
     }));
 }
 
-export function formatRupiah(inputAngka: number) {
-    new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-    }).format(inputAngka);
-}
-
 function RequiredMark() {
     return <span className="ml-0.5 text-red-500">*</span>;
 }
@@ -125,8 +119,15 @@ function SectionHeading({
 
 export default function FormLuaranJurnal({ fakultas, luaranJurnal }: Props) {
     const isEdit = !!luaranJurnal;
-    const [jenisluaranJurnal, setJenisluaranJurnal] = useState(luaranJurnal?.jenis_luaran_jurnal ?? "");
+    const [jenisluaranJurnal, setJenisluaranJurnal] = useState(
+        luaranJurnal?.jenis_luaran_jurnal ?? "",
+    );
     const [semester, setSemester] = useState(luaranJurnal?.semester ?? "");
+    const [slug, setSlug] = useState(luaranJurnal?.slug ?? "");
+
+    const handleJudulChange = (value: string) => {
+        setSlug(generateSlug(value));
+    };
 
     const action = isEdit
         ? route("admin.luaran_jurnal.update", luaranJurnal!.id)
@@ -243,7 +244,9 @@ export default function FormLuaranJurnal({ fakultas, luaranJurnal }: Props) {
                                             <Select
                                                 name="jenis_luaran_jurnal"
                                                 value={jenisluaranJurnal}
-                                                onValueChange={setJenisluaranJurnal}
+                                                onValueChange={
+                                                    setJenisluaranJurnal
+                                                }
                                             >
                                                 <SelectTrigger
                                                     id="jenis_luaran_jurnal"
@@ -309,14 +312,55 @@ export default function FormLuaranJurnal({ fakultas, luaranJurnal }: Props) {
                                             <Input
                                                 id="judul"
                                                 name="judul"
-                                                defaultValue={luaranJurnal?.judul}
+                                                defaultValue={
+                                                    luaranJurnal?.judul
+                                                }
                                                 placeholder="Contoh: Analisis Implementasi..."
+                                                onChange={(e) =>
+                                                    handleJudulChange(
+                                                        e.target.value,
+                                                    )
+                                                }
                                                 className="h-11 text-base"
                                                 aria-invalid={!!errors.judul}
                                             />
                                             {errors.judul && (
                                                 <p className="text-sm text-red-500">
                                                     {errors.judul}
+                                                </p>
+                                            )}
+                                        </Field>
+                                    </FieldGroup>
+                                </div>
+
+                                <div className="space-y-2 sm:pl-12">
+                                    <FieldGroup>
+                                        <Field>
+                                            <Label
+                                                htmlFor="slug"
+                                                className="text-base"
+                                            >
+                                                Slug
+                                                <RequiredMark />
+                                            </Label>
+                                            <Input
+                                                id="slug"
+                                                name="slug"
+                                                value={slug}
+                                                onChange={(e) =>
+                                                    setSlug(
+                                                        generateSlug(
+                                                            e.target.value,
+                                                        ),
+                                                    )
+                                                }
+                                                placeholder="judul-penelitian-otomatis"
+                                                className="h-11 text-base"
+                                                aria-invalid={!!errors.slug}
+                                            />
+                                            {errors.slug && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.slug}
                                                 </p>
                                             )}
                                         </Field>
@@ -336,7 +380,9 @@ export default function FormLuaranJurnal({ fakultas, luaranJurnal }: Props) {
                                             <Textarea
                                                 id="abstrak"
                                                 name="abstrak"
-                                                defaultValue={luaranJurnal?.abstrak}
+                                                defaultValue={
+                                                    luaranJurnal?.abstrak
+                                                }
                                                 placeholder="Ringkasan singkat hak kekayaan intelektual"
                                                 rows={6}
                                                 className="text-base"
@@ -422,7 +468,9 @@ export default function FormLuaranJurnal({ fakultas, luaranJurnal }: Props) {
                                                     id="tahun"
                                                     name="tahun"
                                                     type="number"
-                                                    defaultValue={luaranJurnal?.tahun}
+                                                    defaultValue={
+                                                        luaranJurnal?.tahun
+                                                    }
                                                     placeholder="2026"
                                                     className="h-11 text-base"
                                                     aria-invalid={
@@ -456,7 +504,9 @@ export default function FormLuaranJurnal({ fakultas, luaranJurnal }: Props) {
                                                 id="link_berkas"
                                                 name="link_berkas"
                                                 type="url"
-                                                defaultValue={luaranJurnal?.link_berkas}
+                                                defaultValue={
+                                                    luaranJurnal?.link_berkas
+                                                }
                                                 placeholder="https://drive.google.com/..."
                                                 className="h-11 text-base"
                                                 aria-invalid={
@@ -515,7 +565,15 @@ export default function FormLuaranJurnal({ fakultas, luaranJurnal }: Props) {
                                                         <Label className="text-sm text-muted-foreground">
                                                             Fakultas
                                                         </Label>
-                                                        <Select
+                                                        <Combobox
+                                                            options={fakultas.map(
+                                                                (f) => ({
+                                                                    value: String(
+                                                                        f.id,
+                                                                    ),
+                                                                    label: f.nama_fakultas,
+                                                                }),
+                                                            )}
                                                             value={
                                                                 author.fakultasId
                                                             }
@@ -527,40 +585,20 @@ export default function FormLuaranJurnal({ fakultas, luaranJurnal }: Props) {
                                                                     value,
                                                                 )
                                                             }
-                                                        >
-                                                            <SelectTrigger className="h-11 bg-background text-base">
-                                                                <SelectValue placeholder="Pilih fakultas" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {fakultas.map(
-                                                                    (f) => (
-                                                                        <SelectItem
-                                                                            key={
-                                                                                f.id
-                                                                            }
-                                                                            value={String(
-                                                                                f.id,
-                                                                            )}
-                                                                        >
-                                                                            {
-                                                                                f.nama_fakultas
-                                                                            }
-                                                                        </SelectItem>
-                                                                    ),
-                                                                )}
-                                                            </SelectContent>
-                                                            {errors[
-                                                                `authors.${index}.fakultas_id`
-                                                            ] && (
-                                                                <p className="text-sm text-red-500">
-                                                                    {
-                                                                        errors[
-                                                                            `authors.${index}.fakultas_id`
-                                                                        ]
-                                                                    }
-                                                                </p>
-                                                            )}
-                                                        </Select>
+                                                            placeholder="Pilih fakultas"
+                                                            searchPlaceholder="Cari fakultas..."
+                                                        />
+                                                        {errors[
+                                                            `authors.${index}.fakultas_id`
+                                                        ] && (
+                                                            <p className="text-sm text-red-500">
+                                                                {
+                                                                    errors[
+                                                                        `authors.${index}.fakultas_id`
+                                                                    ]
+                                                                }
+                                                            </p>
+                                                        )}
                                                     </Field>
                                                 </FieldGroup>
                                             </div>
@@ -571,7 +609,15 @@ export default function FormLuaranJurnal({ fakultas, luaranJurnal }: Props) {
                                                         <Label className="text-sm text-muted-foreground">
                                                             Nama Dosen
                                                         </Label>
-                                                        <Select
+                                                        <Combobox
+                                                            options={author.dosenOptions.map(
+                                                                (d) => ({
+                                                                    value: String(
+                                                                        d.id,
+                                                                    ),
+                                                                    label: d.nama_dosen,
+                                                                }),
+                                                            )}
                                                             value={
                                                                 author.dosenId
                                                             }
@@ -583,63 +629,39 @@ export default function FormLuaranJurnal({ fakultas, luaranJurnal }: Props) {
                                                                     value,
                                                                 )
                                                             }
+                                                            placeholder={
+                                                                !author.fakultasId
+                                                                    ? "Pilih fakultas dulu"
+                                                                    : author.loadingDosen
+                                                                      ? "Memuat dosen..."
+                                                                      : author
+                                                                              .dosenOptions
+                                                                              .length ===
+                                                                          0
+                                                                        ? "Tidak ada data dosen"
+                                                                        : "Pilih dosen"
+                                                            }
+                                                            searchPlaceholder="Cari dosen..."
                                                             disabled={
                                                                 !author.fakultasId ||
                                                                 author.loadingDosen ||
-                                                                (author
+                                                                author
                                                                     .dosenOptions
                                                                     .length ===
-                                                                    0 &&
-                                                                    !author.loadingDosen &&
-                                                                    !!author.fakultasId)
+                                                                    0
                                                             }
-                                                        >
-                                                            <SelectTrigger className="h-11 bg-background text-base">
-                                                                <SelectValue
-                                                                    placeholder={
-                                                                        !author.fakultasId
-                                                                            ? "Pilih fakultas dulu"
-                                                                            : author.loadingDosen
-                                                                              ? "Memuat dosen..."
-                                                                              : author
-                                                                                      .dosenOptions
-                                                                                      .length ===
-                                                                                  0
-                                                                                ? "Tidak ada data dosen"
-                                                                                : "Pilih dosen"
-                                                                    }
-                                                                />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {author.dosenOptions.map(
-                                                                    (d) => (
-                                                                        <SelectItem
-                                                                            key={
-                                                                                d.id
-                                                                            }
-                                                                            value={String(
-                                                                                d.id,
-                                                                            )}
-                                                                        >
-                                                                            {
-                                                                                d.nama_dosen
-                                                                            }
-                                                                        </SelectItem>
-                                                                    ),
-                                                                )}
-                                                            </SelectContent>
-                                                            {errors[
-                                                                `authors.${index}.dosen_id`
-                                                            ] && (
-                                                                <p className="text-sm text-red-500">
-                                                                    {
-                                                                        errors[
-                                                                            `authors.${index}.dosen_id`
-                                                                        ]
-                                                                    }
-                                                                </p>
-                                                            )}
-                                                        </Select>
+                                                        />
+                                                        {errors[
+                                                            `authors.${index}.dosen_id`
+                                                        ] && (
+                                                            <p className="text-sm text-red-500">
+                                                                {
+                                                                    errors[
+                                                                        `authors.${index}.dosen_id`
+                                                                    ]
+                                                                }
+                                                            </p>
+                                                        )}
                                                     </Field>
                                                 </FieldGroup>
                                             </div>
@@ -716,7 +738,9 @@ export default function FormLuaranJurnal({ fakultas, luaranJurnal }: Props) {
                             disabled={processing}
                             className="h-11 w-full px-6 text-base sm:w-auto"
                         >
-                            {isEdit ? "Simpan Perubahan" : "Simpan Luaran Jurnal"}
+                            {isEdit
+                                ? "Simpan Perubahan"
+                                : "Simpan Luaran Jurnal"}
                         </Button>
                     </CardFooter>
                 </Card>

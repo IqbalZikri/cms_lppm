@@ -27,7 +27,7 @@ import { Dosen as DosenTypes } from "@/types/dosen";
 interface DosenPageProps {
     data: PaginatedData<DosenTypes>;
     fakultas: Fakultas[];
-    prodi: Prodi[]
+    prodi: Prodi[];
 }
 
 export default function Dosen({ data, fakultas, prodi }: DosenPageProps) {
@@ -38,7 +38,6 @@ export default function Dosen({ data, fakultas, prodi }: DosenPageProps) {
     const jumlahPerempuan = data.data.filter(
         (item) => item.jenis_kelamin === "P",
     ).length;
-    
 
     return (
         <>
@@ -147,13 +146,10 @@ export default function Dosen({ data, fakultas, prodi }: DosenPageProps) {
                             </div>
 
                             <div>
-                                <CardTitle>
-                                    Daftar Dosen
-                                </CardTitle>
+                                <CardTitle>Daftar Dosen</CardTitle>
 
                                 <p className="text-muted-foreground mt-1 text-sm">
-                                    Informasi dosen yang
-                                    terdaftar dalam sistem.
+                                    Informasi dosen yang terdaftar dalam sistem.
                                 </p>
                             </div>
                         </div>
@@ -227,6 +223,10 @@ export default function Dosen({ data, fakultas, prodi }: DosenPageProps) {
                                 {
                                     key: "hp",
                                     label: "No. HP",
+                                },
+                                {
+                                    key: "email",
+                                    label: "Email",
                                 },
                             ]}
                             renderActions={(item) => (
