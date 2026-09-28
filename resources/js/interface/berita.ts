@@ -12,7 +12,7 @@ export interface Berita {
     gambar?: string;
     status_published: string;
     slug: string;
-    published_at?: Date;
+    published_at?: string | null;
     deleted_at?: Date;
     user_id: number;
     user: User;

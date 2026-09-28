@@ -159,7 +159,7 @@ export default function Dosen({ data, fakultas, prodi }: DosenPageProps) {
                         </div>
 
                         <Link
-                            href={route("admin.hki.create")}
+                            href={route("admin.dosen.create")}
                             viewTransition
                             className="w-full sm:w-auto"
                         >

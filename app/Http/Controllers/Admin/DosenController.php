@@ -51,7 +51,8 @@ class DosenController extends Controller
         $request->validate([
             'fakultas_id' => 'required',
             'prodi_id' => 'required',
-            'nidn' => 'required',
+            'nidn' => 'required_without:nuptk',
+            'nuptk' => 'required_without:nidn',
             'nama_dosen' => 'required',
             'jenis_kelamin' => 'required',
             'tanggal_lahir' => 'required',
@@ -63,7 +64,8 @@ class DosenController extends Controller
         ], [
             'fakultas_id.required' => 'Pilih salah satu fakultas',
             'prodi_id.required' => 'Pilih salah satu prodi',
-            'nidn.required' => 'NIDN wajib diisi',
+            'nidn.required_without' => 'NIDN wajib diisi jika tidak mengisi NUPTK',
+            'nuptk.required_without' => 'NUPTK wajib diisi jika tidak mengisi NIDN',
             'nama_dosen.required' => 'Nama dosen wajib diisi',
             'jenis_kelamin.required' => 'Jenis kelamin wajib diisi',
             'tanggal_lahir.required' => 'Tanggal lahir wajib diisi',
@@ -164,7 +166,8 @@ class DosenController extends Controller
         $request->validate([
             'fakultas_id' => 'required',
             'prodi_id' => 'required',
-            'nidn' => 'required|unique:dosens,nidn,' . $id,
+            'nidn' => 'required_without:nuptk|unique:dosens,nidn,' . $id,
+            'nuptk' => 'required_without:nidn|unique:dosens,nuptk,' . $id,
             'nama_dosen' => 'required',
             'jenis_kelamin' => 'required',
             'tanggal_lahir' => 'required',

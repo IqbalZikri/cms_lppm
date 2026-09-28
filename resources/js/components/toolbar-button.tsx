@@ -23,7 +23,7 @@ export default function ToolbarButton({
             aria-label={label}
             className={cn(
                 "h-8 w-8 p-0",
-                isActive && "bg-[#bf9f62] text-white ring-1 ring-border",
+                isActive && "bg-[#bf9f62] text-white ring-1 ring-border hover:bg-[#bf9f62] hover:text-white hover:ring-1 hover:ring-border",
             )}
         >
             {children}

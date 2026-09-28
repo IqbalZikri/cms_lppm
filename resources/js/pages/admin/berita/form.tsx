@@ -35,23 +35,11 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Berita } from "@/interface/berita";
 
 interface Kategori {
     id: number;
     nama_kategori: string;
-}
-
-// Bentuk data berita yang datang dari backend saat mode edit
-interface Berita {
-    id: number;
-    kategori_id: number;
-    judul_berita: string;
-    slug: string;
-    ringkasan_berita: string;
-    isi_berita: string;
-    status_published: string;
-    published_at: string | null;
-    gambar: string | null; // path/url gambar yang sudah ada
 }
 
 interface Props {
@@ -169,7 +157,10 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                                 </SelectTrigger>
                             ) : (
                                 <SelectTrigger id="kategori_id">
-                                    <SelectValue placeholder="Pilih kategori berita" />
+                                    <SelectValue
+                                        placeholder="Pilih kategori berita"
+                                        aria-invalid={!!errors.kategori_id}
+                                    />
                                 </SelectTrigger>
                             )}
                             <SelectContent>
@@ -190,7 +181,9 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                                     <span className="underline">kategori</span>
                                 </button>
                             </DialogTrigger>
-                            <DialogContent onSubmit={(e) => e.stopPropagation()}>
+                            <DialogContent
+                                onSubmit={(e) => e.stopPropagation()}
+                            >
                                 <DialogHeader>
                                     <DialogTitle>Tambah Kategori</DialogTitle>
                                 </DialogHeader>
@@ -202,7 +195,10 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                                     }}
                                     resetOnSuccess
                                 >
-                                    {({ errors: kategoriErrors, processing: kategoriProcessing }) => (
+                                    {({
+                                        errors: kategoriErrors,
+                                        processing: kategoriProcessing,
+                                    }) => (
                                         <>
                                             <FieldGroup>
                                                 <Field>
@@ -233,7 +229,9 @@ export default function BeritaForm({ kategoris, berita }: Props) {
                                                 </DialogClose>
                                                 <Button
                                                     type="submit"
-                                                    disabled={kategoriProcessing}
+                                                    disabled={
+                                                        kategoriProcessing
+                                                    }
                                                 >
                                                     {kategoriProcessing
                                                         ? "...Menyimpan"
