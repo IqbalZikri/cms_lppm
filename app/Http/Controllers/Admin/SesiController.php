@@ -165,7 +165,7 @@ class SesiController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
+            'email' => 'Username atau password salah.',
         ])->onlyInput('email');
     }
 }

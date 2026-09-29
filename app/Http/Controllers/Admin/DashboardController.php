@@ -18,11 +18,17 @@ class DashboardController extends Controller
     public function index()
     {
         $dosens = Dosen::latest()->take(5)->with('fakultas', 'prodi', 'user')->get();
+        $totalDosen = Dosen::count();
         $kegiatan = Kegiatan::latest()->take(5)->get();
+        $totalKegiatan = Kegiatan::count();
         $pkm = Pkm::latest()->take(5)->get();
+        $totalPkm = Pkm::count();
         $hki = Hki::latest()->take(5)->get();
+        $totalHki = Hki::count();
         $luaranJurnal = LuaranJurnal::latest()->take(5)->get();
+        $totalLuaranJurnal = LuaranJurnal::count();
         $luaranProsiding = LuaranProsiding::latest()->take(5)->get();
+        $totalLuaranProsiding = LuaranProsiding::count();
         $user = auth()->user();
 
         $currentYear = Carbon::now()->year;
@@ -54,12 +60,18 @@ class DashboardController extends Controller
 
         return Inertia::render('admin/dashboard', [
             'dosen' => $dosens,
+            'totalDosen' => $totalDosen,
             'kegiatan' => $kegiatan,
+            'totalKegiatan' => $totalKegiatan,
             'pkm' => $pkm,
+            'totalPkm' => $totalPkm,
             'user' => $user,
             'hki' => $hki,
+            'totalHki' => $totalHki,
             'luaranJurnal' => $luaranJurnal,
+            'totalLuaranJurnal' => $totalLuaranJurnal,
             'luaranProsiding' => $luaranProsiding,
+            'totalLuaranProsiding' => $totalLuaranProsiding,
             'chartData' => $chartData
         ]);
     }

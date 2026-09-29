@@ -1,7 +1,5 @@
 import { Head, Link } from "@inertiajs/react";
-import { PlaceholderPattern } from "@/components/ui/placeholder-pattern";
 import { route } from "ziggy-js";
-import Header from "@/components/header";
 import {
     Card,
     CardContent,
@@ -9,9 +7,12 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Book } from "lucide-react";
+import { Book, Check, X } from "lucide-react";
 import { Dosen } from "@/types/dosen";
-import { ChartAreaInteractive, ChartPoint } from "@/components/chart-area-interactive";
+import {
+    ChartAreaInteractive,
+    ChartPoint,
+} from "@/components/chart-area-interactive";
 import { User } from "@/types";
 import {
     Table,
@@ -25,29 +26,45 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Kegiatan } from "@/interface/kegiatan";
 import { Pkm } from "@/interface/pkm";
-
-import dayjs from "dayjs";
-import "dayjs/locale/id";
+import { Badge } from "@/components/ui/badge";
+import { Hki } from "@/interface/hki";
+import { LuaranJurnal } from "@/interface/luaran-jurnal";
+import { LuaranProsiding } from "@/interface/luaran-prosiding";
 
 interface Props {
     dosen: Dosen[];
     kegiatan: Kegiatan[];
     pkm: Pkm[];
+    hki: Hki[];
+    luaranJurnal: LuaranJurnal[];
+    luaranProsiding: LuaranProsiding[];
     user: User;
     chartData: ChartPoint[];
+    totalDosen: number;
+    totalKegiatan: number;
+    totalPkm: number;
+    totalHki: number;
+    totalLuaranJurnal: number;
+    totalLuaranProsiding: number;
 }
 
 export default function Dashboard({
     dosen,
     kegiatan,
     pkm,
+    hki,
+    luaranJurnal,
+    luaranProsiding,
     user,
     chartData,
+    totalDosen,
+    totalKegiatan,
+    totalPkm,
+    totalHki,
+    totalLuaranJurnal,
+    totalLuaranProsiding,
 }: Props) {
     const namaUser = user.name.charAt(0).toUpperCase() + user.name.slice(1);
-    const totalKegiatan = kegiatan.length;
-    const totalDosen = dosen.length;
-    const totalPkm = pkm.length;
 
     return (
         <>
@@ -56,7 +73,7 @@ export default function Dashboard({
                 <h1 className="font-bold text-3xl">
                     Selamat Datang {namaUser}
                 </h1>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">
@@ -125,15 +142,55 @@ export default function Dashboard({
                         </CardHeader>
 
                         <CardContent>
-                            <div className="text-2xl font-bold"></div>
+                            <div className="text-2xl font-bold">{totalHki}</div>
 
                             <p className="text-muted-foreground text-xs">
-                                Total jurnal terdaftar dalam sistem
+                                Total HKI terdaftar dalam sistem
+                            </p>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">
+                                Total Luaran Jurnal
+                            </CardTitle>
+
+                            <Book className="text-muted-foreground h-5 w-5" />
+                        </CardHeader>
+
+                        <CardContent>
+                            <div className="text-2xl font-bold">
+                                {totalLuaranJurnal}
+                            </div>
+
+                            <p className="text-muted-foreground text-xs">
+                                Total luaran jurnal terdaftar dalam sistem
+                            </p>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">
+                                Total Luaran Prosiding
+                            </CardTitle>
+
+                            <Book className="text-muted-foreground h-5 w-5" />
+                        </CardHeader>
+
+                        <CardContent>
+                            <div className="text-2xl font-bold">
+                                {totalLuaranProsiding}
+                            </div>
+
+                            <p className="text-muted-foreground text-xs">
+                                Total luaran prosiding terdaftar dalam sistem
                             </p>
                         </CardContent>
                     </Card>
                 </div>
-                <ChartAreaInteractive chartData={chartData}/>
+                <ChartAreaInteractive chartData={chartData} />
 
                 <Card>
                     <CardHeader>
@@ -148,6 +205,13 @@ export default function Dashboard({
                                     Penelitian Kegiatan
                                 </TabsTrigger>
                                 <TabsTrigger value="pkm">PKM</TabsTrigger>
+                                <TabsTrigger value="hki">HKI</TabsTrigger>
+                                <TabsTrigger value="luaranJurnal">
+                                    Luaran Jurnal
+                                </TabsTrigger>
+                                <TabsTrigger value="luaranProsiding">
+                                    Luaran Prosiding
+                                </TabsTrigger>
                             </TabsList>
                             <TabsContent value="dosen">
                                 <Table>
@@ -221,18 +285,19 @@ export default function Dashboard({
                                                                         "-"}
                                                                 </TableCell>
                                                                 <TableCell>
-                                                                    {dayjs(
-                                                                        item
-                                                                            .user
-                                                                            .email_verified_at,
-                                                                    )
-                                                                        .locale(
-                                                                            "id",
-                                                                        )
-                                                                        .format(
-                                                                            "DD MMMM YYYY",
-                                                                        ) ??
-                                                                        "-"}
+                                                                    {item.user
+                                                                        .email_verified_at ? (
+                                                                        <Badge className="bg-green-500 text-white hover:bg-green-600">
+                                                                            <Check />{" "}
+                                                                            Terverifikasi
+                                                                        </Badge>
+                                                                    ) : (
+                                                                        <Badge className="bg-red-500 text-white hover:bg-red-600">
+                                                                            <X />
+                                                                            Belum
+                                                                            Terverifikasi
+                                                                        </Badge>
+                                                                    )}
                                                                 </TableCell>
                                                             </>
                                                         </TableRow>
@@ -295,7 +360,9 @@ export default function Dashboard({
                                                                             className="rounded-md bg-muted px-2 py-1 text-xs"
                                                                         >
                                                                             {
-                                                                                p.nama_fakultas
+                                                                                p
+                                                                                    .fakultas
+                                                                                    .nama_fakultas
                                                                             }
                                                                         </span>
                                                                     ),
@@ -317,7 +384,9 @@ export default function Dashboard({
                                                                             className="rounded-md bg-muted px-2 py-1 text-xs"
                                                                         >
                                                                             {
-                                                                                p.nama_dosen
+                                                                                p
+                                                                                    .dosen
+                                                                                    .nama_dosen
                                                                             }
                                                                         </span>
                                                                     ),
@@ -326,9 +395,435 @@ export default function Dashboard({
                                                         </TableCell>
 
                                                         <TableCell>
-                                                            {
-                                                                item.judul_kegiatan
-                                                            }
+                                                            {item.judul}
+                                                        </TableCell>
+
+                                                        <TableCell>
+                                                            <Link
+                                                                href={
+                                                                    item.link_berkas
+                                                                }
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-blue-600 underline"
+                                                            >
+                                                                Lihat Berkas
+                                                            </Link>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </TabsContent>
+                            <TabsContent value="pkm">
+                                <Table>
+                                    <TableCaption>
+                                        Data PKM Terbaru.
+                                    </TableCaption>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="w-[100px]">
+                                                No.
+                                            </TableHead>
+                                            <TableHead>Judul</TableHead>
+                                            <TableHead>Fakultas</TableHead>
+                                            <TableHead>Nama Dosen</TableHead>
+                                            <TableHead>Link Berkas</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {pkm.length === 0 ? (
+                                            <>
+                                                <TableRow>
+                                                    <TableCell
+                                                        className="font-medium text-center"
+                                                        colSpan={5}
+                                                    >
+                                                        Data belum ada.
+                                                    </TableCell>
+                                                </TableRow>
+                                            </>
+                                        ) : (
+                                            <>
+                                                {pkm.map((item, index) => (
+                                                    <TableRow key={item.id}>
+                                                        <TableCell className="font-medium">
+                                                            {index + 1}
+                                                        </TableCell>
+
+                                                        <TableCell>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {(
+                                                                    item.penulis ??
+                                                                    []
+                                                                ).map(
+                                                                    (p, i) => (
+                                                                        <span
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                            className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                        >
+                                                                            {
+                                                                                p
+                                                                                    .fakultas
+                                                                                    .nama_fakultas
+                                                                            }
+                                                                        </span>
+                                                                    ),
+                                                                )}
+                                                            </div>
+                                                        </TableCell>
+
+                                                        <TableCell>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {(
+                                                                    item.penulis ??
+                                                                    []
+                                                                ).map(
+                                                                    (p, i) => (
+                                                                        <span
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                            className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                        >
+                                                                            {
+                                                                                p
+                                                                                    .dosen
+                                                                                    .nama_dosen
+                                                                            }
+                                                                        </span>
+                                                                    ),
+                                                                )}
+                                                            </div>
+                                                        </TableCell>
+
+                                                        <TableCell>
+                                                            {item.judul}
+                                                        </TableCell>
+
+                                                        <TableCell>
+                                                            <Link
+                                                                href={
+                                                                    item.link_berkas
+                                                                }
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-blue-600 underline"
+                                                            >
+                                                                Lihat Berkas
+                                                            </Link>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </TabsContent>
+                            <TabsContent value="hki">
+                                <Table>
+                                    <TableCaption>
+                                        Data HKI Terbaru.
+                                    </TableCaption>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="w-[100px]">
+                                                No.
+                                            </TableHead>
+                                            <TableHead>Judul</TableHead>
+                                            <TableHead>Fakultas</TableHead>
+                                            <TableHead>Nama Dosen</TableHead>
+                                            <TableHead>Link Berkas</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {hki.length === 0 ? (
+                                            <>
+                                                <TableRow>
+                                                    <TableCell
+                                                        className="font-medium text-center"
+                                                        colSpan={5}
+                                                    >
+                                                        Data belum ada.
+                                                    </TableCell>
+                                                </TableRow>
+                                            </>
+                                        ) : (
+                                            <>
+                                                {hki.map((item, index) => (
+                                                    <TableRow key={item.id}>
+                                                        <TableCell className="font-medium">
+                                                            {index + 1}
+                                                        </TableCell>
+
+                                                        <TableCell>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {(
+                                                                    item.penulis ??
+                                                                    []
+                                                                ).map(
+                                                                    (p, i) => (
+                                                                        <span
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                            className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                        >
+                                                                            {
+                                                                                p
+                                                                                    .fakultas
+                                                                                    .nama_fakultas
+                                                                            }
+                                                                        </span>
+                                                                    ),
+                                                                )}
+                                                            </div>
+                                                        </TableCell>
+
+                                                        <TableCell>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {(
+                                                                    item.penulis ??
+                                                                    []
+                                                                ).map(
+                                                                    (p, i) => (
+                                                                        <span
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                            className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                        >
+                                                                            {
+                                                                                p
+                                                                                    .dosen
+                                                                                    .nama_dosen
+                                                                            }
+                                                                        </span>
+                                                                    ),
+                                                                )}
+                                                            </div>
+                                                        </TableCell>
+
+                                                        <TableCell>
+                                                            {item.judul}
+                                                        </TableCell>
+
+                                                        <TableCell>
+                                                            <Link
+                                                                href={
+                                                                    item.link_berkas
+                                                                }
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-blue-600 underline"
+                                                            >
+                                                                Lihat Berkas
+                                                            </Link>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </TabsContent>
+                            <TabsContent value="luaranJurnal">
+                                <Table>
+                                    <TableCaption>
+                                        Data Luaran Jurnal Terbaru.
+                                    </TableCaption>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="w-[100px]">
+                                                No.
+                                            </TableHead>
+                                            <TableHead>Judul</TableHead>
+                                            <TableHead>Fakultas</TableHead>
+                                            <TableHead>Nama Dosen</TableHead>
+                                            <TableHead>Link Berkas</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {luaranJurnal.length === 0 ? (
+                                            <>
+                                                <TableRow>
+                                                    <TableCell
+                                                        className="font-medium text-center"
+                                                        colSpan={5}
+                                                    >
+                                                        Data belum ada.
+                                                    </TableCell>
+                                                </TableRow>
+                                            </>
+                                        ) : (
+                                            <>
+                                                {luaranJurnal.map((item, index) => (
+                                                    <TableRow key={item.id}>
+                                                        <TableCell className="font-medium">
+                                                            {index + 1}
+                                                        </TableCell>
+
+                                                        <TableCell>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {(
+                                                                    item.penulis ??
+                                                                    []
+                                                                ).map(
+                                                                    (p, i) => (
+                                                                        <span
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                            className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                        >
+                                                                            {
+                                                                                p
+                                                                                    .fakultas
+                                                                                    .nama_fakultas
+                                                                            }
+                                                                        </span>
+                                                                    ),
+                                                                )}
+                                                            </div>
+                                                        </TableCell>
+
+                                                        <TableCell>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {(
+                                                                    item.penulis ??
+                                                                    []
+                                                                ).map(
+                                                                    (p, i) => (
+                                                                        <span
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                            className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                        >
+                                                                            {
+                                                                                p
+                                                                                    .dosen
+                                                                                    .nama_dosen
+                                                                            }
+                                                                        </span>
+                                                                    ),
+                                                                )}
+                                                            </div>
+                                                        </TableCell>
+
+                                                        <TableCell>
+                                                            {item.judul}
+                                                        </TableCell>
+
+                                                        <TableCell>
+                                                            <Link
+                                                                href={
+                                                                    item.link_berkas
+                                                                }
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-blue-600 underline"
+                                                            >
+                                                                Lihat Berkas
+                                                            </Link>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </TabsContent>
+                            <TabsContent value="luaranProsiding">
+                                <Table>
+                                    <TableCaption>
+                                        Data Luaran Prosiding Terbaru.
+                                    </TableCaption>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="w-[100px]">
+                                                No.
+                                            </TableHead>
+                                            <TableHead>Judul</TableHead>
+                                            <TableHead>Fakultas</TableHead>
+                                            <TableHead>Nama Dosen</TableHead>
+                                            <TableHead>Link Berkas</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {luaranProsiding.length === 0 ? (
+                                            <>
+                                                <TableRow>
+                                                    <TableCell
+                                                        className="font-medium text-center"
+                                                        colSpan={5}
+                                                    >
+                                                        Data belum ada.
+                                                    </TableCell>
+                                                </TableRow>
+                                            </>
+                                        ) : (
+                                            <>
+                                                {luaranProsiding.map((item, index) => (
+                                                    <TableRow key={item.id}>
+                                                        <TableCell className="font-medium">
+                                                            {index + 1}
+                                                        </TableCell>
+
+                                                        <TableCell>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {(
+                                                                    item.penulis ??
+                                                                    []
+                                                                ).map(
+                                                                    (p, i) => (
+                                                                        <span
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                            className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                        >
+                                                                            {
+                                                                                p
+                                                                                    .fakultas
+                                                                                    .nama_fakultas
+                                                                            }
+                                                                        </span>
+                                                                    ),
+                                                                )}
+                                                            </div>
+                                                        </TableCell>
+
+                                                        <TableCell>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {(
+                                                                    item.penulis ??
+                                                                    []
+                                                                ).map(
+                                                                    (p, i) => (
+                                                                        <span
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                            className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                        >
+                                                                            {
+                                                                                p
+                                                                                    .dosen
+                                                                                    .nama_dosen
+                                                                            }
+                                                                        </span>
+                                                                    ),
+                                                                )}
+                                                            </div>
+                                                        </TableCell>
+
+                                                        <TableCell>
+                                                            {item.judul}
                                                         </TableCell>
 
                                                         <TableCell>

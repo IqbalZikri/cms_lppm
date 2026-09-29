@@ -9,7 +9,14 @@ import { Fakultas } from "@/interface/fakultas";
 import { Hki as HkiInterface } from "@/interface/hki";
 import { PaginatedData } from "@/interface/pagination";
 import { Head, Link } from "@inertiajs/react";
-import { Eye, FileText, Pencil, Plus, ScrollText } from "lucide-react";
+import {
+    Eye,
+    FileBadge,
+    FileText,
+    Pencil,
+    Plus,
+    ScrollText,
+} from "lucide-react";
 import { route } from "ziggy-js";
 
 interface Props {
@@ -52,7 +59,7 @@ export default function Hki({ data, fakultas }: Props) {
                     <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-3">
                             <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-                                <ScrollText className="h-5 w-5" />
+                                <FileBadge className="h-5 w-5" />
                             </div>
 
                             <div>
@@ -107,7 +114,10 @@ export default function Hki({ data, fakultas }: Props) {
                                                     className="flex flex-wrap items-center gap-1.5"
                                                 >
                                                     <Badge className="whitespace-nowrap text-[13px]">
-                                                        {penulis.fakultas.nama_fakultas}
+                                                        {
+                                                            penulis.fakultas
+                                                                .nama_fakultas
+                                                        }
                                                     </Badge>
                                                 </div>
                                             ))}
@@ -126,7 +136,10 @@ export default function Hki({ data, fakultas }: Props) {
                                                     className="flex flex-wrap items-center gap-1.5"
                                                 >
                                                     <Badge className="whitespace-nowrap text-[13px]">
-                                                        {penulis.dosen.nama_dosen}
+                                                        {
+                                                            penulis.dosen
+                                                                .nama_dosen
+                                                        }
                                                     </Badge>
                                                 </div>
                                             ))}
@@ -198,11 +211,10 @@ export default function Hki({ data, fakultas }: Props) {
     );
 }
 
-Hki.layouts = {
+Hki.layout = {
     breadcrumbs: [
         {
-            title: "HKI",
-            href: "HKI",
+            title: "Hak Kekayaan Intelektual",
         },
     ],
 };
