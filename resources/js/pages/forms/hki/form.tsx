@@ -12,14 +12,7 @@ import {
     Wallet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -36,21 +29,21 @@ import { Dosen } from "@/types/dosen";
 import { Form, Link } from "@inertiajs/react";
 import { useState } from "react";
 import { route } from "ziggy-js";
+import { Hki } from "@/interface/hki";
 import { Penulis } from "@/interface/penulis";
 import { Field, FieldGroup } from "@/components/ui/field";
-import { Kegiatan } from "@/interface/kegiatan";
-import { generateSlug } from "../berita/form";
 import {
     InputGroup,
     InputGroupAddon,
     InputGroupInput,
 } from "@/components/ui/input-group";
-import { formatRupiah } from "../pkm/form";
 import { Combobox } from "@/components/ui/combobox";
+import { generateSlug } from "@/pages/admin/berita/form";
+import { formatRupiah } from "@/pages/forms/pkm/form";
 
 interface Props {
     fakultas: Fakultas[];
-    kegiatan?: Kegiatan;
+    hki?: Hki;
 }
 
 interface AuthorRow {
@@ -123,25 +116,26 @@ function SectionHeading({
     );
 }
 
-export default function FormKegiatan({ fakultas, kegiatan }: Props) {
-    const isEdit = !!kegiatan;
-    const [semester, setSemester] = useState(kegiatan?.semester ?? "");
-    const [sumberDana, setSumberDana] = useState(kegiatan?.sumber_dana ?? "");
+export default function FormHki({ fakultas, hki }: Props) {
+    const isEdit = !!hki;
+    const [jenisHki, setJenisHki] = useState(hki?.jenis_hki ?? "");
+    const [semester, setSemester] = useState(hki?.semester ?? "");
+    const [sumberDana, setSumberDana] = useState(hki?.sumber_dana ?? "");
     const [jumlahDana, setJumlahDana] = useState(
-        kegiatan?.jumlah_dana ? String(kegiatan?.jumlah_dana) : "",
+        hki?.jumlah_dana ? String(hki?.jumlah_dana) : "",
     );
-    const [slug, setSlug] = useState(kegiatan?.slug ?? "");
+    const [slug, setSlug] = useState(hki?.slug ?? "");
 
     const handleJudulChange = (value: string) => {
         setSlug(generateSlug(value));
     };
 
     const action = isEdit
-        ? route("admin.kegiatan.update", kegiatan!.id)
-        : route("admin.kegiatan.store");
+        ? route("admin.hki.update", hki!.id)
+        : route("admin.hki.store");
 
     const [authors, setAuthors] = useState<AuthorRow[]>(() =>
-        buildInitialAuthors(kegiatan?.penulis),
+        buildInitialAuthors(hki?.penulis),
     );
 
     async function fetchDosenByFakultas(fakultasId: string): Promise<Dosen[]> {
@@ -229,7 +223,7 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
             {({ errors, processing }) => (
                 <Card className="w-full shadow-sm">
                     <CardContent className="grid grid-cols-1 gap-8 pt-6 lg:grid-cols-3 lg:gap-10">
-                        {/* Kolom kiri: Informasi Publikasi + Detail kegiatan */}
+                        {/* Kolom kiri: Informasi Publikasi + Detail HKI */}
                         <div className="space-y-8 lg:col-span-2">
                             <div className="space-y-5">
                                 <SectionHeading
@@ -237,6 +231,48 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
                                     title="Informasi Publikasi"
                                     description="Judul dan ringkasan singkat dari hak kekayaan intelektual."
                                 />
+
+                                <div className="space-y-2 sm:pl-12">
+                                    <FieldGroup>
+                                        <Field>
+                                            <Label
+                                                htmlFor="jenis_hki"
+                                                className="text-base"
+                                            >
+                                                Jenis HKI
+                                                <RequiredMark />
+                                            </Label>
+                                            <Select
+                                                name="jenis_hki"
+                                                value={jenisHki}
+                                                onValueChange={setJenisHki}
+                                            >
+                                                <SelectTrigger
+                                                    id="jenis_hki"
+                                                    className="h-11 text-base"
+                                                    aria-invalid={
+                                                        !!errors.jenis_hki
+                                                    }
+                                                >
+                                                    <SelectValue placeholder="Pilih jenis HKI" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="paten">
+                                                        Paten
+                                                    </SelectItem>
+                                                    <SelectItem value="haki">
+                                                        HAKI
+                                                    </SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            {errors.jenis_hki && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.jenis_hki}
+                                                </p>
+                                            )}
+                                        </Field>
+                                    </FieldGroup>
+                                </div>
 
                                 <div className="space-y-2 sm:pl-12">
                                     <FieldGroup>
@@ -251,7 +287,7 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
                                             <Input
                                                 id="judul"
                                                 name="judul"
-                                                defaultValue={kegiatan?.judul}
+                                                defaultValue={hki?.judul}
                                                 placeholder="Contoh: Analisis Implementasi..."
                                                 onChange={(e) =>
                                                     handleJudulChange(
@@ -317,7 +353,7 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
                                             <Textarea
                                                 id="abstrak"
                                                 name="abstrak"
-                                                defaultValue={kegiatan?.abstrak}
+                                                defaultValue={hki?.abstrak}
                                                 placeholder="Ringkasan singkat hak kekayaan intelektual"
                                                 rows={6}
                                                 className="text-base"
@@ -338,7 +374,7 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
                             <div className="space-y-5">
                                 <SectionHeading
                                     icon={FileText}
-                                    title="Detail kegiatan"
+                                    title="Detail HKI"
                                     description="Waktu terbit dan berkas pendukung."
                                 />
 
@@ -403,9 +439,7 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
                                                     id="tahun"
                                                     name="tahun"
                                                     type="number"
-                                                    defaultValue={
-                                                        kegiatan?.tahun
-                                                    }
+                                                    defaultValue={hki?.tahun}
                                                     placeholder="2026"
                                                     className="h-11 text-base"
                                                     aria-invalid={
@@ -439,9 +473,7 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
                                                 id="link_berkas"
                                                 name="link_berkas"
                                                 type="url"
-                                                defaultValue={
-                                                    kegiatan?.link_berkas
-                                                }
+                                                defaultValue={hki?.link_berkas}
                                                 placeholder="https://drive.google.com/..."
                                                 className="h-11 text-base"
                                                 aria-invalid={
@@ -560,6 +592,94 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
                                                 {errors.sumber_dana && (
                                                     <p className="text-sm text-red-500">
                                                         {errors.sumber_dana}
+                                                    </p>
+                                                )}
+                                            </Field>
+                                        </FieldGroup>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <Separator />
+
+                            <div className="space-y-5">
+                                <SectionHeading
+                                    icon={Hash}
+                                    title="Nomor Pengajuan HAKI atau Nomor Paten"
+                                    description="Nomor resmi pengajuan HAKI atau paten."
+                                />
+
+                                <div className="grid grid-cols-1 gap-6 sm:pl-12 sm:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <FieldGroup>
+                                            <Field>
+                                                <Label
+                                                    htmlFor="sumber_dana"
+                                                    className="text-base"
+                                                >
+                                                    Nomor Paten
+                                                    {jenisHki === "paten" ? (
+                                                        <RequiredMark />
+                                                    ) : (
+                                                        ""
+                                                    )}
+                                                </Label>
+                                                <Input
+                                                    name="nomer_paten"
+                                                    id="nomer_paten"
+                                                    placeholder="Nomor Paten"
+                                                    disabled={
+                                                        jenisHki === "haki" ||
+                                                        !jenisHki
+                                                    }
+                                                    aria-invalid={
+                                                        !!errors.nomer_paten
+                                                    }
+                                                    value={hki?.nomer_paten}
+                                                />
+                                                {errors.nomer_paten && (
+                                                    <p className="text-sm text-red-500">
+                                                        {errors.nomer_paten}
+                                                    </p>
+                                                )}
+                                            </Field>
+                                        </FieldGroup>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <FieldGroup>
+                                            <Field>
+                                                <Label
+                                                    htmlFor="nomer_pengajuan_haki"
+                                                    className="text-base"
+                                                >
+                                                    Nomor Pengajuan HAKI
+                                                    {jenisHki === "haki" ? (
+                                                        <RequiredMark />
+                                                    ) : (
+                                                        ""
+                                                    )}
+                                                </Label>
+                                                <Input
+                                                    name="nomer_pengajuan_haki"
+                                                    id="nomer_pengajuan_haki"
+                                                    placeholder="Nomor Pengajuan HAKI"
+                                                    disabled={
+                                                        jenisHki === "paten" ||
+                                                        !jenisHki
+                                                    }
+                                                    aria-invalid={
+                                                        !!errors.nomer_pengajuan_haki
+                                                    }
+                                                    value={
+                                                        hki?.nomer_pengajuan_haki
+                                                    }
+                                                />
+                                                {errors.nomer_pengajuan_haki && (
+                                                    <p className="text-sm text-red-500">
+                                                        {
+                                                            errors.nomer_pengajuan_haki
+                                                        }
                                                     </p>
                                                 )}
                                             </Field>
@@ -766,7 +886,7 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
 
                     <CardFooter className="flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-end">
                         <Link
-                            href={route("admin.kegiatan.index")}
+                            href={route("admin.hki.index")}
                             viewTransition
                             className="w-full sm:w-auto"
                         >
@@ -783,7 +903,7 @@ export default function FormKegiatan({ fakultas, kegiatan }: Props) {
                             disabled={processing}
                             className="h-11 w-full px-6 text-base sm:w-auto"
                         >
-                            {isEdit ? "Simpan Perubahan" : "Simpan kegiatan"}
+                            {isEdit ? "Simpan Perubahan" : "Simpan HKI"}
                         </Button>
                     </CardFooter>
                 </Card>

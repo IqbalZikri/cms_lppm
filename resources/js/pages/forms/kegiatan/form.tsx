@@ -4,10 +4,12 @@ import {
     ArrowLeft,
     BookText,
     FileText,
+    Hash,
     Link2,
     Plus,
     Trash2,
     Users,
+    Wallet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,21 +36,30 @@ import { Dosen } from "@/types/dosen";
 import { Form, Link } from "@inertiajs/react";
 import { useState } from "react";
 import { route } from "ziggy-js";
-import { LuaranProsiding } from "@/interface/luaran-prosiding";
-import { Field, FieldGroup } from "@/components/ui/field";
-import { Combobox } from "@/components/ui/combobox";
-import { generateSlug } from "../berita/form";
 import { Penulis } from "@/interface/penulis";
+import { Field, FieldGroup } from "@/components/ui/field";
+import { Kegiatan } from "@/interface/kegiatan";
+import { generateSlug } from "../../admin/berita/form";
+import {
+    InputGroup,
+    InputGroupAddon,
+    InputGroupInput,
+} from "@/components/ui/input-group";
+import { formatRupiah } from "../pkm/form";
+import { Combobox } from "@/components/ui/combobox";
 
 interface Props {
     fakultas: Fakultas[];
-    luaranProsiding?: LuaranProsiding; // kalau ada berarti mode edit
+    kegiatan?: Kegiatan;
+    role?: string;
+    action?: string;
 }
 
 interface AuthorRow {
     key: string;
     fakultasId: string;
     dosenId: string;
+    fakultasOptions: Fakultas[];
     dosenOptions: Dosen[];
     loadingDosen: boolean;
 }
@@ -64,6 +75,7 @@ function buildInitialAuthors(penulis: Penulis[] | undefined): AuthorRow[] {
                 key: makeKey(),
                 fakultasId: "",
                 dosenId: "",
+                fakultasOptions: [],
                 dosenOptions: [],
                 loadingDosen: false,
             },
@@ -74,6 +86,7 @@ function buildInitialAuthors(penulis: Penulis[] | undefined): AuthorRow[] {
         key: makeKey(),
         fakultasId: String(p.fakultas_id),
         dosenId: String(p.dosen_id),
+        fakultasOptions: [],
         dosenOptions: [],
         loadingDosen: false,
     }));
@@ -112,29 +125,35 @@ function SectionHeading({
     );
 }
 
-export default function FormLuaranProsiding({
+export default function FormKegiatan({
     fakultas,
-    luaranProsiding,
+    kegiatan,
+    role,
+    action,
 }: Props) {
-    const isEdit = !!luaranProsiding;
-    const [semester, setSemester] = useState(luaranProsiding?.semester ?? "");
-    const [slug, setSlug] = useState(luaranProsiding?.slug ?? "");
+    const isEdit = !!kegiatan;
+    const [semester, setSemester] = useState(kegiatan?.semester ?? "");
+    const [sumberDana, setSumberDana] = useState(kegiatan?.sumber_dana ?? "");
+    const [jumlahDana, setJumlahDana] = useState(
+        kegiatan?.jumlah_dana ? String(kegiatan?.jumlah_dana) : "",
+    );
+    const [slug, setSlug] = useState(kegiatan?.slug ?? "");
 
     const handleJudulChange = (value: string) => {
         setSlug(generateSlug(value));
     };
 
-    const action = isEdit
-        ? route("admin.luaran_prosiding.update", luaranProsiding!.id)
-        : route("admin.luaran_prosiding.store");
+    const actionAdmin = isEdit
+        ? route("admin.kegiatan.update", kegiatan!.id)
+        : route("admin.kegiatan.store");
 
     const [authors, setAuthors] = useState<AuthorRow[]>(() =>
-        buildInitialAuthors(luaranProsiding?.penulis),
+        buildInitialAuthors(kegiatan?.penulis),
     );
 
     async function fetchDosenByFakultas(fakultasId: string): Promise<Dosen[]> {
         const { data } = await axios.get<Dosen[]>(
-            route("admin.dosen.getDosen", fakultasId),
+            route("dosen.getDosen", fakultasId),
         );
         return data;
     }
@@ -157,6 +176,7 @@ export default function FormLuaranProsiding({
                 key: makeKey(),
                 fakultasId: "",
                 dosenId: "",
+                fakultasOptions: [],
                 dosenOptions: [],
                 loadingDosen: false,
             },
@@ -212,17 +232,17 @@ export default function FormLuaranProsiding({
     }
 
     return (
-        <Form action={action} method={isEdit ? "put" : "post"}>
+        <Form action={action ?? actionAdmin} method={isEdit ? "put" : "post"}>
             {({ errors, processing }) => (
                 <Card className="w-full shadow-sm">
                     <CardContent className="grid grid-cols-1 gap-8 pt-6 lg:grid-cols-3 lg:gap-10">
-                        {/* Kolom kiri: Informasi Publikasi + Detail Prosiding */}
+                        {/* Kolom kiri: Informasi Publikasi + Detail kegiatan */}
                         <div className="space-y-8 lg:col-span-2">
                             <div className="space-y-5">
                                 <SectionHeading
                                     icon={BookText}
                                     title="Informasi Publikasi"
-                                    description="Judul dan ringkasan singkat dari luaran prosiding."
+                                    description="Judul dan ringkasan singkat dari hak kekayaan intelektual."
                                 />
 
                                 <div className="space-y-2 sm:pl-12">
@@ -238,7 +258,7 @@ export default function FormLuaranProsiding({
                                             <Input
                                                 id="judul"
                                                 name="judul"
-                                                defaultValue={luaranProsiding?.judul}
+                                                defaultValue={kegiatan?.judul}
                                                 placeholder="Contoh: Analisis Implementasi..."
                                                 onChange={(e) =>
                                                     handleJudulChange(
@@ -292,26 +312,31 @@ export default function FormLuaranProsiding({
                                 </div>
 
                                 <div className="space-y-2 sm:pl-12">
-                                    <Label
-                                        htmlFor="abstrak"
-                                        className="text-base"
-                                    >
-                                        Abstrak
-                                        <RequiredMark />
-                                    </Label>
-                                    <Textarea
-                                        id="abstrak"
-                                        name="abstrak"
-                                        defaultValue={luaranProsiding?.abstrak}
-                                        placeholder="Ringkasan singkat luaran prosiding"
-                                        rows={6}
-                                        className="text-base"
-                                    />
-                                    {errors.abstrak && (
-                                        <p className="text-sm text-red-500">
-                                            {errors.abstrak}
-                                        </p>
-                                    )}
+                                    <FieldGroup>
+                                        <Field>
+                                            <Label
+                                                htmlFor="abstrak"
+                                                className="text-base"
+                                            >
+                                                Abstrak
+                                                <RequiredMark />
+                                            </Label>
+                                            <Textarea
+                                                id="abstrak"
+                                                name="abstrak"
+                                                defaultValue={kegiatan?.abstrak}
+                                                placeholder="Ringkasan singkat hak kekayaan intelektual"
+                                                rows={6}
+                                                className="text-base"
+                                                aria-invalid={!!errors.abstrak}
+                                            />
+                                            {errors.abstrak && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.abstrak}
+                                                </p>
+                                            )}
+                                        </Field>
+                                    </FieldGroup>
                                 </div>
                             </div>
 
@@ -320,7 +345,7 @@ export default function FormLuaranProsiding({
                             <div className="space-y-5">
                                 <SectionHeading
                                     icon={FileText}
-                                    title="Detail Prosiding"
+                                    title="Detail kegiatan"
                                     description="Waktu terbit dan berkas pendukung."
                                 />
 
@@ -342,6 +367,9 @@ export default function FormLuaranProsiding({
                                                     <SelectTrigger
                                                         id="semester"
                                                         className="h-11 text-base"
+                                                        aria-invalid={
+                                                            !!errors.semester
+                                                        }
                                                     >
                                                         <SelectValue placeholder="Pilih semester" />
                                                     </SelectTrigger>
@@ -369,57 +397,181 @@ export default function FormLuaranProsiding({
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label
-                                            htmlFor="tahun"
-                                            className="text-base"
-                                        >
-                                            Tahun
-                                            <RequiredMark />
-                                        </Label>
-                                        <Input
-                                            id="tahun"
-                                            name="tahun"
-                                            type="number"
-                                            defaultValue={
-                                                luaranProsiding?.tahun
-                                            }
-                                            placeholder="2026"
-                                            className="h-11 text-base"
-                                        />
-                                        {errors.tahun && (
-                                            <p className="text-sm text-red-500">
-                                                {errors.tahun}
-                                            </p>
-                                        )}
+                                        <FieldGroup>
+                                            <Field>
+                                                <Label
+                                                    htmlFor="tahun"
+                                                    className="text-base"
+                                                >
+                                                    Tahun
+                                                    <RequiredMark />
+                                                </Label>
+                                                <Input
+                                                    id="tahun"
+                                                    name="tahun"
+                                                    type="number"
+                                                    defaultValue={
+                                                        kegiatan?.tahun
+                                                    }
+                                                    placeholder="2026"
+                                                    className="h-11 text-base"
+                                                    aria-invalid={
+                                                        !!errors.tahun
+                                                    }
+                                                />
+                                                {errors.tahun && (
+                                                    <p className="text-sm text-red-500">
+                                                        {errors.tahun}
+                                                    </p>
+                                                )}
+                                            </Field>
+                                        </FieldGroup>
                                     </div>
                                 </div>
 
                                 <div className="space-y-2 sm:pl-12">
-                                    <Label
-                                        htmlFor="link_berkas"
-                                        className="text-base"
-                                    >
-                                        <span className="inline-flex items-center gap-1.5">
-                                            <Link2 className="h-3.5 w-3.5" />
-                                            Link Berkas
-                                        </span>
-                                        <RequiredMark />
-                                    </Label>
-                                    <Input
-                                        id="link_berkas"
-                                        name="link_berkas"
-                                        type="url"
-                                        defaultValue={
-                                            luaranProsiding?.link_berkas
-                                        }
-                                        placeholder="https://drive.google.com/..."
-                                        className="h-11 text-base"
-                                    />
-                                    {errors.link_berkas && (
-                                        <p className="text-sm text-red-500">
-                                            {errors.link_berkas}
-                                        </p>
-                                    )}
+                                    <FieldGroup>
+                                        <Field>
+                                            <Label
+                                                htmlFor="link_berkas"
+                                                className="text-base"
+                                            >
+                                                <span className="inline-flex items-center gap-1.5">
+                                                    <Link2 className="h-3.5 w-3.5" />
+                                                    Link Berkas
+                                                </span>
+                                                <RequiredMark />
+                                            </Label>
+                                            <Input
+                                                id="link_berkas"
+                                                name="link_berkas"
+                                                type="url"
+                                                defaultValue={
+                                                    kegiatan?.link_berkas
+                                                }
+                                                placeholder="https://drive.google.com/..."
+                                                className="h-11 text-base"
+                                                aria-invalid={
+                                                    !!errors.link_berkas
+                                                }
+                                            />
+                                            {errors.link_berkas && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.link_berkas}
+                                                </p>
+                                            )}
+                                        </Field>
+                                    </FieldGroup>
+                                </div>
+                            </div>
+
+                            <Separator />
+
+                            <div className="space-y-5">
+                                <SectionHeading
+                                    icon={Wallet}
+                                    title="Dana"
+                                    description="Jumlah dan sumber dana."
+                                />
+
+                                <div className="grid grid-cols-1 gap-6 sm:pl-12 sm:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <FieldGroup>
+                                            <Field>
+                                                <Label
+                                                    htmlFor="jumlah_dana"
+                                                    className="text-base"
+                                                >
+                                                    Jumlah Dana
+                                                    <RequiredMark />
+                                                </Label>
+                                                <InputGroup>
+                                                    <InputGroupInput
+                                                        id="jumlah_dana"
+                                                        inputMode="numeric"
+                                                        placeholder="Jumlah Dana"
+                                                        value={
+                                                            jumlahDana
+                                                                ? formatRupiah(
+                                                                      Number(
+                                                                          jumlahDana,
+                                                                      ),
+                                                                  )
+                                                                : ""
+                                                        }
+                                                        onChange={(e) =>
+                                                            setJumlahDana(
+                                                                e.target.value.replace(
+                                                                    /\D/g,
+                                                                    "",
+                                                                ),
+                                                            )
+                                                        }
+                                                        aria-invalid={
+                                                            !!errors.jumlah_dana
+                                                        }
+                                                    />
+                                                    <InputGroupAddon>
+                                                        Rp.
+                                                    </InputGroupAddon>
+                                                </InputGroup>
+                                                <input
+                                                    type="hidden"
+                                                    name="jumlah_dana"
+                                                    value={jumlahDana}
+                                                />
+                                                {errors.jumlah_dana && (
+                                                    <p className="text-sm text-red-500">
+                                                        {errors.jumlah_dana}
+                                                    </p>
+                                                )}
+                                            </Field>
+                                        </FieldGroup>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <FieldGroup>
+                                            <Field>
+                                                <Label
+                                                    htmlFor="sumber_dana"
+                                                    className="text-base"
+                                                >
+                                                    Sumber Dana
+                                                    <RequiredMark />
+                                                </Label>
+                                                <Select
+                                                    name="sumber_dana"
+                                                    value={sumberDana}
+                                                    onValueChange={
+                                                        setSumberDana
+                                                    }
+                                                >
+                                                    <SelectTrigger
+                                                        id="sumber_dana"
+                                                        className="h-11 text-base"
+                                                        aria-invalid={
+                                                            !!errors.sumber_dana
+                                                        }
+                                                    >
+                                                        <SelectValue placeholder="Pilih Sumber Dana" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="internal">
+                                                            Internal
+                                                        </SelectItem>
+                                                        <SelectItem value="eksternal">
+                                                            Eksternal
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                {errors.sumber_dana && (
+                                                    <p className="text-sm text-red-500">
+                                                        {errors.sumber_dana}
+                                                    </p>
+                                                )}
+                                            </Field>
+                                        </FieldGroup>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -584,6 +736,17 @@ export default function FormLuaranProsiding({
                                     />
                                     <input
                                         type="hidden"
+                                        name={`authors[${index}][nama_fakultas]`}
+                                        value={
+                                            fakultas.find(
+                                                (f) =>
+                                                    String(f.id) ===
+                                                    author.fakultasId,
+                                            )?.nama_fakultas ?? ""
+                                        }
+                                    />
+                                    <input
+                                        type="hidden"
                                         name={`authors[${index}][nama_dosen]`}
                                         value={
                                             author.dosenOptions.find(
@@ -605,18 +768,16 @@ export default function FormLuaranProsiding({
                                 <Plus className="mr-1 h-4 w-4" />
                                 Tambah Penulis
                             </Button>
-
-                            {errors.authors && (
-                                <p className="text-sm text-red-500">
-                                    {errors.authors}
-                                </p>
-                            )}
                         </div>
                     </CardContent>
 
                     <CardFooter className="flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-end">
                         <Link
-                            href={route("admin.luaran_prosiding.index")}
+                            href={
+                                role === "dosen"
+                                    ? route("dosen.kegiatan.index")
+                                    : route("admin.kegiatan.index")
+                            }
                             viewTransition
                             className="w-full sm:w-auto"
                         >
@@ -633,9 +794,7 @@ export default function FormLuaranProsiding({
                             disabled={processing}
                             className="h-11 w-full px-6 text-base sm:w-auto"
                         >
-                            {isEdit
-                                ? "Simpan Perubahan"
-                                : "Simpan Luaran Prosiding"}
+                            {isEdit ? "Simpan Perubahan" : "Simpan kegiatan"}
                         </Button>
                     </CardFooter>
                 </Card>

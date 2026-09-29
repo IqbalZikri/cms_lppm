@@ -40,7 +40,7 @@ import { Penulis } from "@/interface/penulis";
 import { Field, FieldGroup } from "@/components/ui/field";
 import { LuaranJurnal } from "@/interface/luaran-jurnal";
 import { Combobox } from "@/components/ui/combobox";
-import { generateSlug } from "../berita/form";
+import { generateSlug } from "../../admin/berita/form";
 
 interface Props {
     fakultas: Fakultas[];

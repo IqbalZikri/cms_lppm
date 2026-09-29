@@ -9,7 +9,7 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Hki } from "@/interface/hki";
-import FormLuaranJurnal from "./form";
+import FormLuaranJurnal from "../../forms/luaran-jurnal/form";
 import { LuaranJurnal } from "@/interface/luaran-jurnal";
 
 interface Props {
@@ -38,7 +38,9 @@ export default function EditLuaranJurnal({ fakultas, data }: Props) {
                             <BreadcrumbList>
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("admin.luaran_jurnal.index")}
+                                        href={route(
+                                            "admin.luaran_jurnal.index",
+                                        )}
                                     >
                                         Luaran Jurnal
                                     </BreadcrumbLink>
@@ -46,7 +48,10 @@ export default function EditLuaranJurnal({ fakultas, data }: Props) {
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("admin.luaran_jurnal.edit", data.id)}
+                                        href={route(
+                                            "admin.luaran_jurnal.edit",
+                                            data.id,
+                                        )}
                                     >
                                         Edit Luaran Jurnal
                                     </BreadcrumbLink>

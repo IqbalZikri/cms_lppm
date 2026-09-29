@@ -24,7 +24,9 @@ Route::post('register', [SesiController::class, 'registerAccount'])->name('sesi.
 Route::get('login', [SesiController::class, 'login'])->name('login');
 Route::post('login', [SesiController::class, 'authenticate'])->name('authenticate');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::get('get-dosen/{id}', [DosenController::class, 'getDosen'])->name('dosen.getDosen');
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -109,7 +111,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('site_setting', [SiteSettingsController::class, 'update'])->name('site_setting.update');
 
         Route::get('get-prodi/{id}', [ProdiController::class, 'getProdi'])->name('prodi.getProdi');
-        Route::get('get-dosen/{id}', [DosenController::class, 'getDosen'])->name('dosen.getDosen');
     });
 });
 

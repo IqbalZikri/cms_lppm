@@ -8,7 +8,7 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import FormLuaranProsiding from "./form";
+import FormLuaranProsiding from "../../forms/luaran-prosiding/form";
 import { LuaranProsiding } from "@/interface/luaran-prosiding";
 
 interface Props {
@@ -37,7 +37,9 @@ export default function EditLuaranProsiding({ fakultas, data }: Props) {
                             <BreadcrumbList>
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("admin.luaran_prosiding.index")}
+                                        href={route(
+                                            "admin.luaran_prosiding.index",
+                                        )}
                                     >
                                         Luaran Prosiding
                                     </BreadcrumbLink>
@@ -45,7 +47,10 @@ export default function EditLuaranProsiding({ fakultas, data }: Props) {
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("admin.luaran_prosiding.edit", data.id)}
+                                        href={route(
+                                            "admin.luaran_prosiding.edit",
+                                            data.id,
+                                        )}
                                     >
                                         Edit Luaran Prosiding
                                     </BreadcrumbLink>
@@ -54,7 +59,10 @@ export default function EditLuaranProsiding({ fakultas, data }: Props) {
                         </Breadcrumb>
                     </div>
                 </div>
-                <FormLuaranProsiding fakultas={fakultas} luaranProsiding={data}/>
+                <FormLuaranProsiding
+                    fakultas={fakultas}
+                    luaranProsiding={data}
+                />
             </div>
         </>
     );

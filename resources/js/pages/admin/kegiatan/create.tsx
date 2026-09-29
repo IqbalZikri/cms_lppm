@@ -1,5 +1,5 @@
 import { Head } from "@inertiajs/react";
-import FormKegiatan from "./form";
+import FormKegiatan from "../../forms/kegiatan/form";
 import { route } from "ziggy-js";
 import { Fakultas } from "@/interface/fakultas";
 import { Dosen } from "@/types/dosen";

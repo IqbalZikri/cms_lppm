@@ -18,6 +18,7 @@ type NavItemBase = {
     title: string;
     icon?: LucideIcon;
     isActive?: boolean;
+    exact?: boolean;
 };
 
 // Leaf: bisa diklik langsung → href wajib, tidak boleh punya children

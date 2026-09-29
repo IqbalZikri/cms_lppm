@@ -1,10 +1,10 @@
 import { AppContent } from '@/components/app-content';
 import { AppShell } from '@/components/app-shell';
 import { AppSidebarHeader } from '@/components/app-sidebar-header';
-import { AppSidebarDosen } from '@/components/dosen/app-sidebar';
+import { AppSidebarDosen } from '@/components/dosen/dosen-sidebar';
 import type { AppLayoutProps } from '@/types';
 
-export default function AppSidebarLayout({
+export default function DosenSidebarLayout({
     children,
     breadcrumbs = [],
 }: AppLayoutProps) {

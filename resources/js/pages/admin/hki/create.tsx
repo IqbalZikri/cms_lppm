@@ -8,7 +8,7 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import FormHki from "./form";
+import FormHki from "@/pages/forms/hki/form";
 
 interface Props {
     fakultas: Fakultas[];

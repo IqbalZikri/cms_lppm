@@ -1,6 +1,9 @@
 import { Head } from "@inertiajs/react";
+import FormKegiatan from "../../forms/kegiatan/form";
 import { route } from "ziggy-js";
 import { Fakultas } from "@/interface/fakultas";
+import { Dosen } from "@/types/dosen";
+import Header from "@/components/header";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -8,25 +11,25 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import FormLuaranProsiding from "../../forms/luaran-prosiding/form";
 
 interface Props {
     fakultas: Fakultas[];
+    role: string;
 }
 
-export default function CreateKegiatan({ fakultas }: Props) {
+export default function CreateKegiatan({ fakultas, role }: Props) {
     return (
         <>
             <Head title="Tambah Penelitian Kegiatan" />
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 sm:p-6">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">
-                            Tambah Data Luaran Prosiding
+                            Tambah Data Penelitian Kegiatan
                         </h1>
 
-                        <p className="mt-1 text-muted-foreground">
-                            Form tambah data luaran prosiding.
+                        <p className="text-muted-foreground">
+                            Form tambah data penelitian kegiatan.
                         </p>
                     </div>
 
@@ -35,26 +38,28 @@ export default function CreateKegiatan({ fakultas }: Props) {
                             <BreadcrumbList>
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route(
-                                            "admin.luaran_prosiding.index",
-                                        )}
+                                        href={route("dosen.kegiatan.index")}
                                     >
-                                        Luaran Prosiding
+                                        Penelitian Kegiatan
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("admin.kegiatan.create")}
+                                        href={route("dosen.kegiatan.create")}
                                     >
-                                        Tambah Luaran Prosiding
+                                        Tambah Penelitian Kegiatan
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>
                     </div>
                 </div>
-                <FormLuaranProsiding fakultas={fakultas} />
+                <FormKegiatan
+                    fakultas={fakultas}
+                    role={role}
+                    action={route("dosen.kegiatan.store")}
+                />
             </div>
         </>
     );
@@ -64,6 +69,7 @@ CreateKegiatan.layout = {
     breadcrumbs: [
         {
             title: "Tambah Penelitian Kegiatan",
+            href: route("dosen.kegiatan.create"),
         },
     ],
 };

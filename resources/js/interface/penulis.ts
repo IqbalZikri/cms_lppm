@@ -3,7 +3,7 @@ import { Fakultas } from "./fakultas";
 
 export interface Penulis {
     id: number;
-    penulisable_type: number;
+    penulisable_type: string;
     penulisable_id: number;
     fakultas_id: number;
     fakultas: Fakultas;

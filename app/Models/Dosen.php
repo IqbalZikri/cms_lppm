@@ -36,4 +36,9 @@ class Dosen extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function penulis()
+    {
+        return $this->hasMany(Penulis::class);
+    }
 }

@@ -1,6 +1,7 @@
 import { LucideIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Icon } from "./ui/icon";
+import { cn } from "@/lib/utils";
 
 interface DataCard {
     label: string;
@@ -10,15 +11,24 @@ interface DataCard {
 
 interface StatisticsCardProps {
     dataCard: DataCard[];
+    className?: string;
 }
 
-export default function StatisticsCard({ dataCard }: StatisticsCardProps) {
+export default function StatisticsCard({
+    dataCard,
+    className,
+}: StatisticsCardProps) {
     return (
         <>
             <div
-                className={`grid gap-4 md:grid-cols-2 ${
-                    dataCard.length === 3 ? "lg:grid-cols-3" : "lg:grid-cols-4"
-                }`}
+                className={cn(
+                    `grid gap-4 md:grid-cols-2 ${
+                        dataCard.length === 3
+                            ? "lg:grid-cols-3"
+                            : "lg:grid-cols-4"
+                    }`,
+                    className,
+                )}
             >
                 {dataCard.map((item) => {
                     const icon = item.icon;

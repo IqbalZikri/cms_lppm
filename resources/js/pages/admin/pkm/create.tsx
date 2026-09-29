@@ -1,6 +1,6 @@
 import { Fakultas } from "@/types/fakultas";
 import { Head } from "@inertiajs/react";
-import FormPkm from "./form";
+import FormPkm from "../../forms/pkm/form";
 
 interface Props {
     fakultas: Fakultas[];

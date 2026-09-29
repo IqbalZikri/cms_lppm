@@ -8,7 +8,7 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import FormLuaranJurnal from "./form";
+import FormLuaranJurnal from "../../forms/luaran-jurnal/form";
 
 interface Props {
     fakultas: Fakultas[];
@@ -35,7 +35,9 @@ export default function CreateLuaranJurnal({ fakultas }: Props) {
                             <BreadcrumbList>
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("admin.luaran_jurnal.index")}
+                                        href={route(
+                                            "admin.luaran_jurnal.index",
+                                        )}
                                     >
                                         Luaran Jurnal
                                     </BreadcrumbLink>
@@ -43,7 +45,9 @@ export default function CreateLuaranJurnal({ fakultas }: Props) {
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("admin.luaran_jurnal.create")}
+                                        href={route(
+                                            "admin.luaran_jurnal.create",
+                                        )}
                                     >
                                         Tambah Luaran Jurnal
                                     </BreadcrumbLink>

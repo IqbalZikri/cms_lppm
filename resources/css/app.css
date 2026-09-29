@@ -65,27 +65,24 @@
     --color-uca-green-100: #d4e8dc;
     --color-uca-green-200: #a8d1b8;
     --color-uca-green-300: #6fb08c;
-    --color-uca-green-600: #14663a; /* dekat warna huruf logo */
+    --color-uca-green-600: #14663a;
     --color-uca-green-700: #0d4e2c;
     --color-uca-green-800: #093c21;
     --color-uca-green-900: #052916;
 
-    /* Emas — dari warna bulan sabit, sedikit lebih hangat */
     --color-uca-gold-50: #fbf7ec;
     --color-uca-gold-100: #f3e6c4;
     --color-uca-gold-300: #dcc07f;
-    --color-uca-gold-500: #bd9a55; /* dekat warna crescent logo */
+    --color-uca-gold-500: #bd9a55;
     --color-uca-gold-700: #8a6f34;
     --color-uca-gold-800: #6b5427;
 
-    /* Oranye — dari bintang, dipakai sebagai aksen kecil (badge, CTA sekunder) */
     --color-uca-orange-100: #fde9d9;
     --color-uca-orange-500: #e8792b;
     --color-uca-orange-600: #c2570f;
     --color-uca-orange-800: #8f3f0a;
 
-    /* Netral pendukung — supaya latar tidak putih polos */
-    --color-uca-cream: #faf8f3; /* alternatif background hangat */
+    --color-uca-cream: #faf8f3;
     --color-uca-ink: #16241c;
 }
 
@@ -115,12 +112,12 @@
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
     --radius: 0.625rem;
-    --sidebar: #003c20;
-    --sidebar-foreground: #fff;
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
     --sidebar-primary: oklch(0.205 0 0);
     --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: #bf9f62;
-    --sidebar-accent-foreground: #fff;
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.87 0 0);
 }
@@ -158,6 +155,79 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(0.269 0 0);
     --sidebar-ring: oklch(0.439 0 0);
+}
+
+.theme-uca {
+    --background: #f6f4ee;
+    --foreground: #16241c;
+
+    --card: #ffffff;
+    --card-foreground: #16241c;
+    --popover: #ffffff;
+    --popover-foreground: #16241c;
+
+    --primary: #14663a;
+    --primary-foreground: #ffffff;
+
+    --secondary: #f3e6c4;
+    --secondary-foreground: #6b5427;
+
+    --muted: #eef1ec;
+    --muted-foreground: #5b6b62;
+
+    --accent: #e6f0ea;
+    --accent-foreground: #0d4e2c;
+
+    --destructive: #c0392b;
+    --destructive-foreground: #ffffff;
+
+    --border: #dde5df;
+    --input: #cfd9d2;
+    --ring: #bd9a55;
+
+    --chart-1: #14663a;
+    --chart-2: #bd9a55;
+    --chart-3: #e8792b;
+    --chart-4: #6fb08c;
+    --chart-5: #8a6f34;
+
+    --sidebar: #093c21;
+    --sidebar-foreground: #e8f1eb;
+    --sidebar-primary: #bd9a55;
+    --sidebar-primary-foreground: #052916;
+    --sidebar-accent: #bd9a55;
+    --sidebar-accent-foreground: #fff;
+    --sidebar-border: #14663a;
+    --sidebar-ring: #bd9a55;
+}
+
+.dark.theme-uca {
+    --background: #0e1a13;
+    --foreground: #f3f1ea;
+
+    --card: #14241b;
+    --card-foreground: #f3f1ea;
+    --popover: #14241b;
+    --popover-foreground: #f3f1ea;
+
+    --primary: #6fb08c;
+    --primary-foreground: #052916;
+
+    --secondary: #2a2415;
+    --secondary-foreground: #dcc07f;
+
+    --muted: #1b2c22;
+    --muted-foreground: #9db0a4;
+
+    --accent: #1f3629;
+    --accent-foreground: #d4e8dc;
+
+    --border: #24382c;
+    --input: #2d4536;
+    --ring: #bd9a55;
+
+    --sidebar: #061f12;
+    --sidebar-border: #14663a;
 }
 
 @layer base {

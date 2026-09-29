@@ -38,26 +38,26 @@ const mainNavItems: NavItem[] = [
                 href: route("dosen.kegiatan.index"),
                 icon: Activity,
             },
-            {
-                title: "PKM",
-                href: route("dosen.pkm.index"),
-                icon: HandHeart,
-            },
-            {
-                title: "HKI",
-                href: route("dosen.hki.index"),
-                icon: FileBadge,
-            },
-            {
-                title: "Luaran Prosiding",
-                href: route("dosen.luaran_prosiding.index"),
-                icon: ScrollText,
-            },
-            {
-                title: "Luaran Jurnal",
-                href: route("dosen.luaran_jurnal.index"),
-                icon: Notebook,
-            },
+            // {
+            //     title: "PKM",
+            //     href: route("dosen.pkm.index"),
+            //     icon: HandHeart,
+            // },
+            // {
+            //     title: "HKI",
+            //     href: route("dosen.hki.index"),
+            //     icon: FileBadge,
+            // },
+            // {
+            //     title: "Luaran Prosiding",
+            //     href: route("dosen.luaran_prosiding.index"),
+            //     icon: ScrollText,
+            // },
+            // {
+            //     title: "Luaran Jurnal",
+            //     href: route("dosen.luaran_jurnal.index"),
+            //     icon: Notebook,
+            // },
         ],
     },
 ];
@@ -85,7 +85,7 @@ export function AppSidebarDosen() {
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent>
+            <SidebarContent className="text-[#ffff]">
                 <NavMain items={mainNavItems} />
             </SidebarContent>
 

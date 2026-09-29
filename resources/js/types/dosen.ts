@@ -1,6 +1,7 @@
 import { Fakultas } from "@/interface/fakultas";
 import { Prodi } from "@/interface/prodi";
 import { User } from "./auth";
+import { Penulis } from "@/interface/penulis";
 
 export type Dosen = {
     id: number;
@@ -12,7 +13,7 @@ export type Dosen = {
     nuptk: number;
     nama_dosen: string;
     jenis_kelamin: string;
-    tanggal_lahir: string ;
+    tanggal_lahir: string;
     tempat_lahir: string;
     alamat: string;
     hp: number;
@@ -20,4 +21,5 @@ export type Dosen = {
     foto: string;
     user_id: number;
     user: User;
+    penulis: Penulis[];
 };

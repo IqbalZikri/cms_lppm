@@ -1,5 +1,5 @@
 import { Head } from "@inertiajs/react";
-import FormPkm from "./form";
+import FormPkm from "../../forms/pkm/form";
 import { Pkm } from "@/interface/pkm";
 import { Fakultas } from "@/types/fakultas";
 
