@@ -42,7 +42,8 @@ import { Penulis } from "@/interface/penulis";
 
 interface Props {
     fakultas: Fakultas[];
-    luaranProsiding?: LuaranProsiding; // kalau ada berarti mode edit
+    luaranProsiding?: LuaranProsiding;
+    role?: string;
 }
 
 interface AuthorRow {
@@ -115,6 +116,7 @@ function SectionHeading({
 export default function FormLuaranProsiding({
     fakultas,
     luaranProsiding,
+    role,
 }: Props) {
     const isEdit = !!luaranProsiding;
     const [semester, setSemester] = useState(luaranProsiding?.semester ?? "");
@@ -124,9 +126,17 @@ export default function FormLuaranProsiding({
         setSlug(generateSlug(value));
     };
 
-    const action = isEdit
+    const actionAdmin = isEdit
         ? route("admin.luaran_prosiding.update", luaranProsiding!.id)
         : route("admin.luaran_prosiding.store");
+
+    const actionDosen = isEdit
+        ? route("dosen.luaran_prosiding.update", luaranProsiding!.id)
+        : route("dosen.luaran_prosiding.store");
+
+    const actionUppm = isEdit
+        ? route("uppm.luaran_prosiding.update", luaranProsiding!.id)
+        : route("uppm.luaran_prosiding.store");
 
     const [authors, setAuthors] = useState<AuthorRow[]>(() =>
         buildInitialAuthors(luaranProsiding?.penulis),
@@ -134,7 +144,7 @@ export default function FormLuaranProsiding({
 
     async function fetchDosenByFakultas(fakultasId: string): Promise<Dosen[]> {
         const { data } = await axios.get<Dosen[]>(
-            route("admin.dosen.getDosen", fakultasId),
+            route("dosen.getDosen", fakultasId),
         );
         return data;
     }
@@ -212,7 +222,16 @@ export default function FormLuaranProsiding({
     }
 
     return (
-        <Form action={action} method={isEdit ? "put" : "post"}>
+        <Form
+            action={
+                role === "dosen"
+                    ? actionDosen
+                    : role === "uppm"
+                      ? actionUppm
+                      : actionAdmin
+            }
+            method={isEdit ? "put" : "post"}
+        >
             {({ errors, processing }) => (
                 <Card className="w-full shadow-sm">
                     <CardContent className="grid grid-cols-1 gap-8 pt-6 lg:grid-cols-3 lg:gap-10">
@@ -618,7 +637,13 @@ export default function FormLuaranProsiding({
 
                     <CardFooter className="flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-end">
                         <Link
-                            href={route("admin.luaran_prosiding.index")}
+                            href={
+                                role === "dosen"
+                                    ? route("dosen.luaran_prosiding.index")
+                                    : role === "uppm"
+                                      ? route("uppm.luaran_prosiding.index")
+                                      : route("admin.luaran_prosiding.index")
+                            }
                             viewTransition
                             className="w-full sm:w-auto"
                         >

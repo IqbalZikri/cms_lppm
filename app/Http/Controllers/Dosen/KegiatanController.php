@@ -19,7 +19,7 @@ class KegiatanController extends Controller
         $dosen = Dosen::where('user_id', auth()->user()->id)->with('penulis', 'fakultas')->first();
         $kegiatan = Kegiatan::whereHas('penulis', function ($query) use ($dosen) {
             $query->where('dosen_id', $dosen->id);
-        })->latest()->paginate(10);
+        })->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10);
         return Inertia::render('dosen/kegiatan/index', [
             'kegiatan' => $kegiatan
         ]);

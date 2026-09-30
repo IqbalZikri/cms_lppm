@@ -49,6 +49,7 @@ import { Combobox } from "@/components/ui/combobox";
 interface Props {
     fakultas: Fakultas[];
     pkm?: Pkm;
+    role?: string;
 }
 
 interface AuthorRow {
@@ -134,7 +135,7 @@ function SectionHeading({
     );
 }
 
-export default function FormPkm({ fakultas, pkm }: Props) {
+export default function FormPkm({ fakultas, pkm, role }: Props) {
     const isEdit = !!pkm;
     const [jenisPkm, setJenisPkm] = useState(pkm?.jenis_pkm ?? "");
     const [semester, setSemester] = useState(pkm?.semester ?? "");
@@ -144,9 +145,17 @@ export default function FormPkm({ fakultas, pkm }: Props) {
     );
     const [slug, setSlug] = useState(pkm?.slug ?? "");
 
-    const action = isEdit
+    const actionAdmin = isEdit
         ? route("admin.pkm.update", pkm!.id)
         : route("admin.pkm.store");
+
+    const actionDosen = isEdit
+        ? route("dosen.pkm.update", pkm!.id)
+        : route("dosen.pkm.store");
+
+    const actionUppm = isEdit
+        ? route("uppm.pkm.update", pkm!.id)
+        : route("uppm.pkm.store");
 
     const [authors, setAuthors] = useState<AuthorRow[]>(() =>
         buildInitialAuthors(pkm?.penulis),
@@ -154,7 +163,7 @@ export default function FormPkm({ fakultas, pkm }: Props) {
 
     async function fetchDosenByFakultas(fakultasId: string): Promise<Dosen[]> {
         const { data } = await axios.get<Dosen[]>(
-            route("admin.dosen.getDosen", fakultasId),
+            route("dosen.getDosen", fakultasId),
         );
         return data;
     }
@@ -237,7 +246,16 @@ export default function FormPkm({ fakultas, pkm }: Props) {
     }
 
     return (
-        <Form action={action} method={isEdit ? "put" : "post"}>
+        <Form
+            action={
+                role === "dosen"
+                    ? actionDosen
+                    : role === "uppm"
+                      ? actionUppm
+                      : actionAdmin
+            }
+            method={isEdit ? "put" : "post"}
+        >
             {({ errors, processing }) => (
                 <Card className="w-full shadow-sm">
                     <CardContent className="grid grid-cols-1 gap-8 pt-6 lg:grid-cols-3 lg:gap-10">
@@ -817,7 +835,13 @@ export default function FormPkm({ fakultas, pkm }: Props) {
 
                     <CardFooter className="flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-end">
                         <Link
-                            href={route("admin.pkm.index")}
+                            href={
+                                role === "dosen"
+                                    ? route("dosen.pkm.index")
+                                    : role === "uppm"
+                                      ? route("uppm.pkm.index")
+                                      : route("admin.pkm.index")
+                            }
                             viewTransition
                             className="w-full sm:w-auto"
                         >

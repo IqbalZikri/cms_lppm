@@ -16,7 +16,7 @@ class PkmController extends Controller
 {
     public function index()
     {
-        $data = Pkm::latest()->paginate(10);
+        $data = Pkm::latest()->paginate(10)->withQueryString();
         $data->load('penulis.fakultas', 'penulis.dosen');
         $fakultas = Fakultas::get();
         return Inertia::render('admin/pkm/index', [

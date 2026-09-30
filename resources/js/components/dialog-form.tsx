@@ -38,6 +38,7 @@ type KolomInput = {
     required?: boolean;
     options?: SelectOption[];
     autoComplete?: string;
+    showIf?: { name: string; value: string };
 };
 
 type DialogFormProps = {
@@ -74,9 +75,20 @@ export default function DialogFormCreate({
     kolomInput,
 }: DialogFormProps) {
     const [open, setOpen] = useState(false);
+    const [values, setValues] = useState<Record<string, string>>({});
+
+    const handleChange = (name: string, value: string) => {
+        setValues((prev) => ({ ...prev, [name]: value }));
+    };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog
+            open={open}
+            onOpenChange={(state) => {
+                setOpen(state);
+                if (!state) setValues({}); // reset saat dialog ditutup
+            }}
+        >
             <DialogTrigger asChild>
                 <Button type="button" className="mb-[20px] w-[200px]">
                     <Plus className="h-4 w-4" />
@@ -90,109 +102,133 @@ export default function DialogFormCreate({
                 <Form
                     action={route(actionUrl)}
                     method="POST"
-                    onSuccess={() => setOpen(false)}
+                    onSuccess={() => {
+                        setOpen(false);
+                        setValues({});
+                    }}
                     resetOnSuccess
                 >
                     {({ errors, processing }) => (
                         <>
                             <FieldGroup>
-                                {kolomInput.map((kolom) => (
-                                    <Field key={kolom.name}>
-                                        <Label htmlFor={kolom.name}>
-                                            {kolom.label}{" "}
-                                            {kolom.required && (
-                                                <span className="text-destructive">
-                                                    *
-                                                </span>
-                                            )}
-                                        </Label>
+                                {kolomInput
+                                    // Sembunyikan kolom jika syarat showIf tidak terpenuhi
+                                    .filter(
+                                        (kolom) =>
+                                            !kolom.showIf ||
+                                            values[kolom.showIf.name] ===
+                                                kolom.showIf.value,
+                                    )
+                                    .map((kolom) => (
+                                        <Field key={kolom.name}>
+                                            <Label htmlFor={kolom.name}>
+                                                {kolom.label}{" "}
+                                                {kolom.required && (
+                                                    <span className="text-destructive">
+                                                        *
+                                                    </span>
+                                                )}
+                                            </Label>
 
-                                        {kolom.type === "select" ? (
-                                            <Select
-                                                name={kolom.name}
-                                                required={kolom.required}
-                                            >
-                                                <SelectTrigger id={kolom.name}>
-                                                    <SelectValue
-                                                        placeholder={
-                                                            `Pilih ${kolom.label}`
-                                                        }
-                                                    />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {kolom.options?.map(
-                                                        (opt) => (
-                                                            <SelectItem
-                                                                key={opt.value}
-                                                                value={String(
-                                                                    opt.value,
-                                                                )}
-                                                            >
-                                                                {opt.label}
-                                                            </SelectItem>
-                                                        ),
-                                                    )}
-                                                </SelectContent>
-                                                <small>Pastikan data {kolom.placeholder} sudah terdaftar di sistem.</small>
-                                            </Select>
-                                        ) : (
-                                            <>
-                                                {kolom.type === "radio" ? (
-                                                    <RadioGroup
+                                            {kolom.type === "select" ? (
+                                                <>
+                                                    <Select
                                                         name={kolom.name}
-                                                    >
-                                                        {kolom.options?.map(
-                                                            (item: any) => (
-                                                                <div className="flex items-center gap-3">
-                                                                    <RadioGroupItem
-                                                                        value={
-                                                                            item.value
-                                                                        }
-                                                                        id={
-                                                                            item.value
-                                                                        }
-                                                                    />
-                                                                    <Label
-                                                                        htmlFor={
-                                                                            item.value
-                                                                        }
-                                                                    >
-                                                                        {
-                                                                            item.label
-                                                                        }
-                                                                    </Label>
-                                                                </div>
-                                                            ),
-                                                        )}
-                                                    </RadioGroup>
-                                                ) : (
-                                                    <Input
-                                                        id={kolom.name}
-                                                        name={kolom.name}
-                                                        type={
-                                                            kolom.type ?? "text"
-                                                        }
-                                                        placeholder={
-                                                            kolom.placeholder
-                                                        }
                                                         required={
                                                             kolom.required
                                                         }
-                                                        autoComplete={
-                                                            kolom.autoComplete
+                                                        onValueChange={(v) =>
+                                                            handleChange(
+                                                                kolom.name,
+                                                                v,
+                                                            )
                                                         }
-                                                    />
-                                                )}
-                                            </>
-                                        )}
+                                                    >
+                                                        <SelectTrigger
+                                                            id={kolom.name}
+                                                        >
+                                                            <SelectValue
+                                                                placeholder={`Pilih ${kolom.label}`}
+                                                            />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {kolom.options?.map(
+                                                                (opt) => (
+                                                                    <SelectItem
+                                                                        key={
+                                                                            opt.value
+                                                                        }
+                                                                        value={String(
+                                                                            opt.value,
+                                                                        )}
+                                                                    >
+                                                                        {
+                                                                            opt.label
+                                                                        }
+                                                                    </SelectItem>
+                                                                ),
+                                                            )}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <small>
+                                                        Pastikan data{" "}
+                                                        {kolom.label} sudah
+                                                        terdaftar di sistem.
+                                                    </small>
+                                                </>
+                                            ) : kolom.type === "radio" ? (
+                                                <RadioGroup
+                                                    name={kolom.name}
+                                                    onValueChange={(v) =>
+                                                        handleChange(
+                                                            kolom.name,
+                                                            v,
+                                                        )
+                                                    }
+                                                >
+                                                    {kolom.options?.map(
+                                                        (item: any) => (
+                                                            <div
+                                                                key={item.value}
+                                                                className="flex items-center gap-3"
+                                                            >
+                                                                <RadioGroupItem
+                                                                    value={
+                                                                        item.value
+                                                                    }
+                                                                    id={`${kolom.name}-${item.value}`}
+                                                                />
+                                                                <Label
+                                                                    htmlFor={`${kolom.name}-${item.value}`}
+                                                                >
+                                                                    {item.label}
+                                                                </Label>
+                                                            </div>
+                                                        ),
+                                                    )}
+                                                </RadioGroup>
+                                            ) : (
+                                                <Input
+                                                    id={kolom.name}
+                                                    name={kolom.name}
+                                                    type={kolom.type ?? "text"}
+                                                    placeholder={
+                                                        kolom.placeholder
+                                                    }
+                                                    required={kolom.required}
+                                                    autoComplete={
+                                                        kolom.autoComplete
+                                                    }
+                                                />
+                                            )}
 
-                                        {errors[kolom.name] && (
-                                            <p className="text-sm text-red-500">
-                                                {errors[kolom.name]}
-                                            </p>
-                                        )}
-                                    </Field>
-                                ))}
+                                            {errors[kolom.name] && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors[kolom.name]}
+                                                </p>
+                                            )}
+                                        </Field>
+                                    ))}
                             </FieldGroup>
                             <DialogFooter className="mt-[20px]">
                                 <DialogClose asChild>
@@ -219,9 +255,29 @@ export function DialogFormEdit<T extends { id: number }>({
     item,
 }: DialogFormEditProps<T>) {
     const [open, setOpen] = useState(false);
+    const getInitialValues = () =>
+        Object.fromEntries(
+            kolomInput.map((kolom) => [
+                kolom.name,
+                String((item as any)[kolom.name] ?? ""),
+            ]),
+        ) as Record<string, string>;
+
+    const [values, setValues] =
+        useState<Record<string, string>>(getInitialValues);
+
+    const handleChange = (name: string, value: string) => {
+        setValues((prev) => ({ ...prev, [name]: value }));
+    };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog
+            open={open}
+            onOpenChange={(state) => {
+                setOpen(state);
+                if (state) setValues(getInitialValues()); // reset saat dialog ditutup
+            }}
+        >
             <DialogTrigger asChild>
                 <Button type="button">Edit</Button>
             </DialogTrigger>
@@ -232,133 +288,169 @@ export function DialogFormEdit<T extends { id: number }>({
                 <Form
                     action={actionUrl}
                     method="put"
-                    onSuccess={() => setOpen(false)}
+                    onSuccess={() => {
+                        setOpen(false);
+                        setValues({});
+                    }}
                     resetOnSuccess
                 >
                     {({ errors, processing }) => (
                         <>
                             <FieldGroup>
-                                {kolomInput.map((kolom) => {
-                                    const currentValue = (item as any)[
-                                        kolom.name
-                                    ];
+                                {kolomInput
+                                    // Sembunyikan kolom jika syarat showIf tidak terpenuhi
+                                    .filter(
+                                        (kolom) =>
+                                            !kolom.showIf ||
+                                            values[kolom.showIf.name] ===
+                                                kolom.showIf.value,
+                                    )
+                                    .map((kolom) => {
+                                        const currentValue = (item as any)[
+                                            kolom.name
+                                        ];
 
-                                    return (
-                                        <Field key={kolom.name}>
-                                            <Label htmlFor={kolom.name}>
-                                                {kolom.label}{" "}
-                                                {kolom.required && (
-                                                    <span className="text-destructive">
-                                                        *
-                                                    </span>
-                                                )}
-                                            </Label>
+                                        return (
+                                            <Field key={kolom.name}>
+                                                <Label htmlFor={kolom.name}>
+                                                    {kolom.label}{" "}
+                                                    {kolom.required && (
+                                                        <span className="text-destructive">
+                                                            *
+                                                        </span>
+                                                    )}
+                                                </Label>
 
-                                            {kolom.type === "select" ? (
-                                                <Select
-                                                    name={kolom.name}
-                                                    required={kolom.required}
-                                                    defaultValue={
-                                                        currentValue != null
-                                                            ? String(
-                                                                  currentValue,
-                                                              )
-                                                            : undefined
-                                                    }
-                                                >
-                                                    <SelectTrigger
-                                                        id={kolom.name}
+                                                {kolom.type === "select" ? (
+                                                    <Select
+                                                        name={kolom.name}
+                                                        required={
+                                                            kolom.required
+                                                        }
+                                                        defaultValue={
+                                                            currentValue != null
+                                                                ? String(
+                                                                      currentValue,
+                                                                  )
+                                                                : undefined
+                                                        }
                                                     >
-                                                        <SelectValue
-                                                            placeholder={
-                                                                kolom.placeholder ??
-                                                                `Pilih ${kolom.label}`
-                                                            }
-                                                        />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {kolom.options?.map(
-                                                            (opt) => (
-                                                                <SelectItem
-                                                                    key={
-                                                                        opt.value
-                                                                    }
-                                                                    value={String(
-                                                                        opt.value,
-                                                                    )}
-                                                                >
-                                                                    {opt.label}
-                                                                </SelectItem>
-                                                            ),
-                                                        )}
-                                                    </SelectContent>
-                                                </Select>
-                                            ) : (
-                                                <>
-                                                {console.log(currentValue)}
-                                                    {kolom.type == "radio" ? (
-                                                        <RadioGroup
-                                                            name={kolom.name}
-                                                            defaultValue={ currentValue ?? ""}
+                                                        <SelectTrigger
+                                                            id={kolom.name}
                                                         >
+                                                            <SelectValue
+                                                                placeholder={
+                                                                    kolom.placeholder ??
+                                                                    `Pilih ${kolom.label}`
+                                                                }
+                                                            />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
                                                             {kolom.options?.map(
-                                                                (item: any) => (
-                                                                    <div className="flex items-center gap-3">
-                                                                        <RadioGroupItem
-                                                                            value={
-                                                                                item.value
-                                                                            }
-                                                                            id={
-                                                                                item.value
-                                                                            }
-                                                                        />
-                                                                        <Label
-                                                                            htmlFor={
-                                                                                item.value
-                                                                            }
-                                                                        >
-                                                                            {
-                                                                                item.label
-                                                                            }
-                                                                        </Label>
-                                                                    </div>
+                                                                (opt) => (
+                                                                    <SelectItem
+                                                                        key={
+                                                                            opt.value
+                                                                        }
+                                                                        value={String(
+                                                                            opt.value,
+                                                                        )}
+                                                                    >
+                                                                        {
+                                                                            opt.label
+                                                                        }
+                                                                    </SelectItem>
                                                                 ),
                                                             )}
-                                                        </RadioGroup>
-                                                    ) : (
-                                                        <Input
-                                                            id={kolom.name}
-                                                            name={kolom.name}
-                                                            type={
-                                                                kolom.type ??
-                                                                "text"
-                                                            }
-                                                            placeholder={
-                                                                kolom.placeholder
-                                                            }
-                                                            required={
-                                                                kolom.required
-                                                            }
-                                                            autoComplete={
-                                                                kolom.autoComplete
-                                                            }
-                                                            defaultValue={
-                                                                currentValue ??
-                                                                ""
-                                                            }
-                                                        />
-                                                    )}
-                                                </>
-                                            )}
+                                                        </SelectContent>
+                                                    </Select>
+                                                ) : (
+                                                    <>
+                                                        {console.log(
+                                                            currentValue,
+                                                        )}
+                                                        {kolom.type ==
+                                                        "radio" ? (
+                                                            <RadioGroup
+                                                                name={
+                                                                    kolom.name
+                                                                }
+                                                                defaultValue={
+                                                                    currentValue ??
+                                                                    ""
+                                                                }
+                                                                onValueChange={(
+                                                                    v,
+                                                                ) =>
+                                                                    handleChange(
+                                                                        kolom.name,
+                                                                        v,
+                                                                    )
+                                                                }
+                                                            >
+                                                                {kolom.options?.map(
+                                                                    (
+                                                                        opt: any,
+                                                                    ) => (
+                                                                        <div
+                                                                            key={
+                                                                                opt.value
+                                                                            }
+                                                                            className="flex items-center gap-3"
+                                                                        >
+                                                                            <RadioGroupItem
+                                                                                value={
+                                                                                    opt.value
+                                                                                }
+                                                                                id={`edit-${item.id}-${kolom.name}-${opt.value}`}
+                                                                            />
+                                                                            <Label
+                                                                                htmlFor={`edit-${item.id}-${kolom.name}-${opt.value}`}
+                                                                            >
+                                                                                {
+                                                                                    opt.label
+                                                                                }
+                                                                            </Label>
+                                                                        </div>
+                                                                    ),
+                                                                )}
+                                                            </RadioGroup>
+                                                        ) : (
+                                                            <Input
+                                                                id={kolom.name}
+                                                                name={
+                                                                    kolom.name
+                                                                }
+                                                                type={
+                                                                    kolom.type ??
+                                                                    "text"
+                                                                }
+                                                                placeholder={
+                                                                    kolom.placeholder
+                                                                }
+                                                                required={
+                                                                    kolom.required
+                                                                }
+                                                                autoComplete={
+                                                                    kolom.autoComplete
+                                                                }
+                                                                defaultValue={
+                                                                    currentValue ??
+                                                                    ""
+                                                                }
+                                                            />
+                                                        )}
+                                                    </>
+                                                )}
 
-                                            {errors[kolom.name] && (
-                                                <p className="text-sm text-red-500">
-                                                    {errors[kolom.name]}
-                                                </p>
-                                            )}
-                                        </Field>
-                                    );
-                                })}
+                                                {errors[kolom.name] && (
+                                                    <p className="text-sm text-red-500">
+                                                        {errors[kolom.name]}
+                                                    </p>
+                                                )}
+                                            </Field>
+                                        );
+                                    })}
                             </FieldGroup>
                             <DialogFooter className="mt-[20px]">
                                 <DialogClose asChild>

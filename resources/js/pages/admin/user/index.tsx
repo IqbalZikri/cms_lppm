@@ -13,15 +13,23 @@ import { User } from "@/types";
 import { Head } from "@inertiajs/react";
 import { Check, Users, X } from "lucide-react";
 import { route } from "ziggy-js";
+import { Fakultas } from "@/types/fakultas";
 
 interface UserPageProps {
     users: PaginatedData<User>;
     totalUser: number;
+    totalUppm: number;
+    totalAdmin: number;
+    fakultas: Fakultas[];
 }
 
-export default function UserPage({ users, totalUser }: UserPageProps) {
-    const userAdmin = users.data.filter((item) => item.role === "admin").length;
-    const userUppm = users.data.filter((item) => item.role === "uppm").length;
+export default function UserPage({
+    users,
+    totalUser,
+    totalUppm,
+    totalAdmin,
+    fakultas,
+}: UserPageProps) {
     return (
         <>
             <Head title="User" />
@@ -46,12 +54,12 @@ export default function UserPage({ users, totalUser }: UserPageProps) {
                         },
                         {
                             label: "Admin Terdaftar",
-                            count: userAdmin,
+                            count: totalAdmin,
                             icon: Users,
                         },
                         {
                             label: "UPPM Terdaftar",
-                            count: userUppm,
+                            count: totalUppm,
                             icon: Users,
                         },
                     ]}
@@ -111,6 +119,16 @@ export default function UserPage({ users, totalUser }: UserPageProps) {
                                         { label: "Admin", value: "admin" },
                                         { label: "UPPM", value: "uppm" },
                                     ],
+                                },
+                                {
+                                    label: "Fakultas",
+                                    name: "fakultas_id",
+                                    type: "select",
+                                    showIf: { name: "role", value: "uppm" },
+                                    options: fakultas.map((item) => ({
+                                        label: item.nama_fakultas,
+                                        value: item.id,
+                                    })),
                                 },
                             ]}
                         />
@@ -201,6 +219,21 @@ export default function UserPage({ users, totalUser }: UserPageProps) {
                                                                 value: "uppm",
                                                             },
                                                         ],
+                                                    },
+                                                    {
+                                                        label: "Fakultas",
+                                                        name: "fakultas_id",
+                                                        type: "select",
+                                                        showIf: {
+                                                            name: "role",
+                                                            value: "uppm",
+                                                        },
+                                                        options: fakultas.map(
+                                                            (item) => ({
+                                                                label: item.nama_fakultas,
+                                                                value: item.id,
+                                                            }),
+                                                        ),
                                                     },
                                                 ]}
                                             />

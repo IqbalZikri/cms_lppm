@@ -1,4 +1,5 @@
 import { DialogDelete } from "@/components/dialog-form";
+import Header from "@/components/header";
 import TablePage from "@/components/table-page";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,15 @@ export default function IndexKegiatan({ kegiatan }: Props) {
         <>
             <Head title="Kegiatan Penelitian" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <Header
+                    page="Penelitian Kegiatan"
+                    breadcrumb={[
+                        {
+                            label: "Penelitian Kegiatan",
+                            href: "dosen.kegiatan.index",
+                        },
+                    ]}
+                />
                 <Card>
                     <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-3">
@@ -54,6 +64,44 @@ export default function IndexKegiatan({ kegiatan }: Props) {
                                 {
                                     key: "judul",
                                     label: "Judul Kegiatan",
+                                },
+                                {
+                                    id: "fakultas",
+                                    key: "penulis",
+                                    label: "Fakultas",
+                                    render: (_, item) =>
+                                        item.penulis.map((penulis, i) => (
+                                            <Badge key={i} className="mr-2">
+                                                {penulis.fakultas.nama_fakultas}
+                                            </Badge>
+                                        )),
+                                },
+                                {
+                                    id: "dosen",
+                                    key: "penulis",
+                                    label: "Dosen",
+                                    render: (_, item) =>
+                                        item.penulis.map((penulis, i) => (
+                                            <Badge
+                                                key={i}
+                                                className="mr-2 rounded-md px-2 py-1 text-xs"
+                                            >
+                                                {penulis.dosen.nama_dosen}
+                                            </Badge>
+                                        )),
+                                },
+                                {
+                                    id: "periode",
+                                    key: "semester",
+                                    label: "Periode",
+                                    render: (_, item) => (
+                                        <div className="flex flex-wrap gap-4">
+                                            <Badge>{item.semester}</Badge>
+                                            <Badge variant={"secondary"}>
+                                                {item.tahun}
+                                            </Badge>
+                                        </div>
+                                    ),
                                 },
                                 {
                                     id: "berkas",

@@ -20,7 +20,7 @@ class DosenController extends Controller
      */
     public function index()
     {
-        $data = Dosen::paginate(10);
+        $data = Dosen::paginate(10)->withQueryString();
         $fakultas = Fakultas::with('dosen')->get();
         $prodi = Prodi::get();
 

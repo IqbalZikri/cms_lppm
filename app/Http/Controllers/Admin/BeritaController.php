@@ -14,7 +14,7 @@ class BeritaController extends Controller
 {
     public function index(Request $request)
     {
-        $data = Berita::with('kategori')->latest()->paginate(10);
+        $data = Berita::with('kategori')->latest()->paginate(10)->withQueryString();
         $kategori = Kategori::get();
         $beritaDraft = Berita::where('status_published', 'draft')->count();
         $beritaPublished = Berita::where('status_published', 'published')->count();

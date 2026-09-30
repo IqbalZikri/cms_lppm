@@ -16,12 +16,12 @@ class PkmController extends Controller
 {
     public function index()
     {
-        $data = Pkm::latest()->paginate(10);
-        $data->load('penulis.fakultas', 'penulis.dosen');
-        $fakultas = Fakultas::get();
+        $dosen = Dosen::where('user_id', auth()->user()->id)->with('penulis', 'fakultas')->first();
+        $data = Pkm::whereHas('penulis', function ($query) use ($dosen) {
+            $query->where('dosen_id', $dosen->id);
+        })->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10);
         return Inertia::render('dosen/pkm/index', [
             'data' => $data,
-            'fakultas' => $fakultas,
         ]);
     }
 
@@ -29,7 +29,8 @@ class PkmController extends Controller
     {
         $fakultas = Fakultas::get();
         return Inertia::render('dosen/pkm/create', [
-            'fakultas' => $fakultas
+            'fakultas' => $fakultas,
+            'role' => auth()->user()->role
         ]);
     }
 
@@ -118,7 +119,8 @@ class PkmController extends Controller
         $fakultas = Fakultas::get();
         return Inertia::render('dosen/pkm/edit', [
             'data' => $data,
-            'fakultas' => $fakultas
+            'fakultas' => $fakultas,
+            'role' => auth()->user()->role
         ]);
     }
 

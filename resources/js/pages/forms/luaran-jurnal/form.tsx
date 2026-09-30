@@ -45,6 +45,7 @@ import { generateSlug } from "../../admin/berita/form";
 interface Props {
     fakultas: Fakultas[];
     luaranJurnal?: LuaranJurnal;
+    role?: string;
 }
 
 interface AuthorRow {
@@ -117,7 +118,11 @@ function SectionHeading({
     );
 }
 
-export default function FormLuaranJurnal({ fakultas, luaranJurnal }: Props) {
+export default function FormLuaranJurnal({
+    fakultas,
+    luaranJurnal,
+    role,
+}: Props) {
     const isEdit = !!luaranJurnal;
     const [jenisluaranJurnal, setJenisluaranJurnal] = useState(
         luaranJurnal?.jenis_luaran_jurnal ?? "",
@@ -129,9 +134,17 @@ export default function FormLuaranJurnal({ fakultas, luaranJurnal }: Props) {
         setSlug(generateSlug(value));
     };
 
-    const action = isEdit
+    const actionAdmin = isEdit
         ? route("admin.luaran_jurnal.update", luaranJurnal!.id)
         : route("admin.luaran_jurnal.store");
+
+    const actionDosen = isEdit
+        ? route("dosen.luaran_jurnal.update", luaranJurnal!.id)
+        : route("dosen.luaran_jurnal.store");
+
+    const actionUppm = isEdit
+        ? route("uppm.luaran_jurnal.update", luaranJurnal!.id)
+        : route("uppm.luaran_jurnal.store");
 
     const [authors, setAuthors] = useState<AuthorRow[]>(() =>
         buildInitialAuthors(luaranJurnal?.penulis),
@@ -139,7 +152,7 @@ export default function FormLuaranJurnal({ fakultas, luaranJurnal }: Props) {
 
     async function fetchDosenByFakultas(fakultasId: string): Promise<Dosen[]> {
         const { data } = await axios.get<Dosen[]>(
-            route("admin.dosen.getDosen", fakultasId),
+            route("dosen.getDosen", fakultasId),
         );
         return data;
     }
@@ -218,7 +231,16 @@ export default function FormLuaranJurnal({ fakultas, luaranJurnal }: Props) {
     }
 
     return (
-        <Form action={action} method={isEdit ? "put" : "post"}>
+        <Form
+            action={
+                role === "dosen"
+                    ? actionDosen
+                    : role === "uppm"
+                      ? actionUppm
+                      : actionAdmin
+            }
+            method={isEdit ? "put" : "post"}
+        >
             {({ errors, processing }) => (
                 <Card className="w-full shadow-sm">
                     <CardContent className="grid grid-cols-1 gap-8 pt-6 lg:grid-cols-3 lg:gap-10">
@@ -721,7 +743,13 @@ export default function FormLuaranJurnal({ fakultas, luaranJurnal }: Props) {
 
                     <CardFooter className="flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-end">
                         <Link
-                            href={route("admin.luaran_jurnal.index")}
+                            href={
+                                role === "dosen"
+                                    ? route("dosen.luaran_jurnal.index")
+                                    : role === "uppm"
+                                      ? route("uppm.luaran_jurnal.index")
+                                      : route("admin.luaran_jurnal.index")
+                            }
                             viewTransition
                             className="w-full sm:w-auto"
                         >

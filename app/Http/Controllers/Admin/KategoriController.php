@@ -15,7 +15,7 @@ class KategoriController extends Controller
      */
     public function index()
     {
-        $data = Kategori::paginate(10);
+        $data = Kategori::paginate(10)->withQueryString();
 
         return Inertia::render('admin/kategori/index', [
             'data' => $data,

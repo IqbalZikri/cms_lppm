@@ -13,7 +13,7 @@ class ProdiController extends Controller
 {
     public function index()
     {
-        $data = Prodi::paginate(10);
+        $data = Prodi::paginate(10)->withQueryString();
         $fakultas = Fakultas::get();
 
         return Inertia::render('admin/prodi/index', [

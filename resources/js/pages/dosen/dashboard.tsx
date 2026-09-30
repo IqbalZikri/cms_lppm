@@ -66,27 +66,27 @@ export default function Dashboard({
                     className="lg:grid-cols-3"
                     dataCard={[
                         {
-                            label: "Total Penelitian",
+                            label: "Penelitian",
                             count: dosenLogin.penulis.length,
                         },
                         {
-                            label: "Total Kegiatan",
+                            label: "Kegiatan",
                             count: totalKegiatan,
                         },
                         {
-                            label: "Total PKM",
+                            label: "PKM",
                             count: totalPkm,
                         },
                         {
-                            label: "Total HKI",
+                            label: "HKI",
                             count: totalHki,
                         },
                         {
-                            label: "Total Luaran Jurnal",
+                            label: "Luaran Jurnal",
                             count: totalLuaranJurnal,
                         },
                         {
-                            label: "Total Luaran Prosiding",
+                            label: "Luaran Prosiding",
                             count: totalLuaranProsiding,
                         },
                     ]}

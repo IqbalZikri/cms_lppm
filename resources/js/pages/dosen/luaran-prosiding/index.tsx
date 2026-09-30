@@ -5,28 +5,17 @@ import TablePage from "@/components/table-page";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Fakultas } from "@/interface/fakultas";
 import { LuaranProsiding as LuaranProsidingInterface } from "@/interface/luaran-prosiding";
 import { PaginatedData } from "@/interface/pagination";
 import { Head, Link } from "@inertiajs/react";
-import { Eye, FileText, Pencil, Plus, ScrollText } from "lucide-react";
+import { FileText, Plus, ScrollText } from "lucide-react";
 import { route } from "ziggy-js";
 
 interface Props {
     data: PaginatedData<LuaranProsidingInterface>;
-    fakultas: Fakultas[];
 }
 
-export default function LuaranProsiding({ data, fakultas }: Props) {
-    const statistikFakultas = fakultas.map((item) => ({
-        label: item.nama_fakultas,
-        count: data.data.filter((luaranProsiding) =>
-            luaranProsiding.penulis.some(
-                (penulis) => penulis.fakultas_id === item.id,
-            ),
-        ).length,
-    }));
-
+export default function LuaranProsiding({ data }: Props) {
     return (
         <>
             <Head title="Luaran Prosiding" />
@@ -36,15 +25,8 @@ export default function LuaranProsiding({ data, fakultas }: Props) {
                     breadcrumb={[
                         {
                             label: "Luaran Prosiding",
-                            href: "admin.luaran_prosiding.index",
+                            href: "dosen.luaran_prosiding.index",
                         },
-                    ]}
-                />
-
-                <StatisticsCard
-                    dataCard={[
-                        { label: "Total Luaran Prosiding", count: data.total },
-                        ...statistikFakultas,
                     ]}
                 />
 
@@ -66,7 +48,7 @@ export default function LuaranProsiding({ data, fakultas }: Props) {
                         </div>
 
                         <Link
-                            href={route("admin.luaran_prosiding.create")}
+                            href={route("dosen.luaran_prosiding.create")}
                             viewTransition
                             className="w-full sm:w-auto"
                         >
@@ -168,7 +150,7 @@ export default function LuaranProsiding({ data, fakultas }: Props) {
                                 <div className="flex items-center gap-3">
                                     <Link
                                         href={route(
-                                            "admin.luaran_prosiding.show",
+                                            "dosen.luaran_prosiding.show",
                                             item.id,
                                         )}
                                         viewTransition
@@ -182,7 +164,7 @@ export default function LuaranProsiding({ data, fakultas }: Props) {
                                     </Link>
                                     <Link
                                         href={route(
-                                            "admin.luaran_prosiding.edit",
+                                            "dosen.luaran_prosiding.edit",
                                             item.id,
                                         )}
                                         viewTransition
@@ -192,7 +174,7 @@ export default function LuaranProsiding({ data, fakultas }: Props) {
                                     <DialogDelete
                                         label={item.judul}
                                         actionUrl={route(
-                                            "admin.luaran_prosiding.destroy",
+                                            "dosen.luaran_prosiding.destroy",
                                             item.id,
                                         )}
                                         page="Penelitian Kegiatan"

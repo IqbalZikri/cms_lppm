@@ -24,7 +24,10 @@ Route::post('register', [SesiController::class, 'registerAccount'])->name('sesi.
 Route::get('login', [SesiController::class, 'login'])->name('login');
 Route::post('login', [SesiController::class, 'authenticate'])->name('authenticate');
 
-Route::get('get-dosen/{id}', [DosenController::class, 'getDosen'])->name('dosen.getDosen');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('get-dosen/{id}', [DosenController::class, 'getDosen'])->name('dosen.getDosen');
+});
+
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
@@ -116,3 +119,4 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/dosen.php';
+require __DIR__ . '/uppm.php';

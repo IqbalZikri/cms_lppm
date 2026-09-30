@@ -15,7 +15,6 @@ return new class extends Migration {
             $table->enum('jenis_pkm', ['pelaksanaan', 'jurnal']);
             $table->string('judul');
             $table->string('slug');
-            $table->string('gambar')->nullable();
             $table->string('abstrak');
             $table->string('semester');
             $table->year('tahun');

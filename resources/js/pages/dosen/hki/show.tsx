@@ -18,10 +18,10 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { ArrowLeft, FileText, Pencil } from "lucide-react";
-import { Pkm } from "@/interface/pkm";
+import { Hki } from "@/interface/hki";
 
 interface Props {
-    data: Pkm;
+    data: Hki;
 }
 
 function formatRupiah(value: string | number) {
@@ -42,7 +42,7 @@ export default function Show({ data }: Props) {
             <Head title={`Detail - ${data.judul}`} />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
-                    <Link href={route("dosen.pkm.index")} viewTransition>
+                    <Link href={route("dosen.hki.index")} viewTransition>
                         <Button variant="outline" size="sm">
                             <ArrowLeft className="mr-1 h-4 w-4" />
                             Kembali
@@ -50,7 +50,7 @@ export default function Show({ data }: Props) {
                     </Link>
 
                     <Link
-                        href={route("dosen.pkm.edit", data.id)}
+                        href={route("dosen.hki.edit", data.id)}
                         viewTransition
                     >
                         <Button size="sm">
@@ -69,7 +69,7 @@ export default function Show({ data }: Props) {
                             </small>
                         </CardTitle>
                         <CardDescription>
-                            Detail Pengabdian Kepada Masyarakat ( PKM )
+                            Detail Hak Kekayaan Intelektual ( HKI )
                         </CardDescription>
                     </CardHeader>
 
@@ -106,6 +106,26 @@ export default function Show({ data }: Props) {
                                     {formatRupiah(data.jumlah_dana)}
                                 </p>
                             </div>
+                            {data.nomer_paten && (
+                                <div>
+                                    <p className="text-muted-foreground text-sm">
+                                        Nomor Paten
+                                    </p>
+                                    <p className="font-medium">
+                                        {data.nomer_paten}
+                                    </p>
+                                </div>
+                            )}
+                            {data.nomer_pengajuan_haki && (
+                                <div>
+                                    <p className="text-muted-foreground text-sm">
+                                        Nomor Pengajuan HAKI
+                                    </p>
+                                    <p className="font-medium">
+                                        {data.nomer_pengajuan_haki}
+                                    </p>
+                                </div>
+                            )}
                         </div>
 
                         {/* Abstrak */}
@@ -187,8 +207,8 @@ export default function Show({ data }: Props) {
 Show.layout = {
     breadcrumbs: [
         {
-            title: "Kegiatan Penelitian",
-            href: route("dosen.kegiatan.index"),
+            title: "Hak Kekayaan Intelektual",
+            href: route("dosen.hki.index"),
         },
         {
             title: "Detail",

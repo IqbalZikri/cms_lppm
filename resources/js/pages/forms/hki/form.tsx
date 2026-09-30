@@ -44,6 +44,7 @@ import { formatRupiah } from "@/pages/forms/pkm/form";
 interface Props {
     fakultas: Fakultas[];
     hki?: Hki;
+    role?: string;
 }
 
 interface AuthorRow {
@@ -116,7 +117,7 @@ function SectionHeading({
     );
 }
 
-export default function FormHki({ fakultas, hki }: Props) {
+export default function FormHki({ fakultas, hki, role }: Props) {
     const isEdit = !!hki;
     const [jenisHki, setJenisHki] = useState(hki?.jenis_hki ?? "");
     const [semester, setSemester] = useState(hki?.semester ?? "");
@@ -130,9 +131,17 @@ export default function FormHki({ fakultas, hki }: Props) {
         setSlug(generateSlug(value));
     };
 
-    const action = isEdit
+    const actionAdmin = isEdit
         ? route("admin.hki.update", hki!.id)
         : route("admin.hki.store");
+
+    const actionDosen = isEdit
+        ? route("dosen.hki.update", hki!.id)
+        : route("dosen.hki.store");
+
+    const actionUppm = isEdit
+        ? route("dosen.hki.update", hki!.id)
+        : route("dosen.hki.store");
 
     const [authors, setAuthors] = useState<AuthorRow[]>(() =>
         buildInitialAuthors(hki?.penulis),
@@ -140,7 +149,7 @@ export default function FormHki({ fakultas, hki }: Props) {
 
     async function fetchDosenByFakultas(fakultasId: string): Promise<Dosen[]> {
         const { data } = await axios.get<Dosen[]>(
-            route("admin.dosen.getDosen", fakultasId),
+            route("dosen.getDosen", fakultasId),
         );
         return data;
     }
@@ -219,7 +228,16 @@ export default function FormHki({ fakultas, hki }: Props) {
     }
 
     return (
-        <Form action={action} method={isEdit ? "put" : "post"}>
+        <Form
+            action={
+                role === "dosen"
+                    ? actionDosen
+                    : role === "uppm"
+                      ? actionUppm
+                      : actionAdmin
+            }
+            method={isEdit ? "put" : "post"}
+        >
             {({ errors, processing }) => (
                 <Card className="w-full shadow-sm">
                     <CardContent className="grid grid-cols-1 gap-8 pt-6 lg:grid-cols-3 lg:gap-10">
@@ -886,7 +904,13 @@ export default function FormHki({ fakultas, hki }: Props) {
 
                     <CardFooter className="flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-end">
                         <Link
-                            href={route("admin.hki.index")}
+                            href={
+                                role === "dosen"
+                                    ? route("dosen.hki.index")
+                                    : role === "uppm"
+                                      ? route("uppm.hki.index")
+                                      : route("admin.hki.index")
+                            }
                             viewTransition
                             className="w-full sm:w-auto"
                         >

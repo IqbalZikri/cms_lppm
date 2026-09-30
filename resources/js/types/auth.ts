@@ -1,10 +1,14 @@
+import { Fakultas } from "./fakultas";
+
 export type User = {
     id: number;
     name: string;
     email: string;
     avatar?: string;
     email_verified_at: string | null;
-    role: string
+    role: string;
+    fakultas_id: string;
+    fakultas: Fakultas;
     two_factor_enabled?: boolean;
     created_at: string;
     updated_at: string;

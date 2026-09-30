@@ -9,7 +9,7 @@ interface Props {
 export default function CreatePkm({ fakultas }: Props) {
     return (
         <>
-            <Head title="Tambah Penelitian PKM" />
+            <Head title="Tambah PKM" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <FormPkm fakultas={fakultas} />
             </div>
@@ -20,7 +20,7 @@ export default function CreatePkm({ fakultas }: Props) {
 CreatePkm.layout = {
     breadcrumbs: [
         {
-            title: "Tambah Penelitian PKM",
+            title: "Tambah PKM",
         },
     ],
 };

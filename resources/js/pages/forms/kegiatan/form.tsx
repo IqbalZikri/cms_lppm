@@ -147,6 +147,14 @@ export default function FormKegiatan({
         ? route("admin.kegiatan.update", kegiatan!.id)
         : route("admin.kegiatan.store");
 
+    const actionDosen = isEdit
+        ? route("dosen.kegiatan.update", kegiatan!.id)
+        : route("dosen.kegiatan.store");
+
+    const actionUppm = isEdit
+        ? route("dosen.kegiatan.update", kegiatan!.id)
+        : route("dosen.kegiatan.store");
+
     const [authors, setAuthors] = useState<AuthorRow[]>(() =>
         buildInitialAuthors(kegiatan?.penulis),
     );
@@ -232,7 +240,16 @@ export default function FormKegiatan({
     }
 
     return (
-        <Form action={action ?? actionAdmin} method={isEdit ? "put" : "post"}>
+        <Form
+            action={
+                role === "dosen"
+                    ? actionDosen
+                    : role === "uppm"
+                      ? actionUppm
+                      : actionAdmin
+            }
+            method={isEdit ? "put" : "post"}
+        >
             {({ errors, processing }) => (
                 <Card className="w-full shadow-sm">
                     <CardContent className="grid grid-cols-1 gap-8 pt-6 lg:grid-cols-3 lg:gap-10">

@@ -11,7 +11,6 @@ class Pkm extends Model
         'jenis_pkm',
         'judul',
         'slug',
-        'gambar',
         'abstrak',
         'semester',
         'tahun',

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Dosen;
 
 use App\Http\Controllers\Controller;
 use App\Models\Dosen;
@@ -18,12 +18,12 @@ class LuaranJurnalController extends Controller
      */
     public function index()
     {
-        $data = LuaranJurnal::latest()->paginate(10)->withQueryString();
-        $data->load('penulis.fakultas', 'penulis.dosen');
-        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
-        return Inertia::render('admin/luaran-jurnal/index', [
+        $dosen = Dosen::where('user_id', auth()->user()->id)->with('penulis', 'fakultas')->first();
+        $data = LuaranJurnal::whereHas('penulis', function ($query) use ($dosen) {
+            $query->where('dosen_id', $dosen->id);
+        })->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10);
+        return Inertia::render('dosen/luaran-jurnal/index', [
             'data' => $data,
-            'fakultas' => $fakultas
         ]);
     }
 
@@ -33,8 +33,9 @@ class LuaranJurnalController extends Controller
     public function create()
     {
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
-        return Inertia::render('admin/luaran-jurnal/create', [
-            'fakultas' => $fakultas
+        return Inertia::render('dosen/luaran-jurnal/create', [
+            'fakultas' => $fakultas,
+            'role' => auth()->user()->role
         ]);
     }
 
@@ -93,7 +94,7 @@ class LuaranJurnalController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.luaran_jurnal.index')->with('success', 'Berhasil menambahkan luaran jurnal');
+            return redirect()->route('dosen.luaran_jurnal.index')->with('success', 'Berhasil menambahkan luaran jurnal');
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::error($th->getMessage(), [$th->getTraceAsString()]);
@@ -107,7 +108,7 @@ class LuaranJurnalController extends Controller
     public function show(LuaranJurnal $luaranJurnal)
     {
         $luaranJurnal->load('penulis.fakultas', 'penulis.dosen');
-        return Inertia::render('admin/luaran-jurnal/show', [
+        return Inertia::render('dosen/luaran-jurnal/show', [
             'data' => $luaranJurnal
         ]);
     }
@@ -119,9 +120,10 @@ class LuaranJurnalController extends Controller
     {
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
         $luaranJurnal->load('penulis');
-        return Inertia::render('admin/luaran-jurnal/edit', [
+        return Inertia::render('dosen/luaran-jurnal/edit', [
             'fakultas' => $fakultas,
-            'data' => $luaranJurnal
+            'data' => $luaranJurnal,
+            'role' => auth()->user()->role
         ]);
     }
 
@@ -181,7 +183,7 @@ class LuaranJurnalController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.luaran_jurnal.index')->with('success', 'Berhasil mengedit luaran jurnal');
+            return redirect()->route('dosen.luaran_jurnal.index')->with('success', 'Berhasil mengedit luaran jurnal');
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::error($th->getMessage(), [$th->getTraceAsString()]);

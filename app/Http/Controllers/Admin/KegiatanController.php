@@ -19,8 +19,7 @@ class KegiatanController extends Controller
      */
     public function index()
     {
-        // $data = Kegiatan::latest()->paginate(10);
-        $data = Kegiatan::latest()->paginate(10);
+        $data = Kegiatan::latest()->paginate(10)->withQueryString();
         $data->load('penulis.fakultas', 'penulis.dosen');
         $fakultas = Fakultas::get();
         return Inertia::render('admin/kegiatan/index', [

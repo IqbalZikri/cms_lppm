@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Dosen;
 
 use App\Http\Controllers\Controller;
 use App\Models\Dosen;
@@ -18,12 +18,12 @@ class LuaranProsidingController extends Controller
      */
     public function index()
     {
-        $data = LuaranProsiding::latest()->paginate(10)->withQueryString();
-        $data->load('penulis.fakultas', 'penulis.dosen');
-        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
-        return Inertia::render('admin/luaran-prosiding/index', [
+        $dosen = Dosen::where('user_id', auth()->user()->id)->with('penulis', 'fakultas')->first();
+        $data = LuaranProsiding::whereHas('penulis', function ($query) use ($dosen) {
+            $query->where('dosen_id', $dosen->id);
+        })->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10);
+        return Inertia::render('dosen/luaran-prosiding/index', [
             'data' => $data,
-            'fakultas' => $fakultas
         ]);
     }
 
@@ -33,8 +33,9 @@ class LuaranProsidingController extends Controller
     public function create()
     {
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
-        return Inertia::render('admin/luaran-prosiding/create', [
-            'fakultas' => $fakultas
+        return Inertia::render('dosen/luaran-prosiding/create', [
+            'fakultas' => $fakultas,
+            'role' => auth()->user()->role
         ]);
     }
 
@@ -86,7 +87,7 @@ class LuaranProsidingController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.luaran_prosiding.index')->with('success', 'Berhasil menambahkan luaran prosiding');
+            return redirect()->route('dosen.luaran_prosiding.index')->with('success', 'Berhasil menambahkan luaran prosiding');
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
@@ -100,7 +101,7 @@ class LuaranProsidingController extends Controller
     public function show(LuaranProsiding $luaranProsiding)
     {
         $luaranProsiding->load('penulis.fakultas', 'penulis.dosen');
-        return Inertia::render('admin/luaran-prosiding/show', [
+        return Inertia::render('dosen/luaran-prosiding/show', [
             'data' => $luaranProsiding
         ]);
     }
@@ -112,9 +113,10 @@ class LuaranProsidingController extends Controller
     {
         $luaranProsiding->load('penulis');
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
-        return Inertia::render('admin/luaran-prosiding/edit', [
+        return Inertia::render('dosen/luaran-prosiding/edit', [
             'data' => $luaranProsiding,
-            'fakultas' => $fakultas
+            'fakultas' => $fakultas,
+            'role' => auth()->user()->role
         ]);
     }
 
@@ -167,7 +169,7 @@ class LuaranProsidingController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.luaran_prosiding.index')->with('success', 'Berhasil mengedit luaran prosiding');
+            return redirect()->route('dosen.luaran_prosiding.index')->with('success', 'Berhasil mengedit luaran prosiding');
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);

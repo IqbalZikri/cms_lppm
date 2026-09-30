@@ -18,10 +18,10 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { ArrowLeft, FileText, Pencil } from "lucide-react";
-import { Pkm } from "@/interface/pkm";
+import { LuaranJurnal } from "@/interface/luaran-jurnal";
 
 interface Props {
-    data: Pkm;
+    data: LuaranJurnal;
 }
 
 function formatRupiah(value: string | number) {
@@ -42,7 +42,10 @@ export default function Show({ data }: Props) {
             <Head title={`Detail - ${data.judul}`} />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
-                    <Link href={route("dosen.pkm.index")} viewTransition>
+                    <Link
+                        href={route("dosen.luaran_jurnal.index")}
+                        viewTransition
+                    >
                         <Button variant="outline" size="sm">
                             <ArrowLeft className="mr-1 h-4 w-4" />
                             Kembali
@@ -50,7 +53,7 @@ export default function Show({ data }: Props) {
                     </Link>
 
                     <Link
-                        href={route("dosen.pkm.edit", data.id)}
+                        href={route("dosen.luaran_jurnal.edit", data.id)}
                         viewTransition
                     >
                         <Button size="sm">
@@ -62,15 +65,13 @@ export default function Show({ data }: Props) {
 
                 <Card className="w-full">
                     <CardHeader>
-                        <CardTitle className="text-xl">
+                        <CardTitle className="text-xl flex justify-between">
                             {data.judul}
                             <small className="text-base font-thin">
                                 slug: {data.slug}
                             </small>
                         </CardTitle>
-                        <CardDescription>
-                            Detail Pengabdian Kepada Masyarakat ( PKM )
-                        </CardDescription>
+                        <CardDescription>Detail Luaran Jurnal</CardDescription>
                     </CardHeader>
 
                     <CardContent className="space-y-6">
@@ -87,24 +88,6 @@ export default function Show({ data }: Props) {
                                     Tahun
                                 </p>
                                 <p className="font-medium">{data.tahun}</p>
-                            </div>
-                            <div>
-                                <p className="text-muted-foreground text-sm">
-                                    Sumber Dana
-                                </p>
-                                <Badge variant="secondary" className="mt-1">
-                                    {data.sumber_dana === "internal"
-                                        ? "Internal"
-                                        : "Eksternal"}
-                                </Badge>
-                            </div>
-                            <div>
-                                <p className="text-muted-foreground text-sm">
-                                    Jumlah Dana
-                                </p>
-                                <p className="font-medium">
-                                    {formatRupiah(data.jumlah_dana)}
-                                </p>
                             </div>
                         </div>
 
@@ -187,8 +170,8 @@ export default function Show({ data }: Props) {
 Show.layout = {
     breadcrumbs: [
         {
-            title: "Kegiatan Penelitian",
-            href: route("dosen.kegiatan.index"),
+            title: "Luaran Jurnal",
+            href: route("dosen.luaran_jurnal.index"),
         },
         {
             title: "Detail",

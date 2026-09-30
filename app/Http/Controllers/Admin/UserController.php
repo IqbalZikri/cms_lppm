@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Fakultas;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -17,9 +18,15 @@ class UserController extends Controller
     {
         $users = User::whereIn('role', ['admin', 'uppm'])->paginate(10)->withQueryString();
         $totalUser = $users->total();
+        $totalUppm = User::where('role', 'uppm')->count();
+        $totalAdmin = User::where('role', 'admin')->count();
+        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
         return Inertia::render('admin/user/index', [
             'users' => $users,
-            'totalUser' => $totalUser
+            'totalUser' => $totalUser,
+            'totalUppm' => $totalUppm,
+            'totalAdmin' => $totalAdmin,
+            'fakultas' => $fakultas,
         ]);
     }
 
@@ -33,12 +40,14 @@ class UserController extends Controller
             'email' => 'required',
             'password' => 'required|confirmed',
             'role' => 'required',
+            'fakultas_id' => 'exists:fakultas,id',
         ], [
             'name.required' => "Nama akun wajib diisi",
             'email.required' => 'Email wajib diisi',
             'password.required' => "Password wajib diisi",
             'password.confirmed' => "Konfirmasi Password wajib diisi",
-            'role.required' => 'Pilih salah satu role'
+            'role.required' => 'Pilih salah satu role',
+            'fakultas_id.exists' => 'Data fakultas tidak ada di dalam sistem',
         ]);
 
         try {
@@ -52,27 +61,34 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required',
+            'email' => 'required',
+            'password' => 'required|confirmed',
+            'role' => 'required',
+            'fakultas_id' => 'exists:fakultas,id',
+        ], [
+            'name.required' => "Nama akun wajib diisi",
+            'email.required' => 'Email wajib diisi',
+            'password.required' => "Password wajib diisi",
+            'password.confirmed' => "Konfirmasi Password wajib diisi",
+            'role.required' => 'Pilih salah satu role',
+            'fakultas_id.exists' => 'Data fakultas tidak ada di dalam sistem',
+        ]);
+
+        try {
+            $user = User::findOrFail($id);
+            $user->update($validated);
+
+            return back()->with('success', 'Berhasil mengedit data user');
+        } catch (\Throwable $th) {
+            Log::info($th->getMessage());
+            return back()->with('error', 'Terjadi Kesalahan');
+        }
     }
 
     /**
@@ -80,6 +96,13 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user = User::findOrFail($id);
+        try {
+            $user->delete();
+            return back()->with('success', 'Berhasil menghapus user');
+        } catch (\Throwable $th) {
+            Log::info($th->getMessage());
+            return back()->with('error', 'Terjadi Kesalahan');
+        }
     }
 }

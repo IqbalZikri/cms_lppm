@@ -5,7 +5,6 @@ export interface Pkm {
     jenis_pkm: string;
     judul: string;
     slug: string;
-    gambar?: string;
     abstrak: string;
     semester: string;
     tahun: number;
