@@ -34,11 +34,21 @@ class DashboardController extends Controller
             $query->where('dosen_id', $dosenLogin->id);
         })->count();
 
-        $kegiatanTerbaru = Kegiatan::latest()->take(10)->get();
-        $pkmTerbaru = Pkm::latest()->take(10)->get();
-        $hkiTerbaru = Hki::latest()->take(10)->get();
-        $luaranJurnalTerbaru = LuaranJurnal::latest()->take(10)->get();
-        $luaranProsidingTerbaru = LuaranProsiding::latest()->take(10)->get();
+        $kegiatanTerbaru = Kegiatan::whereHas("penulis", function ($query) use ($dosenLogin) {
+            $query->where('dosen_id', $dosenLogin->id);
+        })->latest()->take(10)->get();
+        $pkmTerbaru = Pkm::whereHas("penulis", function ($query) use ($dosenLogin) {
+            $query->where('dosen_id', $dosenLogin->id);
+        })->latest()->take(10)->get();
+        $hkiTerbaru = Hki::whereHas("penulis", function ($query) use ($dosenLogin) {
+            $query->where('dosen_id', $dosenLogin->id);
+        })->latest()->take(10)->get();
+        $luaranJurnalTerbaru = LuaranJurnal::whereHas("penulis", function ($query) use ($dosenLogin) {
+            $query->where('dosen_id', $dosenLogin->id);
+        })->latest()->take(10)->get();
+        $luaranProsidingTerbaru = LuaranProsiding::whereHas("penulis", function ($query) use ($dosenLogin) {
+            $query->where('dosen_id', $dosenLogin->id);
+        })->latest()->take(10)->get();
 
         return Inertia::render('dosen/dashboard', [
             'dosenLogin' => $dosenLogin,

@@ -56,7 +56,7 @@ export default function SiteSettingsPage({ site_setting: s }: Props) {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route("admin.site_setting.update"), {
+        post(route("site_setting.update"), {
             forceFormData: true, // wajib untuk upload file
             preserveScroll: true,
         });
@@ -68,7 +68,7 @@ export default function SiteSettingsPage({ site_setting: s }: Props) {
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <Header
                     page="Pengaturan Website"
-                    breadcrumb={[{ label: "Pengaturan Website", href: "admin.site_setting.index" }]}
+                    breadcrumb={[{ label: "Pengaturan Website", href: "site_setting.index" }]}
                 />
 
                 <form onSubmit={submit} className="space-y-4">
@@ -201,5 +201,5 @@ export default function SiteSettingsPage({ site_setting: s }: Props) {
 }
 
 SiteSettingsPage.layout = {
-    breadcrumbs: [{ title: "Site Settings", href: route("admin.site_setting.index") }],
+    breadcrumbs: [{ title: "Site Settings", href: route("site_setting.index") }],
 };

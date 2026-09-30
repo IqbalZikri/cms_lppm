@@ -50,7 +50,7 @@ const chartConfig = {
     prosiding: { label: "Prosiding", color: "var(--chart-5)" },
 } satisfies ChartConfig;
 
-export function ChartAreaInteractive({ chartData }: Props) {
+export function ChartDashboardAdmin({ chartData }: Props) {
     const [timeRange, setTimeRange] = React.useState("3y");
 
     const filteredData = React.useMemo(() => {

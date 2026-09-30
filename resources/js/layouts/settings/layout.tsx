@@ -30,7 +30,7 @@ const sidebarNavItems: NavItem[] = [
     },
     {
         title: "Site Settings",
-        href: route("admin.site_setting.index"),
+        href: route("site_setting.index"),
         icon: null,
     },
 ];

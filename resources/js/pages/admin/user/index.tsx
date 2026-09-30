@@ -197,6 +197,7 @@ export default function UserPage({
                                                         placeholder:
                                                             "Password Akun",
                                                         type: "password",
+                                                        small: "Kosongkan password dan konfirmasi password jika tidak ingin merubah password"
                                                     },
                                                     {
                                                         label: "Konfirmasi Password",

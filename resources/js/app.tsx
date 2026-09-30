@@ -5,6 +5,7 @@ import AppLayout from "@/layouts/admin/app-layout";
 import AuthLayout from "@/layouts/auth-layout";
 import SettingsLayout from "@/layouts/settings/layout";
 import DosenAppLayout from "./layouts/dosen/dosen-layout";
+import UppmAppLayout from "./layouts/uppm/uppm-layout";
 
 const appName = "Lembaga Penjamin dan Pengabdian Masyarakat";
 
@@ -20,6 +21,8 @@ void createInertiaApp({
                 return [AppLayout, SettingsLayout];
             case name.startsWith("dosen/"):
                 return DosenAppLayout;
+            case name.startsWith("uppm/"):
+                return UppmAppLayout;
             default:
                 return AppLayout;
         }

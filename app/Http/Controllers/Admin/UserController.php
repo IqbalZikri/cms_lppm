@@ -16,7 +16,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::whereIn('role', ['admin', 'uppm'])->paginate(10)->withQueryString();
+        $users = User::whereIn('role', ['admin', 'uppm'])->oldest('id')->paginate(10)->withQueryString();
         $totalUser = $users->total();
         $totalUppm = User::where('role', 'uppm')->count();
         $totalAdmin = User::where('role', 'admin')->count();
@@ -68,14 +68,11 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required',
             'email' => 'required',
-            'password' => 'required|confirmed',
             'role' => 'required',
             'fakultas_id' => 'exists:fakultas,id',
         ], [
             'name.required' => "Nama akun wajib diisi",
             'email.required' => 'Email wajib diisi',
-            'password.required' => "Password wajib diisi",
-            'password.confirmed' => "Konfirmasi Password wajib diisi",
             'role.required' => 'Pilih salah satu role',
             'fakultas_id.exists' => 'Data fakultas tidak ada di dalam sistem',
         ]);

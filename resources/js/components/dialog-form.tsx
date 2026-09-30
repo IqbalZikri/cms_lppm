@@ -39,6 +39,7 @@ type KolomInput = {
     options?: SelectOption[];
     autoComplete?: string;
     showIf?: { name: string; value: string };
+    small?: string;
 };
 
 type DialogFormProps = {
@@ -208,18 +209,24 @@ export default function DialogFormCreate({
                                                     )}
                                                 </RadioGroup>
                                             ) : (
-                                                <Input
-                                                    id={kolom.name}
-                                                    name={kolom.name}
-                                                    type={kolom.type ?? "text"}
-                                                    placeholder={
-                                                        kolom.placeholder
-                                                    }
-                                                    required={kolom.required}
-                                                    autoComplete={
-                                                        kolom.autoComplete
-                                                    }
-                                                />
+                                                <>
+                                                    <Input
+                                                        id={kolom.name}
+                                                        name={kolom.name}
+                                                        type={
+                                                            kolom.type ?? "text"
+                                                        }
+                                                        placeholder={
+                                                            kolom.placeholder
+                                                        }
+                                                        required={
+                                                            kolom.required
+                                                        }
+                                                        autoComplete={
+                                                            kolom.autoComplete
+                                                        }
+                                                    />
+                                                </>
                                             )}
 
                                             {errors[kolom.name] && (
@@ -366,9 +373,6 @@ export function DialogFormEdit<T extends { id: number }>({
                                                     </Select>
                                                 ) : (
                                                     <>
-                                                        {console.log(
-                                                            currentValue,
-                                                        )}
                                                         {kolom.type ==
                                                         "radio" ? (
                                                             <RadioGroup
@@ -416,29 +420,42 @@ export function DialogFormEdit<T extends { id: number }>({
                                                                 )}
                                                             </RadioGroup>
                                                         ) : (
-                                                            <Input
-                                                                id={kolom.name}
-                                                                name={
-                                                                    kolom.name
-                                                                }
-                                                                type={
-                                                                    kolom.type ??
-                                                                    "text"
-                                                                }
-                                                                placeholder={
-                                                                    kolom.placeholder
-                                                                }
-                                                                required={
-                                                                    kolom.required
-                                                                }
-                                                                autoComplete={
-                                                                    kolom.autoComplete
-                                                                }
-                                                                defaultValue={
-                                                                    currentValue ??
+                                                            <>
+                                                                <Input
+                                                                    id={
+                                                                        kolom.name
+                                                                    }
+                                                                    name={
+                                                                        kolom.name
+                                                                    }
+                                                                    type={
+                                                                        kolom.type ??
+                                                                        "text"
+                                                                    }
+                                                                    placeholder={
+                                                                        kolom.placeholder
+                                                                    }
+                                                                    required={
+                                                                        kolom.required
+                                                                    }
+                                                                    autoComplete={
+                                                                        kolom.autoComplete
+                                                                    }
+                                                                    defaultValue={
+                                                                        currentValue ??
+                                                                        ""
+                                                                    }
+                                                                />
+                                                                {kolom.small ? (
+                                                                    <small>
+                                                                        {
+                                                                            kolom.small
+                                                                        }
+                                                                    </small>
+                                                                ) : (
                                                                     ""
-                                                                }
-                                                            />
+                                                                )}
+                                                            </>
                                                         )}
                                                     </>
                                                 )}

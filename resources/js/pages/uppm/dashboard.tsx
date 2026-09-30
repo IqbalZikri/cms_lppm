@@ -8,7 +8,6 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Book, Check, X } from "lucide-react";
-import { Dosen } from "@/types/dosen";
 import { User } from "@/types";
 import {
     Table,
@@ -26,40 +25,43 @@ import { Badge } from "@/components/ui/badge";
 import { Hki } from "@/interface/hki";
 import { LuaranJurnal } from "@/interface/luaran-jurnal";
 import { LuaranProsiding } from "@/interface/luaran-prosiding";
-import { ChartDashboardAdmin, ChartPoint } from "@/components/chart-dashboard-admin";
+import {
+    ChartDashboardAdmin,
+    ChartPoint,
+} from "@/components/chart-dashboard-admin";
+import { Dosen } from "@/types/dosen";
+import { ChartAreaInteractive } from "@/components/chart-area-interactive";
 
 interface Props {
-    dosen: Dosen[];
-    kegiatan: Kegiatan[];
-    pkm: Pkm[];
-    hki: Hki[];
-    luaranJurnal: LuaranJurnal[];
-    luaranProsiding: LuaranProsiding[];
     user: User;
-    chartData: ChartPoint[];
     totalDosen: number;
     totalKegiatan: number;
     totalPkm: number;
     totalHki: number;
     totalLuaranJurnal: number;
     totalLuaranProsiding: number;
+    dosenTerbaru: Dosen[];
+    kegiatanTerbaru: Kegiatan[];
+    pkmTerbaru: Pkm[];
+    hkiTerbaru: Hki[];
+    luaranJurnalTerbaru: LuaranJurnal[];
+    luaranProsidingTerbaru: LuaranProsiding[];
 }
 
 export default function Dashboard({
-    dosen,
-    kegiatan,
-    pkm,
-    hki,
-    luaranJurnal,
-    luaranProsiding,
     user,
-    chartData,
     totalDosen,
     totalKegiatan,
     totalPkm,
     totalHki,
     totalLuaranJurnal,
     totalLuaranProsiding,
+    dosenTerbaru,
+    kegiatanTerbaru,
+    pkmTerbaru,
+    hkiTerbaru,
+    luaranJurnalTerbaru,
+    luaranProsidingTerbaru,
 }: Props) {
     const namaUser = user.name.charAt(0).toUpperCase() + user.name.slice(1);
 
@@ -187,7 +189,7 @@ export default function Dashboard({
                         </CardContent>
                     </Card>
                 </div>
-                <ChartDashboardAdmin chartData={chartData} />
+                <ChartAreaInteractive />
 
                 <Card>
                     <CardHeader>
@@ -232,7 +234,7 @@ export default function Dashboard({
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {dosen.length === 0 ? (
+                                        {dosenTerbaru.length === 0 ? (
                                             <>
                                                 <TableRow>
                                                     <>
@@ -247,7 +249,7 @@ export default function Dashboard({
                                             </>
                                         ) : (
                                             <>
-                                                {dosen.map(
+                                                {dosenTerbaru.map(
                                                     (item, index = 0) => (
                                                         <TableRow key={item.id}>
                                                             <>
@@ -324,7 +326,7 @@ export default function Dashboard({
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {kegiatan.length === 0 ? (
+                                        {kegiatanTerbaru.length === 0 ? (
                                             <>
                                                 <TableRow>
                                                     <TableCell
@@ -337,7 +339,7 @@ export default function Dashboard({
                                             </>
                                         ) : (
                                             <>
-                                                {kegiatan.map((item, index) => (
+                                                {kegiatanTerbaru.map((item, index) => (
                                                     <TableRow key={item.id}>
                                                         <TableCell className="font-medium">
                                                             {index + 1}
@@ -431,7 +433,7 @@ export default function Dashboard({
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {pkm.length === 0 ? (
+                                        {pkmTerbaru.length === 0 ? (
                                             <>
                                                 <TableRow>
                                                     <TableCell
@@ -444,7 +446,7 @@ export default function Dashboard({
                                             </>
                                         ) : (
                                             <>
-                                                {pkm.map((item, index) => (
+                                                {pkmTerbaru.map((item, index) => (
                                                     <TableRow key={item.id}>
                                                         <TableCell className="font-medium">
                                                             {index + 1}
@@ -538,7 +540,7 @@ export default function Dashboard({
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {hki.length === 0 ? (
+                                        {hkiTerbaru.length === 0 ? (
                                             <>
                                                 <TableRow>
                                                     <TableCell
@@ -551,7 +553,7 @@ export default function Dashboard({
                                             </>
                                         ) : (
                                             <>
-                                                {hki.map((item, index) => (
+                                                {hkiTerbaru.map((item, index) => (
                                                     <TableRow key={item.id}>
                                                         <TableCell className="font-medium">
                                                             {index + 1}
@@ -645,7 +647,7 @@ export default function Dashboard({
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {luaranJurnal.length === 0 ? (
+                                        {luaranJurnalTerbaru.length === 0 ? (
                                             <>
                                                 <TableRow>
                                                     <TableCell
@@ -658,78 +660,86 @@ export default function Dashboard({
                                             </>
                                         ) : (
                                             <>
-                                                {luaranJurnal.map((item, index) => (
-                                                    <TableRow key={item.id}>
-                                                        <TableCell className="font-medium">
-                                                            {index + 1}
-                                                        </TableCell>
+                                                {luaranJurnalTerbaru.map(
+                                                    (item, index) => (
+                                                        <TableRow key={item.id}>
+                                                            <TableCell className="font-medium">
+                                                                {index + 1}
+                                                            </TableCell>
 
-                                                        <TableCell>
-                                                            <div className="flex flex-wrap gap-2">
-                                                                {(
-                                                                    item.penulis ??
-                                                                    []
-                                                                ).map(
-                                                                    (p, i) => (
-                                                                        <span
-                                                                            key={
-                                                                                i
-                                                                            }
-                                                                            className="rounded-md bg-muted px-2 py-1 text-xs"
-                                                                        >
-                                                                            {
-                                                                                p
-                                                                                    .fakultas
-                                                                                    .nama_fakultas
-                                                                            }
-                                                                        </span>
-                                                                    ),
-                                                                )}
-                                                            </div>
-                                                        </TableCell>
+                                                            <TableCell>
+                                                                <div className="flex flex-wrap gap-2">
+                                                                    {(
+                                                                        item.penulis ??
+                                                                        []
+                                                                    ).map(
+                                                                        (
+                                                                            p,
+                                                                            i,
+                                                                        ) => (
+                                                                            <span
+                                                                                key={
+                                                                                    i
+                                                                                }
+                                                                                className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                            >
+                                                                                {
+                                                                                    p
+                                                                                        .fakultas
+                                                                                        .nama_fakultas
+                                                                                }
+                                                                            </span>
+                                                                        ),
+                                                                    )}
+                                                                </div>
+                                                            </TableCell>
 
-                                                        <TableCell>
-                                                            <div className="flex flex-wrap gap-2">
-                                                                {(
-                                                                    item.penulis ??
-                                                                    []
-                                                                ).map(
-                                                                    (p, i) => (
-                                                                        <span
-                                                                            key={
-                                                                                i
-                                                                            }
-                                                                            className="rounded-md bg-muted px-2 py-1 text-xs"
-                                                                        >
-                                                                            {
-                                                                                p
-                                                                                    .dosen
-                                                                                    .nama_dosen
-                                                                            }
-                                                                        </span>
-                                                                    ),
-                                                                )}
-                                                            </div>
-                                                        </TableCell>
+                                                            <TableCell>
+                                                                <div className="flex flex-wrap gap-2">
+                                                                    {(
+                                                                        item.penulis ??
+                                                                        []
+                                                                    ).map(
+                                                                        (
+                                                                            p,
+                                                                            i,
+                                                                        ) => (
+                                                                            <span
+                                                                                key={
+                                                                                    i
+                                                                                }
+                                                                                className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                            >
+                                                                                {
+                                                                                    p
+                                                                                        .dosen
+                                                                                        .nama_dosen
+                                                                                }
+                                                                            </span>
+                                                                        ),
+                                                                    )}
+                                                                </div>
+                                                            </TableCell>
 
-                                                        <TableCell>
-                                                            {item.judul}
-                                                        </TableCell>
+                                                            <TableCell>
+                                                                {item.judul}
+                                                            </TableCell>
 
-                                                        <TableCell>
-                                                            <Link
-                                                                href={
-                                                                    item.link_berkas
-                                                                }
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="text-blue-600 underline"
-                                                            >
-                                                                Lihat Berkas
-                                                            </Link>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
+                                                            <TableCell>
+                                                                <Link
+                                                                    href={
+                                                                        item.link_berkas
+                                                                    }
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="text-blue-600 underline"
+                                                                >
+                                                                    Lihat Berkas
+                                                                </Link>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ),
+                                                )}
                                             </>
                                         )}
                                     </TableBody>
@@ -752,7 +762,7 @@ export default function Dashboard({
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {luaranProsiding.length === 0 ? (
+                                        {luaranProsidingTerbaru.length === 0 ? (
                                             <>
                                                 <TableRow>
                                                     <TableCell
@@ -765,78 +775,86 @@ export default function Dashboard({
                                             </>
                                         ) : (
                                             <>
-                                                {luaranProsiding.map((item, index) => (
-                                                    <TableRow key={item.id}>
-                                                        <TableCell className="font-medium">
-                                                            {index + 1}
-                                                        </TableCell>
+                                                {luaranProsidingTerbaru.map(
+                                                    (item, index) => (
+                                                        <TableRow key={item.id}>
+                                                            <TableCell className="font-medium">
+                                                                {index + 1}
+                                                            </TableCell>
 
-                                                        <TableCell>
-                                                            <div className="flex flex-wrap gap-2">
-                                                                {(
-                                                                    item.penulis ??
-                                                                    []
-                                                                ).map(
-                                                                    (p, i) => (
-                                                                        <span
-                                                                            key={
-                                                                                i
-                                                                            }
-                                                                            className="rounded-md bg-muted px-2 py-1 text-xs"
-                                                                        >
-                                                                            {
-                                                                                p
-                                                                                    .fakultas
-                                                                                    .nama_fakultas
-                                                                            }
-                                                                        </span>
-                                                                    ),
-                                                                )}
-                                                            </div>
-                                                        </TableCell>
+                                                            <TableCell>
+                                                                <div className="flex flex-wrap gap-2">
+                                                                    {(
+                                                                        item.penulis ??
+                                                                        []
+                                                                    ).map(
+                                                                        (
+                                                                            p,
+                                                                            i,
+                                                                        ) => (
+                                                                            <span
+                                                                                key={
+                                                                                    i
+                                                                                }
+                                                                                className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                            >
+                                                                                {
+                                                                                    p
+                                                                                        .fakultas
+                                                                                        .nama_fakultas
+                                                                                }
+                                                                            </span>
+                                                                        ),
+                                                                    )}
+                                                                </div>
+                                                            </TableCell>
 
-                                                        <TableCell>
-                                                            <div className="flex flex-wrap gap-2">
-                                                                {(
-                                                                    item.penulis ??
-                                                                    []
-                                                                ).map(
-                                                                    (p, i) => (
-                                                                        <span
-                                                                            key={
-                                                                                i
-                                                                            }
-                                                                            className="rounded-md bg-muted px-2 py-1 text-xs"
-                                                                        >
-                                                                            {
-                                                                                p
-                                                                                    .dosen
-                                                                                    .nama_dosen
-                                                                            }
-                                                                        </span>
-                                                                    ),
-                                                                )}
-                                                            </div>
-                                                        </TableCell>
+                                                            <TableCell>
+                                                                <div className="flex flex-wrap gap-2">
+                                                                    {(
+                                                                        item.penulis ??
+                                                                        []
+                                                                    ).map(
+                                                                        (
+                                                                            p,
+                                                                            i,
+                                                                        ) => (
+                                                                            <span
+                                                                                key={
+                                                                                    i
+                                                                                }
+                                                                                className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                            >
+                                                                                {
+                                                                                    p
+                                                                                        .dosen
+                                                                                        .nama_dosen
+                                                                                }
+                                                                            </span>
+                                                                        ),
+                                                                    )}
+                                                                </div>
+                                                            </TableCell>
 
-                                                        <TableCell>
-                                                            {item.judul}
-                                                        </TableCell>
+                                                            <TableCell>
+                                                                {item.judul}
+                                                            </TableCell>
 
-                                                        <TableCell>
-                                                            <Link
-                                                                href={
-                                                                    item.link_berkas
-                                                                }
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="text-blue-600 underline"
-                                                            >
-                                                                Lihat Berkas
-                                                            </Link>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
+                                                            <TableCell>
+                                                                <Link
+                                                                    href={
+                                                                        item.link_berkas
+                                                                    }
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="text-blue-600 underline"
+                                                                >
+                                                                    Lihat Berkas
+                                                                </Link>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ),
+                                                )}
                                             </>
                                         )}
                                     </TableBody>

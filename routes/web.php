@@ -26,6 +26,9 @@ Route::post('login', [SesiController::class, 'authenticate'])->name('authenticat
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('get-dosen/{id}', [DosenController::class, 'getDosen'])->name('dosen.getDosen');
+
+    Route::get('site_setting', [SiteSettingsController::class, 'index'])->name('site_setting.index');
+    Route::put('site_setting', [SiteSettingsController::class, 'update'])->name('site_setting.update');
 });
 
 
@@ -109,9 +112,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'edit'])->name('luaran_jurnal.edit');
         Route::put('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'update'])->name('luaran_jurnal.update');
         Route::delete('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'destroy'])->name('luaran_jurnal.destroy');
-
-        Route::get('site_setting', [SiteSettingsController::class, 'index'])->name('site_setting.index');
-        Route::put('site_setting', [SiteSettingsController::class, 'update'])->name('site_setting.update');
 
         Route::get('get-prodi/{id}', [ProdiController::class, 'getProdi'])->name('prodi.getProdi');
     });

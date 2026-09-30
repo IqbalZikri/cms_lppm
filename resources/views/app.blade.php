@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class([
     'dark' => ($appearance ?? 'system') == 'dark',
-    'theme-uca' => request()->is('dosen*'),
+    'theme-uca' => request()->is(['dosen*', 'uppm.*']),
 ])>
     <head>
         <meta charset="utf-8">

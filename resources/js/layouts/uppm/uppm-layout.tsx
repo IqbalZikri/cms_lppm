@@ -3,13 +3,14 @@ import { usePage } from "@inertiajs/react";
 import { useEffect } from "react";
 import { toast, Toaster } from "sonner";
 import DosenSidebarLayout from "../app/dosen/dosen-sidebar-layout";
+import UppmSidebarLayout from "../app/uppm/uppm-sidebar-layout";
 
 interface Flash {
     success?: string;
     error?: string;
 }
 
-export default function DosenAppLayout({
+export default function UppmAppLayout({
     breadcrumbs = [],
     children,
 }: {
@@ -29,9 +30,9 @@ export default function DosenAppLayout({
         return () => root.classList.remove("theme-uca");
     }, []);
     return (
-        <DosenSidebarLayout breadcrumbs={breadcrumbs}>
+        <UppmSidebarLayout breadcrumbs={breadcrumbs}>
             {children}
             <Toaster richColors position="top-right" />
-        </DosenSidebarLayout>
+        </UppmSidebarLayout>
     );
 }

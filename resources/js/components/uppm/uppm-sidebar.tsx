@@ -1,13 +1,5 @@
 import { Link } from "@inertiajs/react";
-import {
-    Activity,
-    FileBadge,
-    FileText,
-    HandHeart,
-    LayoutGrid,
-    Notebook,
-    ScrollText,
-} from "lucide-react";
+import { LayoutGrid } from "lucide-react";
 import AppLogo from "@/components/app-logo";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -26,43 +18,43 @@ import { route } from "ziggy-js";
 const mainNavItems: NavItem[] = [
     {
         title: "Dashboard",
-        href: route("dosen.dashboard"),
+        href: route("uppm.dashboard"),
         icon: LayoutGrid,
     },
-    {
-        title: "Penelitian",
-        icon: FileText,
-        items: [
-            {
-                title: "Kegiatan",
-                href: route("dosen.kegiatan.index"),
-                icon: Activity,
-            },
-            {
-                title: "PKM",
-                href: route("dosen.pkm.index"),
-                icon: HandHeart,
-            },
-            {
-                title: "HKI",
-                href: route("dosen.hki.index"),
-                icon: FileBadge,
-            },
-            {
-                title: "Luaran Prosiding",
-                href: route("dosen.luaran_prosiding.index"),
-                icon: ScrollText,
-            },
-            {
-                title: "Luaran Jurnal",
-                href: route("dosen.luaran_jurnal.index"),
-                icon: Notebook,
-            },
-        ],
-    },
+    // {
+    //     title: "Penelitian",
+    //     icon: FileText,
+    //     items: [
+    //         {
+    //             title: "Kegiatan",
+    //             href: route("dosen.kegiatan.index"),
+    //             icon: Activity,
+    //         },
+    //         {
+    //             title: "PKM",
+    //             href: route("dosen.pkm.index"),
+    //             icon: HandHeart,
+    //         },
+    //         {
+    //             title: "HKI",
+    //             href: route("dosen.hki.index"),
+    //             icon: FileBadge,
+    //         },
+    //         {
+    //             title: "Luaran Prosiding",
+    //             href: route("dosen.luaran_prosiding.index"),
+    //             icon: ScrollText,
+    //         },
+    //         {
+    //             title: "Luaran Jurnal",
+    //             href: route("dosen.luaran_jurnal.index"),
+    //             icon: Notebook,
+    //         },
+    //     ],
+    // },
 ];
 
-export function AppSidebarDosen() {
+export function AppSidebarUppm() {
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
