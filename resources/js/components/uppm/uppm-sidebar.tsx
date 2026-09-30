@@ -1,5 +1,5 @@
 import { Link } from "@inertiajs/react";
-import { LayoutGrid } from "lucide-react";
+import { BookOpen, Building, GraduationCap, LayoutGrid } from "lucide-react";
 import AppLogo from "@/components/app-logo";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -20,6 +20,16 @@ const mainNavItems: NavItem[] = [
         title: "Dashboard",
         href: route("uppm.dashboard"),
         icon: LayoutGrid,
+    },
+    {
+        title: "Prodi",
+        href: route("uppm.prodi.index"),
+        icon: BookOpen,
+    },
+    {
+        title: "Dosen",
+        href: route("uppm.dosen.index"),
+        icon: GraduationCap,
     },
     // {
     //     title: "Penelitian",

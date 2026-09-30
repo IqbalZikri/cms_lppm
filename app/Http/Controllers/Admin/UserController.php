@@ -37,13 +37,14 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required',
-            'email' => 'required',
+            'email' => 'required|unique:users,email',
             'password' => 'required|confirmed',
             'role' => 'required',
             'fakultas_id' => 'exists:fakultas,id',
         ], [
             'name.required' => "Nama akun wajib diisi",
             'email.required' => 'Email wajib diisi',
+            'email.unique' => 'Email ini sudah digunakan',
             'password.required' => "Password wajib diisi",
             'password.confirmed' => "Konfirmasi Password wajib diisi",
             'role.required' => 'Pilih salah satu role',
@@ -67,12 +68,13 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required',
-            'email' => 'required',
+            'email' => 'required|unique:users,email,' . $id,
             'role' => 'required',
             'fakultas_id' => 'exists:fakultas,id',
         ], [
             'name.required' => "Nama akun wajib diisi",
             'email.required' => 'Email wajib diisi',
+            'email.unique' => 'Email ini sudah digunakan',
             'role.required' => 'Pilih salah satu role',
             'fakultas_id.exists' => 'Data fakultas tidak ada di dalam sistem',
         ]);
