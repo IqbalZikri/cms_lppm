@@ -13,35 +13,6 @@ class DosenSeeder extends Seeder
      */
     public function run(): void
     {
-        Dosen::insert([
-            [
-                'fakultas_id' => 1,
-                'prodi_id' => 1,
-                'nidn' => "123",
-                'nuptk' => "123",
-                'nama_dosen' => "Bambang",
-                'jenis_kelamin' => "L",
-                'tanggal_lahir' => fake()->date(),
-                'tempat_lahir' => fake()->text(),
-                'alamat' => fake()->streetAddress(),
-                'hp' => fake()->phoneNumber(),
-                'email' => fake()->email(),
-                'user_id' => 2,
-            ],
-            [
-                'fakultas_id' => 2,
-                'prodi_id' => 1,
-                'nidn' => "123",
-                'nuptk' => "123",
-                'nama_dosen' => "Bimbing",
-                'jenis_kelamin' => "L",
-                'tanggal_lahir' => fake()->date(),
-                'tempat_lahir' => fake()->text(),
-                'alamat' => fake()->streetAddress(),
-                'hp' => fake()->phoneNumber(),
-                'email' => fake()->email(),
-                'user_id' => 2,
-            ],
-        ]);
+       Dosen::factory()->count(50)->create();
     }
 }

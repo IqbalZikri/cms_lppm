@@ -12,17 +12,6 @@ class ProdiSeeder extends Seeder
      */
     public function run(): void
     {
-        Prodi::insert([
-            [
-                'fakultas_id' => 1,
-                'kode_prodi' => 01,
-                'nama_prodi' => 'Elektro',
-            ],
-            [
-                'fakultas_id' => 2,
-                'kode_prodi' => 01,
-                'nama_prodi' => 'Ekonomi Syariah',
-            ],
-        ]);
+        Prodi::factory()->count(20)->create();
     }
 }

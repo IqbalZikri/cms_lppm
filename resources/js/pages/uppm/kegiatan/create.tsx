@@ -1,4 +1,5 @@
 import { Head } from "@inertiajs/react";
+import FormKegiatan from "../../forms/kegiatan/form";
 import { route } from "ziggy-js";
 import { Fakultas } from "@/interface/fakultas";
 import {
@@ -8,26 +9,27 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import FormHki from "@/pages/forms/hki/form";
 
 interface Props {
     fakultas: Fakultas[];
     role: string;
 }
 
-export default function CreateHki({ fakultas, role }: Props) {
+export default function CreateKegiatan({ fakultas, role }: Props) {
+    console.log(role);
+    
     return (
         <>
             <Head title="Tambah Penelitian Kegiatan" />
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 sm:p-6">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">
-                            Tambah Data HKI
+                            Tambah Data Penelitian Kegiatan
                         </h1>
 
-                        <p className="mt-1 text-muted-foreground">
-                            Form tambah data HKI.
+                        <p className="text-muted-foreground">
+                            Form tambah data penelitian kegiatan.
                         </p>
                     </div>
 
@@ -36,33 +38,37 @@ export default function CreateHki({ fakultas, role }: Props) {
                             <BreadcrumbList>
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("dosen.hki.index")}
+                                        href={route("dosen.kegiatan.index")}
                                     >
-                                        HKI
+                                        Penelitian Kegiatan
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("dosen.hki.create")}
+                                        href={route("dosen.kegiatan.create")}
                                     >
-                                        Tambah HKI
+                                        Tambah Penelitian Kegiatan
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>
                     </div>
                 </div>
-                <FormHki fakultas={fakultas} role={role} />
+                <FormKegiatan
+                    fakultas={fakultas}
+                    role={role}
+                    action={route("dosen.kegiatan.store")}
+                />
             </div>
         </>
     );
 }
 
-CreateHki.layout = {
+CreateKegiatan.layout = {
     breadcrumbs: [
         {
-            title: "Tambah Hak Kekayaan Intelektual",
+            title: "Tambah Penelitian Kegiatan",
         },
     ],
 };

@@ -1,5 +1,16 @@
 import { Link } from "@inertiajs/react";
-import { BookOpen, Building, GraduationCap, LayoutGrid } from "lucide-react";
+import {
+    Activity,
+    BookOpen,
+    Building,
+    FileBadge,
+    FileText,
+    GraduationCap,
+    HandHeart,
+    LayoutGrid,
+    Notebook,
+    ScrollText,
+} from "lucide-react";
 import AppLogo from "@/components/app-logo";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -20,6 +31,7 @@ const mainNavItems: NavItem[] = [
         title: "Dashboard",
         href: route("uppm.dashboard"),
         icon: LayoutGrid,
+        exact: true,
     },
     {
         title: "Prodi",
@@ -31,37 +43,37 @@ const mainNavItems: NavItem[] = [
         href: route("uppm.dosen.index"),
         icon: GraduationCap,
     },
-    // {
-    //     title: "Penelitian",
-    //     icon: FileText,
-    //     items: [
-    //         {
-    //             title: "Kegiatan",
-    //             href: route("dosen.kegiatan.index"),
-    //             icon: Activity,
-    //         },
-    //         {
-    //             title: "PKM",
-    //             href: route("dosen.pkm.index"),
-    //             icon: HandHeart,
-    //         },
-    //         {
-    //             title: "HKI",
-    //             href: route("dosen.hki.index"),
-    //             icon: FileBadge,
-    //         },
-    //         {
-    //             title: "Luaran Prosiding",
-    //             href: route("dosen.luaran_prosiding.index"),
-    //             icon: ScrollText,
-    //         },
-    //         {
-    //             title: "Luaran Jurnal",
-    //             href: route("dosen.luaran_jurnal.index"),
-    //             icon: Notebook,
-    //         },
-    //     ],
-    // },
+    {
+        title: "Penelitian",
+        icon: FileText,
+        items: [
+            {
+                title: "Kegiatan",
+                href: route("uppm.kegiatan.index"),
+                icon: Activity,
+            },
+            {
+                title: "PKM",
+                href: route("uppm.pkm.index"),
+                icon: HandHeart,
+            },
+            {
+                title: "HKI",
+                href: route("uppm.hki.index"),
+                icon: FileBadge,
+            },
+            {
+                title: "Luaran Prosiding",
+                href: route("uppm.luaran_prosiding.index"),
+                icon: ScrollText,
+            },
+            {
+                title: "Luaran Jurnal",
+                href: route("uppm.luaran_jurnal.index"),
+                icon: Notebook,
+            },
+        ],
+    },
 ];
 
 export function AppSidebarUppm() {

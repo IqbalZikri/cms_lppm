@@ -21,9 +21,11 @@ export function NavMain({ items }: { items: NavItem[] }) {
     const { url: currentUrl } = usePage();
     const [openMenus, setOpenMenus] = useState<string[]>([]);
 
-    const isActivePath = (href: string) => {
+    const isActivePath = (href: string, exact = false) => {
         const target = getPath(href);
         const current = new URL(currentUrl, "http://localhost").pathname;
+
+        if (exact) return current === target;
 
         return current === target || current.startsWith(target + "/");
     };
@@ -131,7 +133,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
                     <SidebarMenuItem key={item.title}>
                         <SidebarMenuButton
                             asChild
-                            isActive={isActivePath(item.href)}
+                            isActive={isActivePath(item.href, item.exact)}
                             tooltip={{
                                 children: item.title,
                             }}

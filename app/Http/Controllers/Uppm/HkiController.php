@@ -4,33 +4,35 @@ namespace App\Http\Controllers\Uppm;
 
 use App\Http\Controllers\Controller;
 use App\Models\Fakultas;
-use App\Models\Kegiatan;
+use App\Models\Hki;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Log;
 
-class KegiatanController extends Controller
+class HkiController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $data = Kegiatan::whereHas('penulis', function ($query) {
+        $data = Hki::whereHas('penulis', function ($query) {
             $query->where('fakultas_id', auth()->user()->fakultas_id);
         })->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10)->withQueryString();
-
-        return Inertia::render('uppm/kegiatan/index', [
-            'kegiatan' => $data
+        return Inertia::render('uppm/hki/index', [
+            'data' => $data,
         ]);
     }
 
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create()
     {
-        $fakultas = Fakultas::get();
-        return Inertia::render('uppm/kegiatan/create', [
+        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
+        return Inertia::render('uppm/hki/create', [
             'fakultas' => $fakultas,
             'role' => auth()->user()->role
         ]);
@@ -42,57 +44,70 @@ class KegiatanController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'jenis_hki' => ['required', Rule::in(['paten', 'haki'])],
             'judul' => 'required',
             'slug' => 'required',
             'abstrak' => 'required',
             'semester' => 'required',
             'tahun' => 'required',
             'link_berkas' => 'required',
-            'sumber_dana' => 'required',
-            'jumlah_dana' => 'required|numeric',
+            'nomer_paten' => 'required_if:jenis_hki,paten',
+            'nomer_pengajuan_haki' => 'required_if:jenis_hki,haki',
+            'jumlah_dana' => 'required',
+            'sumber_dana' => ['required', Rule::in(['internal', 'eksternal'])],
             'authors' => 'required|array|min:1',
             'authors.*.fakultas_id' => 'required|exists:fakultas,id',
-            'authors.*.dosen_id' => 'required|exists:dosens,id',
+            'authors.*.dosen_id' => 'required|exists:dosens,id|distinct',
+            'authors.*.nama_fakultas' => 'required',
+            'authors.*.nama_dosen' => 'required',
         ], [
-            'judul.required' => 'Silahkan isi judul kegiatan',
+            'jenis_hki.required' => 'Silahkan pilih salah satu jenis HKI',
+            'jenis_hki.in' => 'Jenis HKI tidak valid',
+            'judul.required' => 'Silahkan isi judul',
             'slug.required' => 'Silahkan isi slug',
             'abstrak.required' => 'Silahkan isi abstrak',
             'semester.required' => 'Silahkan isi semester',
             'tahun.required' => 'Silahkan isi tahun',
             'link_berkas.required' => 'Silahkan isi link berkas',
-            'sumber_dana.required' => 'Silahkan isi sumber dana',
-            'jumlah_dana.required' => 'Silahkan isi jumlah dana',
-            'jumlah_dana.numeric' => 'Jumlah dana harus berupa angka',
+            'nomer_pengajuan_haki.required_if' => 'Silahkan isi nomer pengajuan haki',
+            'nomer_paten.required_if' => 'Silahkan isi nomer paten',
             'authors.required' => 'Silahkan tambahkan minimal satu penulis',
             'authors.*.fakultas_id.required' => 'Silahkan pilih fakultas untuk setiap penulis',
             'authors.*.dosen_id.required' => 'Silahkan pilih dosen untuk setiap penulis',
+            'authors.*.dosen_id.distinct' => 'Duplikat nama dosen',
         ]);
 
         DB::beginTransaction();
 
         try {
-            $kegiatan = Kegiatan::create([
+
+            $hki = Hki::create([
+                'jenis_hki' => $validated['jenis_hki'],
                 'judul' => $validated['judul'],
                 'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],
                 'link_berkas' => $validated['link_berkas'],
-                'sumber_dana' => $validated['sumber_dana'],
-                'jumlah_dana' => $validated['jumlah_dana'],
+                'nomer_pengajuan_haki' => $validated['nomer_pengajuan_haki'] ?? null,
+                'nomer_paten' => $validated['nomer_paten'] ?? null,
+                'sumber_dana' => $validated['sumber_dana'] ?? null,
+                'jumlah_dana' => $validated['jumlah_dana'] ?? null,
             ]);
 
             foreach ($validated['authors'] as $i => $author) {
-                $kegiatan->penulis()->create([
+                $hki->penulis()->create([
                     'fakultas_id' => $author['fakultas_id'],
                     'dosen_id' => $author['dosen_id'],
+                    'nama_dosen' => $author['nama_dosen'],
+                    'nama_fakultas' => $author['nama_fakultas'],
                     'urutan' => $i + 1,
                 ]);
             }
 
             DB::commit();
 
-            return redirect()->route('uppm.kegiatan.index')->with('success', 'Berhasil menambahkan penelitian kegiatan');
+            return redirect()->route('uppm.hki.index')->with('success', 'Berhasil menambahkan HKI');
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
@@ -103,27 +118,23 @@ class KegiatanController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Hki $hki)
     {
-        $data = Kegiatan::findOrFail($id);
-        $data->load('penulis.fakultas', 'penulis.dosen');
-        $fakultas = Fakultas::get();
-        return Inertia::render('uppm/kegiatan/show', [
-            'data' => $data,
-            'fakultas' => $fakultas
+        $hki->load('penulis.fakultas', 'penulis.dosen');
+        return Inertia::render('uppm/hki/show', [
+            'data' => $hki
         ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Hki $hki)
     {
-        $kegiatan = Kegiatan::findOrFail($id);
-        $kegiatan->load('penulis');
-        $fakultas = Fakultas::get();
-        return Inertia::render('uppm/kegiatan/edit', [
-            'kegiatan' => $kegiatan,
+        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
+        $hki->load('penulis');
+        return Inertia::render('uppm/hki/edit', [
+            'data' => $hki,
             'fakultas' => $fakultas,
             'role' => auth()->user()->role
         ]);
@@ -132,31 +143,32 @@ class KegiatanController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Hki $hki)
     {
-        $kegiatan = Kegiatan::findOrFail($id);
-
         $validated = $request->validate([
+            'jenis_hki' => ['required', Rule::in(['paten', 'haki'])],
             'judul' => 'required',
             'abstrak' => 'required',
             'semester' => 'required',
             'tahun' => 'required',
             'link_berkas' => 'required',
+            'nomer_paten' => 'required_if:jenis_hki,paten',
+            'nomer_pengajuan_haki' => 'required_if:jenis_hki,haki',
+            'jumlah_dana' => 'required',
             'sumber_dana' => ['required', Rule::in(['internal', 'eksternal'])],
-            'jumlah_dana' => 'required|numeric',
             'authors' => 'required|array|min:1',
             'authors.*.fakultas_id' => 'required|exists:fakultas,id',
             'authors.*.dosen_id' => 'required|exists:dosens,id|distinct',
         ], [
-            'judul.required' => 'Silahkan isi judul kegiatan',
+            'jenis_hki.required' => 'Silahkan pilih salah satu jenis HKI',
+            'jenis_hki.in' => 'Jenis HKI tidak valid',
+            'judul.required' => 'Silahkan isi judul',
             'abstrak.required' => 'Silahkan isi abstrak',
             'semester.required' => 'Silahkan isi semester',
             'tahun.required' => 'Silahkan isi tahun',
             'link_berkas.required' => 'Silahkan isi link berkas',
-            'sumber_dana.required' => 'Silahkan isi sumber dana',
-            'sumber_dana.in' => 'Sumber dana tidak valid',
-            'jumlah_dana.required' => 'Silahkan isi jumlah dana',
-            'jumlah_dana.numeric' => 'Jumlah dana harus berupa angka',
+            'nomer_pengajuan_haki.required_if' => 'Silahkan isi nomer pengajuan haki',
+            'nomer_paten.required_if' => 'Silahkan isi nomer paten',
             'authors.required' => 'Silahkan tambahkan minimal satu penulis',
             'authors.*.fakultas_id.required' => 'Silahkan pilih fakultas untuk setiap penulis',
             'authors.*.dosen_id.required' => 'Silahkan pilih dosen untuk setiap penulis',
@@ -166,20 +178,23 @@ class KegiatanController extends Controller
         DB::beginTransaction();
 
         try {
-            $kegiatan->update([
+
+            $hki->update([
+                'jenis_hki' => $validated['jenis_hki'],
                 'judul' => $validated['judul'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],
                 'link_berkas' => $validated['link_berkas'],
-                'sumber_dana' => $validated['sumber_dana'],
-                'jumlah_dana' => $validated['jumlah_dana'],
+                'nomer_pengajuan_haki' => $validated['nomer_pengajuan_haki'] ?? null,
+                'nomer_paten' => $validated['nomer_paten'] ?? null,
+                'sumber_dana' => $validated['sumber_dana'] ?? null,
+                'jumlah_dana' => $validated['jumlah_dana'] ?? null,
             ]);
 
-            $kegiatan->penulis()->delete();
-
+            $hki->penulis()->delete();
             foreach ($validated['authors'] as $i => $author) {
-                $kegiatan->penulis()->create([
+                $hki->penulis()->create([
                     'fakultas_id' => $author['fakultas_id'],
                     'dosen_id' => $author['dosen_id'],
                     'urutan' => $i + 1,
@@ -188,7 +203,7 @@ class KegiatanController extends Controller
 
             DB::commit();
 
-            return redirect()->route('uppm.kegiatan.index')->with('success', 'Berhasil memperbarui kegiatan penelitian');
+            return redirect()->route('uppm.hki.index')->with('success', 'Berhasil mengedit HKI');
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
@@ -199,15 +214,15 @@ class KegiatanController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Hki $hki)
     {
-        $data = Kegiatan::findOrFail($id);
         try {
-            $data->penulis()->delete();
-            $data->delete();
-            return back()->with('success', 'Berhasil menghapus kegiatan penelitian');
+            $hki->penulis()->delete();
+            $hki->delete();
+            return redirect()->route('uppm.hki.index')->with('success', 'Berhasil menghapus HKI');
         } catch (\Throwable $th) {
-            Log::info($th->getMessage(), $th->getTrace());
+            DB::rollBack();
+            Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
             return back()->with('error', 'Terjadi Kesalahan');
         }
     }

@@ -152,8 +152,8 @@ export default function FormKegiatan({
         : route("dosen.kegiatan.store");
 
     const actionUppm = isEdit
-        ? route("dosen.kegiatan.update", kegiatan!.id)
-        : route("dosen.kegiatan.store");
+        ? route("uppm.kegiatan.update", kegiatan!.id)
+        : route("uppm.kegiatan.store");
 
     const [authors, setAuthors] = useState<AuthorRow[]>(() =>
         buildInitialAuthors(kegiatan?.penulis),
@@ -793,7 +793,9 @@ export default function FormKegiatan({
                             href={
                                 role === "dosen"
                                     ? route("dosen.kegiatan.index")
-                                    : route("admin.kegiatan.index")
+                                    : role === "uppm"
+                                      ? route("uppm.kegiatan.index")
+                                      : route("admin.kegiatan.index")
                             }
                             viewTransition
                             className="w-full sm:w-auto"

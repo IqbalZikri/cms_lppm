@@ -24,9 +24,11 @@ Route::post('register', [SesiController::class, 'registerAccount'])->name('sesi.
 Route::get('login', [SesiController::class, 'login'])->name('login');
 Route::post('login', [SesiController::class, 'authenticate'])->name('authenticate');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware('auth')->group(function () {
     Route::get('get-dosen/{id}', [DosenController::class, 'getDosen'])->name('dosen.getDosen');
+});
 
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('site_setting', [SiteSettingsController::class, 'index'])->name('site_setting.index');
     Route::put('site_setting', [SiteSettingsController::class, 'update'])->name('site_setting.update');
 });

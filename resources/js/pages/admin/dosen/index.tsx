@@ -28,17 +28,17 @@ interface DosenPageProps {
     data: PaginatedData<DosenTypes>;
     fakultas: Fakultas[];
     prodi: Prodi[];
+    totalLaki: number;
+    totalPerempuan: number;
 }
 
-export default function Dosen({ data, fakultas, prodi }: DosenPageProps) {
-    const jumlahLakiLaki = data.data.filter(
-        (item) => item.jenis_kelamin === "L",
-    ).length;
-
-    const jumlahPerempuan = data.data.filter(
-        (item) => item.jenis_kelamin === "P",
-    ).length;
-
+export default function Dosen({
+    data,
+    fakultas,
+    prodi,
+    totalLaki,
+    totalPerempuan,
+}: DosenPageProps) {
     return (
         <>
             <Head title="Dosen" />
@@ -106,11 +106,11 @@ export default function Dosen({ data, fakultas, prodi }: DosenPageProps) {
 
                         <CardContent>
                             <div className="text-2xl font-bold">
-                                {jumlahLakiLaki}
+                                {totalLaki}
                             </div>
 
                             <p className="text-muted-foreground text-xs">
-                                Pada halaman ini
+                                Jumlah dosen laki-laki terdaftar
                             </p>
                         </CardContent>
                     </Card>
@@ -127,11 +127,11 @@ export default function Dosen({ data, fakultas, prodi }: DosenPageProps) {
 
                         <CardContent>
                             <div className="text-2xl font-bold">
-                                {jumlahPerempuan}
+                                {totalPerempuan}
                             </div>
 
                             <p className="text-muted-foreground text-xs">
-                                Pada halaman ini
+                                Jumlah dosen perempuan terdaftar
                             </p>
                         </CardContent>
                     </Card>

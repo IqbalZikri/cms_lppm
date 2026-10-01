@@ -1,0 +1,29 @@
+import { Head } from "@inertiajs/react";
+import FormPkm from "../../forms/pkm/form";
+import { Pkm } from "@/interface/pkm";
+import { Fakultas } from "@/types/fakultas";
+
+interface Props {
+    data: Pkm;
+    fakultas: Fakultas[];
+    role: string;
+}
+
+export default function EditPkm({ data, fakultas, role }: Props) {
+    return (
+        <>
+            <Head title="Edit PKM" />
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <FormPkm fakultas={fakultas} pkm={data} role={role} />
+            </div>
+        </>
+    );
+}
+
+EditPkm.layout = {
+    breadcrumbs: [
+        {
+            title: "Edit PKM",
+        },
+    ],
+};

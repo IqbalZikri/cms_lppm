@@ -43,7 +43,7 @@ export default function Show({ data }: Props) {
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
                     <Link
-                        href={route("dosen.luaran_prosiding.index")}
+                        href={route("uppm.luaran_prosiding.index")}
                         viewTransition
                     >
                         <Button variant="outline" size="sm">
@@ -53,7 +53,7 @@ export default function Show({ data }: Props) {
                     </Link>
 
                     <Link
-                        href={route("dosen.luaran_prosiding.edit", data.id)}
+                        href={route("uppm.luaran_prosiding.edit", data.id)}
                         viewTransition
                     >
                         <Button size="sm">

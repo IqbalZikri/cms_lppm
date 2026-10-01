@@ -74,7 +74,7 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
     if (!editor) return null;
 
     return (
-        <div className="overflow-hidden rounded-md border">
+        <div className="overflow-hidden rounded-md border bg-background text-foreground">
             <div className="flex flex-wrap gap-1 border-b p-2">
                 <ToolbarButton
                     label="Bold"

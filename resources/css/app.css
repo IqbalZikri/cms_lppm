@@ -160,6 +160,7 @@
 .theme-uca {
     --background: #f6f4ee;
     --foreground: #16241c;
+    --font-size: 20px;
 
     --card: #ffffff;
     --card-foreground: #16241c;

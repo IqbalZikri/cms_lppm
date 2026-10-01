@@ -140,8 +140,8 @@ export default function FormHki({ fakultas, hki, role }: Props) {
         : route("dosen.hki.store");
 
     const actionUppm = isEdit
-        ? route("dosen.hki.update", hki!.id)
-        : route("dosen.hki.store");
+        ? route("uppm.hki.update", hki!.id)
+        : route("uppm.hki.store");
 
     const [authors, setAuthors] = useState<AuthorRow[]>(() =>
         buildInitialAuthors(hki?.penulis),
@@ -643,6 +643,7 @@ export default function FormHki({ fakultas, hki, role }: Props) {
                                                     )}
                                                 </Label>
                                                 <Input
+                                                    type="number"
                                                     name="nomer_paten"
                                                     id="nomer_paten"
                                                     placeholder="Nomor Paten"
@@ -679,6 +680,7 @@ export default function FormHki({ fakultas, hki, role }: Props) {
                                                     )}
                                                 </Label>
                                                 <Input
+                                                    type="number"
                                                     name="nomer_pengajuan_haki"
                                                     id="nomer_pengajuan_haki"
                                                     placeholder="Nomor Pengajuan HAKI"

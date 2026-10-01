@@ -4,74 +4,76 @@ namespace App\Http\Controllers\Uppm;
 
 use App\Http\Controllers\Controller;
 use App\Models\Fakultas;
-use App\Models\Kegiatan;
+use App\Models\Pkm;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Log;
 
-class KegiatanController extends Controller
+class PkmController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $data = Kegiatan::whereHas('penulis', function ($query) {
+        $data = Pkm::whereHas('penulis', function ($query) {
             $query->where('fakultas_id', auth()->user()->fakultas_id);
         })->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10)->withQueryString();
 
-        return Inertia::render('uppm/kegiatan/index', [
-            'kegiatan' => $data
+        return Inertia::render('uppm/pkm/index', [
+            'data' => $data
         ]);
     }
 
     public function create()
     {
         $fakultas = Fakultas::get();
-        return Inertia::render('uppm/kegiatan/create', [
+        return Inertia::render('uppm/pkm/create', [
             'fakultas' => $fakultas,
             'role' => auth()->user()->role
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'jenis_pkm' => ['required', Rule::in(['pelaksanaan', 'jurnal'])],
             'judul' => 'required',
             'slug' => 'required',
+            'gambar' => 'nullable|max:2048|mimes:png,jpg,jpeg',
             'abstrak' => 'required',
             'semester' => 'required',
             'tahun' => 'required',
             'link_berkas' => 'required',
-            'sumber_dana' => 'required',
+            'sumber_dana' => ['required', Rule::in(['internal', 'eksternal'])],
             'jumlah_dana' => 'required|numeric',
             'authors' => 'required|array|min:1',
             'authors.*.fakultas_id' => 'required|exists:fakultas,id',
-            'authors.*.dosen_id' => 'required|exists:dosens,id',
+            'authors.*.dosen_id' => 'required|exists:dosens,id|distinct',
         ], [
-            'judul.required' => 'Silahkan isi judul kegiatan',
+            'jenis_pkm.required' => 'Silahkan pilih jenis pkm',
+            'judul.required' => 'Silahkan isi judul',
             'slug.required' => 'Silahkan isi slug',
+            'gambar.max' => 'Gambar tidak bisa lebih dari 2 MB',
+            'gambar.mimes' => 'Format file harus berupa jpg / jpeg / png',
             'abstrak.required' => 'Silahkan isi abstrak',
             'semester.required' => 'Silahkan isi semester',
             'tahun.required' => 'Silahkan isi tahun',
             'link_berkas.required' => 'Silahkan isi link berkas',
             'sumber_dana.required' => 'Silahkan isi sumber dana',
+            'sumber_dana.in' => 'Sumber dana tidak valid',
             'jumlah_dana.required' => 'Silahkan isi jumlah dana',
             'jumlah_dana.numeric' => 'Jumlah dana harus berupa angka',
-            'authors.required' => 'Silahkan tambahkan minimal satu penulis',
-            'authors.*.fakultas_id.required' => 'Silahkan pilih fakultas untuk setiap penulis',
-            'authors.*.dosen_id.required' => 'Silahkan pilih dosen untuk setiap penulis',
+            'authors.required' => 'Silahkan tambahkan minimal satu  / pelaksana',
+            'authors.*.fakultas_id.required' => 'Silahkan pilih fakultas untuk setiap  / pelaksana',
+            'authors.*.dosen_id.required' => 'Silahkan pilih dosen untuk setiap  / pelaksana',
+            'authors.*.dosen_id.distinct' => 'Duplikat dosen yang sama',
         ]);
 
         DB::beginTransaction();
 
         try {
-            $kegiatan = Kegiatan::create([
+            $pkm = Pkm::create([
+                'jenis_pkm' => $validated['jenis_pkm'],
                 'judul' => $validated['judul'],
                 'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
@@ -83,7 +85,7 @@ class KegiatanController extends Controller
             ]);
 
             foreach ($validated['authors'] as $i => $author) {
-                $kegiatan->penulis()->create([
+                $pkm->penulis()->create([
                     'fakultas_id' => $author['fakultas_id'],
                     'dosen_id' => $author['dosen_id'],
                     'urutan' => $i + 1,
@@ -92,7 +94,7 @@ class KegiatanController extends Controller
 
             DB::commit();
 
-            return redirect()->route('uppm.kegiatan.index')->with('success', 'Berhasil menambahkan penelitian kegiatan');
+            return redirect()->route('uppm.pkm.index')->with('success', 'Berhasil menambahkan pkm');
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
@@ -100,43 +102,31 @@ class KegiatanController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show($id)
     {
-        $data = Kegiatan::findOrFail($id);
+        $data = Pkm::findOrFail($id);
         $data->load('penulis.fakultas', 'penulis.dosen');
-        $fakultas = Fakultas::get();
-        return Inertia::render('uppm/kegiatan/show', [
-            'data' => $data,
-            'fakultas' => $fakultas
+        return Inertia::render('uppm/pkm/show', [
+            'data' => $data
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit($id)
     {
-        $kegiatan = Kegiatan::findOrFail($id);
-        $kegiatan->load('penulis');
+        $data = Pkm::findOrFail($id);
+        $data->load('penulis');
         $fakultas = Fakultas::get();
-        return Inertia::render('uppm/kegiatan/edit', [
-            'kegiatan' => $kegiatan,
+        return Inertia::render('uppm/pkm/edit', [
+            'data' => $data,
             'fakultas' => $fakultas,
             'role' => auth()->user()->role
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        $kegiatan = Kegiatan::findOrFail($id);
-
         $validated = $request->validate([
+            'jenis_pkm' => ['required', Rule::in(['pelaksanaan', 'jurnal'])],
             'judul' => 'required',
             'abstrak' => 'required',
             'semester' => 'required',
@@ -146,9 +136,10 @@ class KegiatanController extends Controller
             'jumlah_dana' => 'required|numeric',
             'authors' => 'required|array|min:1',
             'authors.*.fakultas_id' => 'required|exists:fakultas,id',
-            'authors.*.dosen_id' => 'required|exists:dosens,id|distinct',
+            'authors.*.dosen_id' => 'required|exists:dosens,id',
         ], [
-            'judul.required' => 'Silahkan isi judul kegiatan',
+            'jenis_pkm.required' => 'Silahkan pilih jenis pkm',
+            'judul.required' => 'Silahkan isi judul',
             'abstrak.required' => 'Silahkan isi abstrak',
             'semester.required' => 'Silahkan isi semester',
             'tahun.required' => 'Silahkan isi tahun',
@@ -157,16 +148,17 @@ class KegiatanController extends Controller
             'sumber_dana.in' => 'Sumber dana tidak valid',
             'jumlah_dana.required' => 'Silahkan isi jumlah dana',
             'jumlah_dana.numeric' => 'Jumlah dana harus berupa angka',
-            'authors.required' => 'Silahkan tambahkan minimal satu penulis',
-            'authors.*.fakultas_id.required' => 'Silahkan pilih fakultas untuk setiap penulis',
-            'authors.*.dosen_id.required' => 'Silahkan pilih dosen untuk setiap penulis',
-            'authors.*.dosen_id.distinct' => 'Duplikat nama dosen',
+            'authors.required' => 'Silahkan tambahkan minimal satu  / pelaksana',
+            'authors.*.fakultas_id.required' => 'Silahkan pilih fakultas untuk setiap  / pelaksana',
+            'authors.*.dosen_id.required' => 'Silahkan pilih dosen untuk setiap  / pelaksana',
         ]);
 
         DB::beginTransaction();
 
         try {
-            $kegiatan->update([
+            $pkm = Pkm::findOrFail($id);
+            $pkm->update([
+                'jenis_pkm' => $validated['jenis_pkm'],
                 'judul' => $validated['judul'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
@@ -176,19 +168,18 @@ class KegiatanController extends Controller
                 'jumlah_dana' => $validated['jumlah_dana'],
             ]);
 
-            $kegiatan->penulis()->delete();
-
+            $pkm->penulis()->delete();
             foreach ($validated['authors'] as $i => $author) {
-                $kegiatan->penulis()->create([
+                $pkm->penulis()->create([
                     'fakultas_id' => $author['fakultas_id'],
                     'dosen_id' => $author['dosen_id'],
-                    'urutan' => $i + 1,
+                    'urutan' => $i++,
                 ]);
             }
 
             DB::commit();
 
-            return redirect()->route('uppm.kegiatan.index')->with('success', 'Berhasil memperbarui kegiatan penelitian');
+            return redirect()->route('uppm.pkm.index')->with('success', 'Berhasil memperbarui pkm');
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
@@ -196,18 +187,16 @@ class KegiatanController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        $data = Kegiatan::findOrFail($id);
+        $data = Pkm::findOrFail($id);
+
         try {
             $data->penulis()->delete();
             $data->delete();
-            return back()->with('success', 'Berhasil menghapus kegiatan penelitian');
+            return back()->with('success', 'Berhasil menghapus pkm');
         } catch (\Throwable $th) {
-            Log::info($th->getMessage(), $th->getTrace());
+            Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
             return back()->with('error', 'Terjadi Kesalahan');
         }
     }

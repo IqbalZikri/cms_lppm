@@ -8,26 +8,29 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import FormHki from "@/pages/forms/hki/form";
+import { Hki } from "@/interface/hki";
+import FormLuaranJurnal from "../../forms/luaran-jurnal/form";
+import { LuaranJurnal } from "@/interface/luaran-jurnal";
 
 interface Props {
     fakultas: Fakultas[];
-    role: string;
+    data: LuaranJurnal;
+    role: string
 }
 
-export default function CreateHki({ fakultas, role }: Props) {
+export default function EditLuaranJurnal({ fakultas, data, role }: Props) {
     return (
         <>
-            <Head title="Tambah Penelitian Kegiatan" />
+            <Head title="Tambah Luaran Jurnal" />
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 sm:p-6">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">
-                            Tambah Data HKI
+                            Edit Data Luaran Jurnal
                         </h1>
 
                         <p className="mt-1 text-muted-foreground">
-                            Form tambah data HKI.
+                            Form edit data luaran jurnal.
                         </p>
                     </div>
 
@@ -36,33 +39,38 @@ export default function CreateHki({ fakultas, role }: Props) {
                             <BreadcrumbList>
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("dosen.hki.index")}
+                                        href={route(
+                                            "admin.luaran_jurnal.index",
+                                        )}
                                     >
-                                        HKI
+                                        Luaran Jurnal
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("dosen.hki.create")}
+                                        href={route(
+                                            "admin.luaran_jurnal.edit",
+                                            data.id,
+                                        )}
                                     >
-                                        Tambah HKI
+                                        Edit Luaran Jurnal
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>
                     </div>
                 </div>
-                <FormHki fakultas={fakultas} role={role} />
+                <FormLuaranJurnal fakultas={fakultas} luaranJurnal={data} role={role}/>
             </div>
         </>
     );
 }
 
-CreateHki.layout = {
+EditLuaranJurnal.layout = {
     breadcrumbs: [
         {
-            title: "Tambah Hak Kekayaan Intelektual",
+            title: "Tambah Penelitian Kegiatan",
         },
     ],
 };

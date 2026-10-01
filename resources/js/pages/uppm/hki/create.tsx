@@ -36,7 +36,7 @@ export default function CreateHki({ fakultas, role }: Props) {
                             <BreadcrumbList>
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("dosen.hki.index")}
+                                        href={route("uppm.hki.index")}
                                     >
                                         HKI
                                     </BreadcrumbLink>
@@ -44,7 +44,7 @@ export default function CreateHki({ fakultas, role }: Props) {
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("dosen.hki.create")}
+                                        href={route("uppm.hki.create")}
                                     >
                                         Tambah HKI
                                     </BreadcrumbLink>

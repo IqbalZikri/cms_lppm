@@ -18,10 +18,10 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { ArrowLeft, FileText, Pencil } from "lucide-react";
-import { LuaranProsiding } from "@/interface/luaran-prosiding";
+import { Pkm } from "@/interface/pkm";
 
 interface Props {
-    data: LuaranProsiding;
+    data: Pkm;
 }
 
 function formatRupiah(value: string | number) {
@@ -42,10 +42,7 @@ export default function Show({ data }: Props) {
             <Head title={`Detail - ${data.judul}`} />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
-                    <Link
-                        href={route("dosen.luaran_prosiding.index")}
-                        viewTransition
-                    >
+                    <Link href={route("uppm.pkm.index")} viewTransition>
                         <Button variant="outline" size="sm">
                             <ArrowLeft className="mr-1 h-4 w-4" />
                             Kembali
@@ -53,7 +50,7 @@ export default function Show({ data }: Props) {
                     </Link>
 
                     <Link
-                        href={route("dosen.luaran_prosiding.edit", data.id)}
+                        href={route("uppm.pkm.edit", data.id)}
                         viewTransition
                     >
                         <Button size="sm">
@@ -72,7 +69,7 @@ export default function Show({ data }: Props) {
                             </small>
                         </CardTitle>
                         <CardDescription>
-                            Detail Luaran Prosiding
+                            Detail Pengabdian Kepada Masyarakat ( PKM )
                         </CardDescription>
                     </CardHeader>
 
@@ -90,6 +87,24 @@ export default function Show({ data }: Props) {
                                     Tahun
                                 </p>
                                 <p className="font-medium">{data.tahun}</p>
+                            </div>
+                            <div>
+                                <p className="text-muted-foreground text-sm">
+                                    Sumber Dana
+                                </p>
+                                <Badge variant="secondary" className="mt-1">
+                                    {data.sumber_dana === "internal"
+                                        ? "Internal"
+                                        : "Eksternal"}
+                                </Badge>
+                            </div>
+                            <div>
+                                <p className="text-muted-foreground text-sm">
+                                    Jumlah Dana
+                                </p>
+                                <p className="font-medium">
+                                    {formatRupiah(data.jumlah_dana)}
+                                </p>
                             </div>
                         </div>
 
@@ -172,8 +187,8 @@ export default function Show({ data }: Props) {
 Show.layout = {
     breadcrumbs: [
         {
-            title: "Luaran Prosiding",
-            href: route("admin.luaran_prosiding.index"),
+            title: "Kegiatan Penelitian",
+            href: route("dosen.kegiatan.index"),
         },
         {
             title: "Detail",

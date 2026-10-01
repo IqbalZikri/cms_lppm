@@ -12,19 +12,21 @@ class FakultasSeeder extends Seeder
      */
     public function run(): void
     {
-        Fakultas::insert([
-            [
-                'kode_fakultas' => 1,
-                'nama_fakultas' => 'Teknik dan Ilmu Komputer',
-            ],
-            [
-                'kode_fakultas' => 2,
-                'nama_fakultas' => 'Ekonomi dan BIsnis Islam',
-            ],
-            [
-                'kode_fakultas' => 3,
-                'nama_fakultas' => 'Tabriyah dan Ilmu Keguruan',
-            ]
-        ]);
+        // Fakultas::insert([
+        //     [
+        //         'kode_fakultas' => 1,
+        //         'nama_fakultas' => 'Teknik dan Ilmu Komputer',
+        //     ],
+        //     [
+        //         'kode_fakultas' => 2,
+        //         'nama_fakultas' => 'Ekonomi dan BIsnis Islam',
+        //     ],
+        //     [
+        //         'kode_fakultas' => 3,
+        //         'nama_fakultas' => 'Tabriyah dan Ilmu Keguruan',
+        //     ]
+        // ]);
+
+        Fakultas::factory()->count(10)->create();
     }
 }

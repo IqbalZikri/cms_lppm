@@ -18,10 +18,10 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { ArrowLeft, FileText, Pencil } from "lucide-react";
-import { LuaranProsiding } from "@/interface/luaran-prosiding";
+import { LuaranJurnal } from "@/interface/luaran-jurnal";
 
 interface Props {
-    data: LuaranProsiding;
+    data: LuaranJurnal;
 }
 
 function formatRupiah(value: string | number) {
@@ -43,7 +43,7 @@ export default function Show({ data }: Props) {
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
                     <Link
-                        href={route("dosen.luaran_prosiding.index")}
+                        href={route("uppm.luaran_jurnal.index")}
                         viewTransition
                     >
                         <Button variant="outline" size="sm">
@@ -53,7 +53,7 @@ export default function Show({ data }: Props) {
                     </Link>
 
                     <Link
-                        href={route("dosen.luaran_prosiding.edit", data.id)}
+                        href={route("uppm.luaran_jurnal.edit", data.id)}
                         viewTransition
                     >
                         <Button size="sm">
@@ -65,15 +65,13 @@ export default function Show({ data }: Props) {
 
                 <Card className="w-full">
                     <CardHeader>
-                        <CardTitle className="text-xl">
+                        <CardTitle className="text-xl flex justify-between">
                             {data.judul}
                             <small className="text-base font-thin">
                                 slug: {data.slug}
                             </small>
                         </CardTitle>
-                        <CardDescription>
-                            Detail Luaran Prosiding
-                        </CardDescription>
+                        <CardDescription>Detail Luaran Jurnal</CardDescription>
                     </CardHeader>
 
                     <CardContent className="space-y-6">
@@ -172,8 +170,8 @@ export default function Show({ data }: Props) {
 Show.layout = {
     breadcrumbs: [
         {
-            title: "Luaran Prosiding",
-            href: route("admin.luaran_prosiding.index"),
+            title: "Luaran Jurnal",
+            href: route("dosen.luaran_jurnal.index"),
         },
         {
             title: "Detail",

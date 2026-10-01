@@ -23,11 +23,15 @@ class DosenController extends Controller
         $data = Dosen::paginate(10)->withQueryString();
         $fakultas = Fakultas::with('dosen')->get();
         $prodi = Prodi::get();
+        $totalLaki = Dosen::where('jenis_kelamin', "L")->count();
+        $totalPerempuan = Dosen::where("jenis_kelamin", "P")->count();
 
         return Inertia::render('admin/dosen/index', [
             'data' => $data,
             'fakultas' => $fakultas,
             'prodi' => $prodi,
+            'totalLaki' => $totalLaki,
+            'totalPerempuan' => $totalPerempuan,
         ]);
     }
 
