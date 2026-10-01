@@ -1,32 +1,47 @@
-import { Form, Head } from '@inertiajs/react';
-import InputError from '@/components/input-error';
-import PasswordInput from '@/components/password-input';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
-import { request } from '@/routes/password';
-import PasskeyVerify from '@/components/passkey-verify';
-import { route } from 'ziggy-js';
+import { Form, Head, usePage } from "@inertiajs/react";
+import InputError from "@/components/input-error";
+import PasswordInput from "@/components/password-input";
+import TextLink from "@/components/text-link";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
+import { request } from "@/routes/password";
+import PasskeyVerify from "@/components/passkey-verify";
+import { route } from "ziggy-js";
+import { Toaster } from "@/components/ui/sonner";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 type Props = {
     status?: string;
     canResetPassword: boolean;
 };
 
+interface Flash {
+    success?: string;
+    error?: string;
+}
+
 export default function Login({ status, canResetPassword }: Props) {
+    const { flash } = usePage<{ flash?: Flash }>().props;
+
+    useEffect(() => {
+        if (flash?.success) toast.success(flash.success);
+        if (flash?.error) toast.error(flash.error);
+    }, [flash]);
     return (
         <>
+            <Toaster richColors position="top-right"/>
             <Head title="Log in" />
 
             {/* <PasskeyVerify /> */}
 
             <Form
-                action={route('authenticate')}
-                method='POST'
-                resetOnSuccess={['password']}
+                action={route("authenticate")}
+                method="POST"
+                resetOnSuccess={["password"]}
                 className="flex flex-col gap-6"
             >
                 {({ processing, errors }) => (
@@ -93,8 +108,11 @@ export default function Login({ status, canResetPassword }: Props) {
                         </div>
 
                         <div className="text-muted-foreground text-center text-sm">
-                            Don't have an account?{' '}
-                            <TextLink href={route('sesi.register')} tabIndex={5}>
+                            Don't have an account?{" "}
+                            <TextLink
+                                href={route("sesi.register")}
+                                tabIndex={5}
+                            >
                                 Sign up
                             </TextLink>
                         </div>
@@ -112,6 +130,6 @@ export default function Login({ status, canResetPassword }: Props) {
 }
 
 Login.layout = {
-    title: 'Log in to your account',
-    description: 'Enter your email and password below to log in',
+    title: "Log in to your account",
+    description: "Enter your email and password below to log in",
 };

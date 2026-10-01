@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class LuaranProsiding extends Model
 {
+    use HasFactory;
     protected $fillable = [
         'judul',
         'slug',
@@ -14,7 +16,6 @@ class LuaranProsiding extends Model
         'semester',
         'tahun',
         'link_berkas',
-        'penulis',
     ];
 
     public function penulis(): MorphMany

@@ -2,14 +2,14 @@
 
 namespace Database\Factories;
 
-use App\Models\Kegiatan;
+use App\Models\LuaranProsiding;
 use App\Models\Penulis;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Kegiatan>
+ * @extends Factory<LuaranProsiding>
  */
-class KegiatanFactory extends Factory
+class LuaranProsidingFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -25,8 +25,6 @@ class KegiatanFactory extends Factory
             'semester' => fake()->randomElement(["Ganjil", "Genap"]),
             'tahun' => fake()->numberBetween(now()->subYears(3)->year, now()->year),
             'link_berkas' => fake()->url(),
-            'sumber_dana' => fake()->randomElement(["internal", "eksternal"]),
-            'jumlah_dana' => fake()->numberBetween(5, 50) * 10000000,
         ];
     }
 

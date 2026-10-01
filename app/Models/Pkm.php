@@ -2,11 +2,20 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Searchable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Pkm extends Model
 {
+    use HasFactory, Searchable;
+
+    protected array $searchable = [
+        'judul',
+        'penulis.fakultas.nama_fakultas',
+        'penulis.dosen.nama_dosen'
+    ];
     protected $fillable = [
         'jenis_pkm',
         'judul',

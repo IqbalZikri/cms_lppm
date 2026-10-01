@@ -2,14 +2,15 @@
 
 namespace Database\Factories;
 
+use App\Models\Dosen;
 use App\Models\Fakultas;
-use App\Models\Prodi;
+use App\Models\Penulis;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Prodi>
+ * @extends Factory<Penulis>
  */
-class ProdiFactory extends Factory
+class PenulisFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -18,11 +19,10 @@ class ProdiFactory extends Factory
      */
     public function definition(): array
     {
-        $no = 1;
         return [
             'fakultas_id' => Fakultas::pluck('id')->random(),
-            'kode_prodi' => $no++,
-            'nama_prodi' => fake()->name(),
+            'dosen_id' => Dosen::pluck('id')->random(),
+            'urutan' => 1,
         ];
     }
 }

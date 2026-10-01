@@ -31,6 +31,9 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2, Plus } from "lucide-react";
+import TablePage from "@/components/table-page";
+import { DialogDelete, DialogFormEdit } from "@/components/dialog-form";
+import { PaginatedData } from "@/interface/pagination";
 
 interface Fakultas {
     id: number;
@@ -38,24 +41,12 @@ interface Fakultas {
     nama_fakultas: string;
 }
 
-interface PaginatedData<T> {
-    data: T[];
-    current_page: number;
-    last_page: number;
-    length: number;
-    map: any;
-}
-
-interface FakultasPageProps {
+type FakultasPageProps = {
     data: PaginatedData<Fakultas>;
-}
+};
 
 export default function Fakultas({ data }: FakultasPageProps) {
     const [open, setOpen] = useState(false);
-
-    const [editingId, setEditingId] = useState<number | null>(null);
-
-    const [deleteId, setDeleteId] = useState<number | null>(null);
 
     return (
         <>
@@ -202,267 +193,52 @@ export default function Fakultas({ data }: FakultasPageProps) {
                     </CardHeader>
 
                     <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[100px]">
-                                        No
-                                    </TableHead>
-                                    <TableHead>Kode Fakultas</TableHead>
-                                    <TableHead>Nama Fakultas</TableHead>
-                                    <TableHead>Aksi</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {data.data.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell
-                                            colSpan={4}
-                                            className="text-center"
-                                        >
-                                            Data Fakultas Belum Diisi.
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    data.data.map(
-                                        (item: any, index: number) => (
-                                            <TableRow key={item.id}>
-                                                <TableCell>
-                                                    {index + 1}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {item.kode_fakultas}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {item.nama_fakultas}
-                                                </TableCell>
-                                                <TableCell className="flex gap-[20px]">
-                                                    <Dialog
-                                                        open={
-                                                            editingId ===
-                                                            item.id
-                                                        }
-                                                        onOpenChange={(
-                                                            isOpen,
-                                                        ) => {
-                                                            setEditingId(
-                                                                isOpen
-                                                                    ? item.id
-                                                                    : null,
-                                                            );
-                                                        }}
-                                                    >
-                                                        <DialogTrigger asChild>
-                                                            <Button type="button">
-                                                                Edit
-                                                            </Button>
-                                                        </DialogTrigger>
-
-                                                        <DialogContent>
-                                                            <Form
-                                                                action={route(
-                                                                    "admin.fakultas.update",
-                                                                    item.id,
-                                                                )}
-                                                                method="PUT"
-                                                                onSuccess={() =>
-                                                                    setEditingId(
-                                                                        null,
-                                                                    )
-                                                                }
-                                                                resetOnSuccess
-                                                            >
-                                                                {({
-                                                                    errors,
-                                                                    processing,
-                                                                }) => (
-                                                                    <>
-                                                                        <DialogHeader className="mb-[25px]">
-                                                                            <DialogTitle>
-                                                                                Edit
-                                                                                Data
-                                                                                Fakultas
-                                                                            </DialogTitle>
-                                                                        </DialogHeader>
-                                                                        <FieldGroup>
-                                                                            <Field>
-                                                                                <Label htmlFor="kode_fakultas-${item.id}">
-                                                                                    Kode
-                                                                                    Fakultas{" "}
-                                                                                    <span className="text-destructive">
-                                                                                        *
-                                                                                    </span>
-                                                                                </Label>
-                                                                                <Input
-                                                                                    name="kode_fakultas"
-                                                                                    placeholder="Kode Fakultas"
-                                                                                    id={
-                                                                                        "kode_fakultas-${item.id}"
-                                                                                    }
-                                                                                    defaultValue={
-                                                                                        item.kode_fakultas
-                                                                                    }
-                                                                                    required
-                                                                                />
-                                                                                {errors.kode_fakultas && (
-                                                                                    <p className="text-danger text-sm">
-                                                                                        {
-                                                                                            errors.kode_fakultas
-                                                                                        }
-                                                                                    </p>
-                                                                                )}
-                                                                            </Field>
-                                                                            <Field>
-                                                                                <Label htmlFor="nama_fakultas-${item.id}">
-                                                                                    Nama
-                                                                                    Fakultas
-                                                                                    <span className="text-destructive">
-                                                                                        *
-                                                                                    </span>
-                                                                                </Label>
-                                                                                <Input
-                                                                                    name="nama_fakultas"
-                                                                                    placeholder="Nama Fakultas"
-                                                                                    id={
-                                                                                        "nama_fakultas-${item.id}"
-                                                                                    }
-                                                                                    defaultValue={
-                                                                                        item.nama_fakultas
-                                                                                    }
-                                                                                    required
-                                                                                />
-                                                                                {errors.nama_fakultas && (
-                                                                                    <p className="text-danger text-sm">
-                                                                                        {
-                                                                                            errors.nama_fakultas
-                                                                                        }
-                                                                                    </p>
-                                                                                )}
-                                                                            </Field>
-                                                                        </FieldGroup>
-                                                                        <DialogFooter>
-                                                                            <DialogClose>
-                                                                                <Button
-                                                                                    type="button"
-                                                                                    variant={
-                                                                                        "outline"
-                                                                                    }
-                                                                                >
-                                                                                    Kembali
-                                                                                </Button>
-                                                                            </DialogClose>
-                                                                            <Button
-                                                                                type="submit"
-                                                                                disabled={
-                                                                                    processing
-                                                                                }
-                                                                            >
-                                                                                {processing
-                                                                                    ? "Menyimpan"
-                                                                                    : "Simpan"}
-                                                                            </Button>
-                                                                        </DialogFooter>
-                                                                    </>
-                                                                )}
-                                                            </Form>
-                                                        </DialogContent>
-                                                    </Dialog>
-                                                    <Dialog
-                                                        open={
-                                                            deleteId === item.id
-                                                        }
-                                                        onOpenChange={(
-                                                            isOpen,
-                                                        ) => {
-                                                            setDeleteId(
-                                                                isOpen
-                                                                    ? item.id
-                                                                    : null,
-                                                            );
-                                                        }}
-                                                    >
-                                                        <DialogTrigger asChild>
-                                                            <Button
-                                                                type="button"
-                                                                variant="destructive"
-                                                            >
-                                                                Hapus
-                                                            </Button>
-                                                        </DialogTrigger>
-                                                        <DialogContent>
-                                                            <Form
-                                                                action={route(
-                                                                    "admin.fakultas.destroy",
-                                                                    item.id,
-                                                                )}
-                                                                method="DELETE"
-                                                                onSuccess={() =>
-                                                                    setDeleteId(
-                                                                        null,
-                                                                    )
-                                                                }
-                                                                resetOnSuccess
-                                                            >
-                                                                {({
-                                                                    processing,
-                                                                }) => (
-                                                                    <>
-                                                                        <DialogHeader>
-                                                                            <DialogTitle>
-                                                                                Hapus
-                                                                                Fakultas
-                                                                            </DialogTitle>
-                                                                            <DialogDescription>
-                                                                                Apakah
-                                                                                anda
-                                                                                yakin
-                                                                                ingin
-                                                                                menghapus
-                                                                                fakultas{" "}
-                                                                                {
-                                                                                    item.nama_fakultas
-                                                                                }
-
-                                                                                ?
-                                                                            </DialogDescription>
-                                                                        </DialogHeader>
-                                                                        <DialogFooter>
-                                                                            <DialogClose>
-                                                                                <Button
-                                                                                    type="button"
-                                                                                    variant={
-                                                                                        "outline"
-                                                                                    }
-                                                                                >
-                                                                                    Kembali
-                                                                                </Button>
-                                                                            </DialogClose>
-                                                                            <Button
-                                                                                type="submit"
-                                                                                disabled={
-                                                                                    processing
-                                                                                }
-                                                                                variant={
-                                                                                    "destructive"
-                                                                                }
-                                                                            >
-                                                                                {processing
-                                                                                    ? "...Menghapus"
-                                                                                    : "Hapus"}
-                                                                            </Button>
-                                                                        </DialogFooter>
-                                                                    </>
-                                                                )}
-                                                            </Form>
-                                                        </DialogContent>
-                                                    </Dialog>
-                                                </TableCell>
-                                            </TableRow>
-                                        ),
-                                    )
-                                )}
-                            </TableBody>
-                        </Table>
+                        <TablePage<Fakultas>
+                            data={data}
+                            columns={[
+                                {
+                                    key: "kode_fakultas",
+                                    label: "Kode Fakultas",
+                                },
+                                {
+                                    key: "nama_fakultas",
+                                    label: "Nama Fakultas",
+                                },
+                            ]}
+                            renderActions={(item) => (
+                                <>
+                                    <DialogFormEdit
+                                        page="Fakultas"
+                                        actionUrl={route(
+                                            "admin.fakultas.update",
+                                            item.id,
+                                        )}
+                                        item={item}
+                                        kolomInput={[
+                                            {
+                                                name: "kode_fakultas",
+                                                label: "Kode Fakultas",
+                                                required: true,
+                                            },
+                                            {
+                                                name: "nama_fakultas",
+                                                label: "Nama Fakultas",
+                                                required: true,
+                                            },
+                                        ]}
+                                    />
+                                    <DialogDelete
+                                        page="Fakultas"
+                                        actionUrl={route(
+                                            "admin.fakultas.destroy",
+                                            item.id,
+                                        )}
+                                        item={item}
+                                        label={item.nama_fakultas}
+                                    />
+                                </>
+                            )}
+                        />
                     </CardContent>
                 </Card>
             </div>

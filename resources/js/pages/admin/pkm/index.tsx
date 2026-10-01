@@ -11,26 +11,41 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { Fakultas } from "@/interface/fakultas";
 import { PaginatedData } from "@/interface/pagination";
 import { Pkm as PkmInterface } from "@/interface/pkm";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import { HandHeart, Plus } from "lucide-react";
+import { FormEvent, useState } from "react";
 import { route } from "ziggy-js";
 
 interface Props {
     data: PaginatedData<PkmInterface>;
     fakultas: Fakultas[];
+    filters: any;
 }
 
-export default function Pkm({ data, fakultas }: Props) {
+export default function Pkm({ data, fakultas, filters }: Props) {
     const statistikFakultas = fakultas.map((item) => ({
         label: item.nama_fakultas,
         count: data.data.filter((pkm) =>
             pkm.penulis.some((penulis) => penulis.fakultas_id === item.id),
         ).length,
     }));
-    
+
+    const [search, setSearch] = useState(filters.search ?? "");
+
+    const handleSearch = (e: FormEvent) => {
+        e.preventDefault();
+        router.get(
+            route("admin.pkm.index"),
+            { search },
+            { preserveState: true, replace: true },
+        );
+    };
+
     return (
         <>
             <Head title="Pengabdian Kepaga Masyarakat" />
@@ -73,21 +88,44 @@ export default function Pkm({ data, fakultas }: Props) {
                             </div>
                         </div>
 
-                        <Link
-                            href={route("admin.pkm.create")}
-                            viewTransition
-                            className="w-full sm:w-auto"
-                        >
-                            <Button className="w-full sm:w-auto">
-                                <Plus />
-                                Tambah PKM
-                            </Button>
-                        </Link>
+                        <div className="grid gap-3 items-center lg:block xl:flex">
+                            <form
+                                onSubmit={handleSearch}
+                                className="flex gap-3 mb-[10px] xl:mb-[0px]"
+                            >
+                                <Field orientation="horizontal">
+                                    <Input
+                                        type="search"
+                                        placeholder="Search..."
+                                        value={search}
+                                        onChange={(e) =>
+                                            setSearch(e.target.value)
+                                        }
+                                    />
+                                    <Button type="submit">Search</Button>
+                                </Field>
+                            </form>
+
+                            <Link
+                                href={route("admin.pkm.create")}
+                                viewTransition
+                                className="w-full sm:w-auto"
+                            >
+                                <Button className="w-full sm:w-auto">
+                                    <Plus />
+                                    Tambah PKM
+                                </Button>
+                            </Link>
+                        </div>
                     </CardHeader>
                     <CardContent>
                         <TablePage<PkmInterface>
                             data={data}
                             columns={[
+                                {
+                                    key: "judul",
+                                    label: "Judul",
+                                },
                                 {
                                     id: "fakultas",
                                     key: "penulis",
@@ -112,10 +150,6 @@ export default function Pkm({ data, fakultas }: Props) {
                                                 {penulis.dosen.nama_dosen}
                                             </Badge>
                                         )),
-                                },
-                                {
-                                    key: "judul",
-                                    label: "Judul",
                                 },
                             ]}
                             renderActions={(item) => (

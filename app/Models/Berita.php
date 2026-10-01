@@ -1,15 +1,13 @@
 <?php
 
 namespace App\Models;
-
-use App\Traits\Searchable;
+use App\Models\Concerns\Searchable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Berita extends Model
 {
-    use Searchable;
-    use SoftDeletes;
+    use SoftDeletes, Searchable;
 
     protected array $searchable = [
         'judul_berita',

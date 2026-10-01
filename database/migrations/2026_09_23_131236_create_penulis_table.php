@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->foreignId('fakultas_id')->constrained()->restrictOnUpdate();
             $table->foreignId('dosen_id')->constrained()->restrictOnDelete();
             $table->unsignedTinyInteger('urutan')->default(1);
-            $table->unique(['penulisable_type', 'penulisable_id', 'dosen_id']);
+            // $table->unique(['penulisable_type', 'penulisable_id', 'dosen_id']);
             $table->timestamps();
         });
     }

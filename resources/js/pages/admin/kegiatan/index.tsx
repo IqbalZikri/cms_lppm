@@ -5,26 +5,46 @@ import TablePage from "@/components/table-page";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { Fakultas } from "@/interface/fakultas";
 import { Kegiatan as KegiatanInterface } from "@/interface/kegiatan";
 import { PaginatedData } from "@/interface/pagination";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import { Activity, Plus } from "lucide-react";
+import { FormEvent, useState } from "react";
 import { route } from "ziggy-js";
 
 interface Props {
     data: PaginatedData<KegiatanInterface>;
     fakultas: Fakultas[];
+    filters: any;
+    totalKegiatanPerFakultas: any;
 }
 
-export default function Kegiatan({ data, fakultas }: Props) {
+export default function Kegiatan({
+    data,
+    fakultas,
+    filters,
+    totalKegiatanPerFakultas,
+}: Props) {
     const totalKegiatan = data.total;
-    const statistikFakultas = fakultas.map((item) => ({
-        label: item.nama_fakultas,
-        count: data.data.filter((kegiatan) =>
-            kegiatan.penulis.some((penulis) => penulis.fakultas_id === item.id),
-        ).length,
+
+    const statistikFakultas = totalKegiatanPerFakultas.map((item: any) => ({
+        label: item.label,
+        count: item.count,
     }));
+
+    const [search, setSearch] = useState(filters.search ?? "");
+
+    const handleSearch = (e: FormEvent) => {
+        e.preventDefault();
+        router.get(
+            route("admin.kegiatan.index"),
+            { search },
+            { preserveState: true, replace: true },
+        );
+    };
 
     return (
         <>
@@ -69,15 +89,35 @@ export default function Kegiatan({ data, fakultas }: Props) {
                             </div>
                         </div>
 
-                        <Link
-                            href={route("admin.kegiatan.create")}
-                            viewTransition
-                        >
-                            <Button className="mb-[20px]">
-                                <Plus />
-                                Tambah Penelitian Kegiatan
-                            </Button>
-                        </Link>
+                        <div className="grid gap-3 items-center lg:block xl:flex">
+                            <form
+                                onSubmit={handleSearch}
+                                className="flex gap-3 mb-[10px] xl:mb-[0px]"
+                            >
+                                <Field orientation="horizontal">
+                                    <Input
+                                        type="search"
+                                        placeholder="Search..."
+                                        value={search}
+                                        onChange={(e) =>
+                                            setSearch(e.target.value)
+                                        }
+                                    />
+                                    <Button type="submit">Search</Button>
+                                </Field>
+                            </form>
+
+                            <Link
+                                href={route("admin.kegiatan.create")}
+                                viewTransition
+                                className=""
+                            >
+                                <Button>
+                                    <Plus />
+                                    Tambah Penelitian Kegiatan
+                                </Button>
+                            </Link>
+                        </div>
                     </CardHeader>
                     <CardContent>
                         <TablePage<KegiatanInterface>
@@ -141,9 +181,7 @@ export default function Kegiatan({ data, fakultas }: Props) {
                                         )}
                                         viewTransition
                                     >
-                                        <Button variant="outline">
-                                            Edit
-                                        </Button>
+                                        <Button variant="outline">Edit</Button>
                                     </Link>
                                     <Link
                                         href={route(
@@ -152,9 +190,7 @@ export default function Kegiatan({ data, fakultas }: Props) {
                                         )}
                                         viewTransition
                                     >
-                                        <Button variant="default">
-                                            Show
-                                        </Button>
+                                        <Button variant="default">Show</Button>
                                     </Link>
                                     <DialogDelete
                                         label={item.judul}

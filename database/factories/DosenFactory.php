@@ -21,18 +21,18 @@ class DosenFactory extends Factory
     public function definition(): array
     {
         return [
-            'fakultas_id' => Fakultas::factory(),
-            'prodi_id' => Prodi::factory(),
-            'nidn' => fake()->numberBetween(0, 20),
-            'nuptk' => fake()->numberBetween(0, 20),
-            'nama_dosen' => fake()->name(),
-            'jenis_kelamin' => fake()->randomElement(["L", "P"]),
+            'fakultas_id' => Fakultas::pluck('id')->random(),
+            'prodi_id' => Prodi::pluck('id')->random(),
+            'nidn' => fake()->unique()->numerify('##########'),
+            'nuptk' => fake()->unique()->numerify('################'),
+            'nama_dosen' => User::pluck('name')->random(),
+            'jenis_kelamin' => fake()->randomElement(['L', 'P']),
             'tanggal_lahir' => fake()->date(),
-            'tempat_lahir' => fake()->address(),
+            'tempat_lahir' => fake()->city(),
             'alamat' => fake()->address(),
             'hp' => fake()->phoneNumber(),
-            'email' => fake()->email(),
-            'user_id' => User::factory(),
+            'email' => User::pluck('email')->random(),
+            'user_id' => User::pluck('id')->random(),
         ];
     }
 }

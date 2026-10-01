@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Fakultas } from "@/interface/fakultas";
 import { PaginatedData } from "@/interface/pagination";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import {
     Building2,
     GraduationCap,
@@ -23,6 +23,9 @@ import { route } from "ziggy-js";
 import { DialogDelete } from "@/components/dialog-form";
 import { Prodi } from "@/interface/prodi";
 import { Dosen as DosenTypes } from "@/types/dosen";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { FormEvent, useState } from "react";
 
 interface DosenPageProps {
     data: PaginatedData<DosenTypes>;
@@ -30,6 +33,7 @@ interface DosenPageProps {
     prodi: Prodi[];
     totalLaki: number;
     totalPerempuan: number;
+    filters: any;
 }
 
 export default function Dosen({
@@ -38,7 +42,18 @@ export default function Dosen({
     prodi,
     totalLaki,
     totalPerempuan,
+    filters,
 }: DosenPageProps) {
+    const [search, setSearch] = useState(filters.search ?? "");
+
+    const handleSearch = (e: FormEvent) => {
+        e.preventDefault();
+        router.get(
+            route("admin.dosen.index"),
+            { search },
+            { preserveState: true, replace: true },
+        );
+    };
     return (
         <>
             <Head title="Dosen" />
@@ -139,7 +154,7 @@ export default function Dosen({
 
                 {/* Table */}
                 <Card>
-                    <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
+                    <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center justify-between">
                         <div className="flex items-center gap-3">
                             <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
                                 <Users className="h-5 w-5" />
@@ -154,16 +169,35 @@ export default function Dosen({
                             </div>
                         </div>
 
-                        <Link
-                            href={route("admin.dosen.create")}
-                            viewTransition
-                            className="w-full sm:w-auto"
-                        >
-                            <Button className="w-full sm:w-auto">
-                                <Plus />
-                                Tambah Dosen
-                            </Button>
-                        </Link>
+                        <div className="lg:flex gap-3 ">
+                            <form
+                                onSubmit={handleSearch}
+                                className="flex gap-3 mb-[10px]"
+                            >
+                                <Field orientation="horizontal">
+                                    <Input
+                                        type="search"
+                                        placeholder="Search..."
+                                        value={search}
+                                        onChange={(e) =>
+                                            setSearch(e.target.value)
+                                        }
+                                    />
+                                    <Button type="submit">Search</Button>
+                                </Field>
+                            </form>
+
+                            <Link
+                                href={route("admin.dosen.create")}
+                                viewTransition
+                                className="w-full sm:w-auto"
+                            >
+                                <Button className="w-full sm:w-auto">
+                                    <Plus />
+                                    Tambah Dosen
+                                </Button>
+                            </Link>
+                        </div>
                     </CardHeader>
 
                     <CardContent>

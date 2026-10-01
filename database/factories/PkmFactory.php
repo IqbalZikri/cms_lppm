@@ -2,14 +2,14 @@
 
 namespace Database\Factories;
 
-use App\Models\Kegiatan;
 use App\Models\Penulis;
+use App\Models\Pkm;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Kegiatan>
+ * @extends Factory<Pkm>
  */
-class KegiatanFactory extends Factory
+class PkmFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -19,14 +19,15 @@ class KegiatanFactory extends Factory
     public function definition(): array
     {
         return [
+            'jenis_pkm' => fake()->randomElement(['pelaksanaan', 'jurnal']),
             'judul' => fake()->sentence(),
-            'slug' => fake()->unique()->slug(),
+            'slug' => fake()->slug(),
             'abstrak' => fake()->paragraph(),
-            'semester' => fake()->randomElement(["Ganjil", "Genap"]),
+            'semester' => fake()->randomElement(["ganjil", "genap"]),
             'tahun' => fake()->numberBetween(now()->subYears(3)->year, now()->year),
-            'link_berkas' => fake()->url(),
             'sumber_dana' => fake()->randomElement(["internal", "eksternal"]),
             'jumlah_dana' => fake()->numberBetween(5, 50) * 10000000,
+            'link_berkas' => fake()->url,
         ];
     }
 

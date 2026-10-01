@@ -14,14 +14,15 @@ use Log;
 
 class PkmController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = Pkm::latest()->paginate(10)->withQueryString();
+        $data = Pkm::query()->with('penulis.fakultas', 'penulis.dosen')->search($request->query('search'))->latest()->paginate(10)->withQueryString();
         $data->load('penulis.fakultas', 'penulis.dosen');
         $fakultas = Fakultas::get();
         return Inertia::render('admin/pkm/index', [
             'data' => $data,
             'fakultas' => $fakultas,
+            'filters' => $request->only('search')
         ]);
     }
 

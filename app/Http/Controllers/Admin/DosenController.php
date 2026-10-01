@@ -18,9 +18,14 @@ class DosenController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data = Dosen::paginate(10)->withQueryString();
+        $data = Dosen::query()
+            ->with(['fakultas', 'prodi'])
+            ->search($request->query('search'))
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
         $fakultas = Fakultas::with('dosen')->get();
         $prodi = Prodi::get();
         $totalLaki = Dosen::where('jenis_kelamin', "L")->count();
@@ -32,6 +37,7 @@ class DosenController extends Controller
             'prodi' => $prodi,
             'totalLaki' => $totalLaki,
             'totalPerempuan' => $totalPerempuan,
+            'filters' => $request->only('search'),
         ]);
     }
 

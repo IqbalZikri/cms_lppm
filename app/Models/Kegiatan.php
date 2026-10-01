@@ -2,13 +2,21 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Searchable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Kegiatan extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable;
+
+    protected array $searchable = [
+        'judul',
+        'penulis.fakultas.nama_fakultas',
+        'penulis.dosen.nama_dosen'
+    ];
+
     protected $fillable = [
         'judul',
         'slug',
@@ -24,8 +32,4 @@ class Kegiatan extends Model
     {
         return $this->morphMany(Penulis::class, 'penulisable')->orderBy('urutan');
     }
-
-    protected $casts = [
-        'penulis' => 'array',
-    ];
 }

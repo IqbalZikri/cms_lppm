@@ -19,15 +19,15 @@ class DashboardController extends Controller
     {
         $dosens = Dosen::latest()->take(5)->with('fakultas', 'prodi', 'user')->get();
         $totalDosen = Dosen::count();
-        $kegiatan = Kegiatan::latest()->take(5)->get();
+        $kegiatan = Kegiatan::latest()->with('penulis.fakultas', 'penulis.dosen')->take(5)->get();
         $totalKegiatan = Kegiatan::count();
-        $pkm = Pkm::latest()->take(5)->get();
+        $pkm = Pkm::latest()->with('penulis.fakultas', 'penulis.dosen')->take(5)->get();
         $totalPkm = Pkm::count();
-        $hki = Hki::latest()->take(5)->get();
+        $hki = Hki::latest()->with('penulis.fakultas', 'penulis.dosen')->take(5)->get();
         $totalHki = Hki::count();
-        $luaranJurnal = LuaranJurnal::latest()->take(5)->get();
+        $luaranJurnal = LuaranJurnal::latest()->with('penulis.fakultas', 'penulis.dosen')->take(5)->get();
         $totalLuaranJurnal = LuaranJurnal::count();
-        $luaranProsiding = LuaranProsiding::latest()->take(5)->get();
+        $luaranProsiding = LuaranProsiding::latest()->with('penulis.fakultas', 'penulis.dosen')->take(5)->get();
         $totalLuaranProsiding = LuaranProsiding::count();
         $user = auth()->user();
 

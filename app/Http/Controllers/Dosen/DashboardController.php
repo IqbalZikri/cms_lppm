@@ -17,7 +17,10 @@ class DashboardController extends Controller
     public function index()
     {
         $userLogin = auth()->user()->id;
-        $dosenLogin = Dosen::where('user_id', $userLogin)->with('penulis','fakultas')->first();
+        $dosenLogin = Dosen::where('user_id', $userLogin)->with('penulis', 'fakultas')->first();
+        if (!$dosenLogin) {
+            return back()->with("error", "Terjadi Kesalahan");
+        }
         $totalKegiatan = Kegiatan::whereHas('penulis', function ($query) use ($dosenLogin) {
             $query->where('dosen_id', $dosenLogin->id);
         })->count();

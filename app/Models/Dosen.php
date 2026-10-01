@@ -2,12 +2,23 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Searchable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Dosen extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable;
+
+    protected array $searchable = [
+        'nama_dosen',
+        'nidn',
+        'nuptk',
+        'email',
+        'fakultas.nama_fakultas', // sesuaikan nama kolom di tabel fakultas
+        'prodi.nama_prodi',       // sesuaikan nama kolom di tabel prodi
+    ];
+
     protected $fillable = [
         'fakultas_id',
         'prodi_id',

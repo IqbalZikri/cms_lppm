@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Dosen;
 use App\Models\Fakultas;
 use App\Models\Kegiatan;
+use App\Models\Penulis;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -17,14 +18,22 @@ class KegiatanController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data = Kegiatan::latest()->paginate(10)->withQueryString();
-        $data->load('penulis.fakultas', 'penulis.dosen');
+        $queryKegiatan = Kegiatan::query()->with('penulis.fakultas', 'penulis.dosen');
+        $data = $queryKegiatan->clone()->search($request->query('search'))->latest()->paginate(10)->withQueryString();
         $fakultas = Fakultas::get();
+        $totalKegiatanPerFakultas = [];
+        foreach ($fakultas as $f) {
+            $penulisSesuai = Penulis::where('penulisable_type', 'App\Models\Kegiatan')->where("fakultas_id", $f->id)->get();
+            $totalKegiatanPerFakultas[] = ["label" => $f->nama_fakultas, "count" => $penulisSesuai->count()];
+        }
+
         return Inertia::render('admin/kegiatan/index', [
             'data' => $data,
             'fakultas' => $fakultas,
+            'filters' => $request->only('search'),
+            'totalKegiatanPerFakultas' => $totalKegiatanPerFakultas
         ]);
     }
 
@@ -109,7 +118,7 @@ class KegiatanController extends Controller
     public function show(string $id)
     {
         $data = Kegiatan::findOrFail($id);
-        $data->load('penulis.fakultas','penulis.dosen');
+        $data->load('penulis.fakultas', 'penulis.dosen');
         $fakultas = Fakultas::get();
         return Inertia::render('admin/kegiatan/show', [
             'data' => $data,

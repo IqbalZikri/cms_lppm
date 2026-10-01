@@ -39,7 +39,12 @@ class DatabaseSeeder extends Seeder
         $this->call([
             FakultasSeeder::class,
             ProdiSeeder::class,
-            DosenSeeder::class
+            DosenSeeder::class,
+            KegiatanSeeder::class,
+            PkmSeeder::class,
+            HkiSeeder::class,
+            LuaranJurnalSeeder::class,
+            LuaranPRosidingSeeder::class
         ]);
 
     }
