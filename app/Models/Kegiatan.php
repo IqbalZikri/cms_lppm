@@ -19,7 +19,6 @@ class Kegiatan extends Model
 
     protected $fillable = [
         'judul',
-        'slug',
         'abstrak',
         'semester',
         'tahun',

@@ -21,7 +21,6 @@ class LuaranJurnalFactory extends Factory
         return [
             'jenis_luaran_jurnal' => fake()->randomElement(['scopus q1', 'scopus q2', 'scopus q3', 'sinta 1', 'sinta 2', 'sinta 3', 'sinta 4', 'sinta 5', 'non sinta', 'non scopus']),
             'judul' => fake()->sentence(),
-            'slug' => fake()->unique()->slug(),
             'abstrak' => fake()->paragraph(),
             'semester' => fake()->randomElement(["Ganjil", "Genap"]),
             'tahun' => fake()->numberBetween(now()->subYears(3)->year, now()->year),

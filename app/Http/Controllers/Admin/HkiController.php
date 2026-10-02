@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Dosen;
 use App\Models\Fakultas;
 use App\Models\Hki;
+use App\Models\Penulis;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -17,14 +18,28 @@ class HkiController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data = Hki::latest()->paginate(10)->withQueryString();
-        $data->load('penulis.fakultas', 'penulis.dosen');
+        $queryHki = Hki::query()->with('penulis.fakultas', 'penulis.dosen');
+        $data = $queryHki->clone()->search($request->query("search"))->latest()->paginate(10)->withQueryString();
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
+        $totalPaten = Hki::where('jenis_hki', 'paten')->count();
+        $totalHaki = Hki::where('jenis_hki', 'haki')->count();
+        $totalHki = Hki::count();
+        $totalHkiPerFakultas = [];
+        foreach ($fakultas as $f) {
+            $penulisSesuai = Penulis::where('penulisable_type', 'App\Models\Hki')->where("fakultas_id", $f->id)->get();
+            $totalHkiPerFakultas[] = ["label" => $f->nama_fakultas, "count" => $penulisSesuai->count()];
+        }
+
         return Inertia::render('admin/hki/index', [
             'data' => $data,
-            'fakultas' => $fakultas
+            'fakultas' => $fakultas,
+            'totalPaten' => $totalPaten,
+            'totalHaki' => $totalHaki,
+            "filters" => $request->only("search"),
+            "totalHkiPerFakultas" => $totalHkiPerFakultas,
+            "totalHki" => $totalHki
         ]);
     }
 
@@ -47,7 +62,6 @@ class HkiController extends Controller
         $validated = $request->validate([
             'jenis_hki' => ['required', Rule::in(['paten', 'haki'])],
             'judul' => 'required',
-            'slug' => 'required',
             'abstrak' => 'required',
             'semester' => 'required',
             'tahun' => 'required',
@@ -65,7 +79,6 @@ class HkiController extends Controller
             'jenis_hki.required' => 'Silahkan pilih salah satu jenis HKI',
             'jenis_hki.in' => 'Jenis HKI tidak valid',
             'judul.required' => 'Silahkan isi judul',
-            'slug.required' => 'Silahkan isi slug',
             'abstrak.required' => 'Silahkan isi abstrak',
             'semester.required' => 'Silahkan isi semester',
             'tahun.required' => 'Silahkan isi tahun',
@@ -85,7 +98,6 @@ class HkiController extends Controller
             $hki = Hki::create([
                 'jenis_hki' => $validated['jenis_hki'],
                 'judul' => $validated['judul'],
-                'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],

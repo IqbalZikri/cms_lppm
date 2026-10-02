@@ -10,10 +10,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PaginatedData } from "@/interface/pagination";
 import { User as UserInterface } from "@/interface/user";
 import { User } from "@/types";
-import { Head } from "@inertiajs/react";
+import { Head, router } from "@inertiajs/react";
 import { Check, Users, X } from "lucide-react";
 import { route } from "ziggy-js";
 import { Fakultas } from "@/types/fakultas";
+import { FormEvent, useState } from "react";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface UserPageProps {
     users: PaginatedData<User>;
@@ -21,6 +25,7 @@ interface UserPageProps {
     totalUppm: number;
     totalAdmin: number;
     fakultas: Fakultas[];
+    filters: any;
 }
 
 export default function UserPage({
@@ -29,7 +34,18 @@ export default function UserPage({
     totalUppm,
     totalAdmin,
     fakultas,
+    filters,
 }: UserPageProps) {
+    const [search, setSearch] = useState(filters.search ?? "");
+
+    const handleSearch = (e: FormEvent) => {
+        e.preventDefault();
+        router.get(
+            route("admin.user.index"),
+            { search },
+            { preserveState: true, replace: true },
+        );
+    };
     return (
         <>
             <Head title="User" />
@@ -83,55 +99,74 @@ export default function UserPage({
                                 </p>
                             </div>
                         </div>
+                        <div className="grid gap-3 items-center lg:block xl:flex">
+                            <form
+                                onSubmit={handleSearch}
+                                className="flex gap-3 mb-[10px] xl:mb-[0px]"
+                            >
+                                <Field orientation={"horizontal"}>
+                                    <Input
+                                        type="search"
+                                        placeholder="Cari Disini..."
+                                        value={search}
+                                        onChange={(e) =>
+                                            setSearch(e.target.value)
+                                        }
+                                    />
+                                    <Button type="submit">Cari</Button>
+                                </Field>
+                            </form>
 
-                        <DialogFormCreate
-                            page="User"
-                            actionUrl="admin.user.store"
-                            kolomInput={[
-                                {
-                                    label: "Nama Akun",
-                                    name: "name",
-                                    placeholder: "Nama Akun",
-                                    required: true,
-                                },
-                                {
-                                    label: "Email",
-                                    name: "email",
-                                    placeholder: "Contoh : admin@example.com",
-                                },
-                                {
-                                    label: "Password",
-                                    name: "password",
-                                    placeholder: "Password Akun",
-                                    type: "password",
-                                },
-                                {
-                                    label: "Konfirmasi Password",
-                                    name: "password_confirmation",
-                                    placeholder: "Konfirmasi Password",
-                                    type: "password",
-                                },
-                                {
-                                    label: "Hak Akses Akun / Role",
-                                    name: "role",
-                                    type: "radio",
-                                    options: [
-                                        { label: "Admin", value: "admin" },
-                                        { label: "UPPM", value: "uppm" },
-                                    ],
-                                },
-                                {
-                                    label: "Fakultas",
-                                    name: "fakultas_id",
-                                    type: "select",
-                                    showIf: { name: "role", value: "uppm" },
-                                    options: fakultas.map((item) => ({
-                                        label: item.nama_fakultas,
-                                        value: item.id,
-                                    })),
-                                },
-                            ]}
-                        />
+                            <DialogFormCreate
+                                page="User"
+                                actionUrl="admin.user.store"
+                                kolomInput={[
+                                    {
+                                        label: "Nama Akun",
+                                        name: "name",
+                                        placeholder: "Nama Akun",
+                                        required: true,
+                                    },
+                                    {
+                                        label: "Email",
+                                        name: "email",
+                                        placeholder:
+                                            "Contoh : admin@example.com",
+                                    },
+                                    {
+                                        label: "Password",
+                                        name: "password",
+                                        placeholder: "Password Akun",
+                                        type: "password",
+                                    },
+                                    {
+                                        label: "Konfirmasi Password",
+                                        name: "password_confirmation",
+                                        placeholder: "Konfirmasi Password",
+                                        type: "password",
+                                    },
+                                    {
+                                        label: "Hak Akses Akun / Role",
+                                        name: "role",
+                                        type: "radio",
+                                        options: [
+                                            { label: "Admin", value: "admin" },
+                                            { label: "UPPM", value: "uppm" },
+                                        ],
+                                    },
+                                    {
+                                        label: "Fakultas",
+                                        name: "fakultas_id",
+                                        type: "select",
+                                        showIf: { name: "role", value: "uppm" },
+                                        options: fakultas.map((item) => ({
+                                            label: item.nama_fakultas,
+                                            value: item.id,
+                                        })),
+                                    },
+                                ]}
+                            />
+                        </div>
                     </CardHeader>
 
                     <CardContent>
@@ -197,7 +232,7 @@ export default function UserPage({
                                                         placeholder:
                                                             "Password Akun",
                                                         type: "password",
-                                                        small: "Kosongkan password dan konfirmasi password jika tidak ingin merubah password"
+                                                        small: "Kosongkan password dan konfirmasi password jika tidak ingin merubah password",
                                                     },
                                                     {
                                                         label: "Konfirmasi Password",

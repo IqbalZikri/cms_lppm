@@ -5,27 +5,47 @@ import TablePage from "@/components/table-page";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { Fakultas } from "@/interface/fakultas";
 import { LuaranProsiding as LuaranProsidingInterface } from "@/interface/luaran-prosiding";
 import { PaginatedData } from "@/interface/pagination";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import { Eye, FileText, Pencil, Plus, ScrollText } from "lucide-react";
+import { FormEvent, useState } from "react";
 import { route } from "ziggy-js";
 
 interface Props {
     data: PaginatedData<LuaranProsidingInterface>;
     fakultas: Fakultas[];
+    filters: any;
+    totalLuaranProsidingPerFakultas: string[];
+    totalLuaranProsiding: number;
 }
 
-export default function LuaranProsiding({ data, fakultas }: Props) {
-    const statistikFakultas = fakultas.map((item) => ({
-        label: item.nama_fakultas,
-        count: data.data.filter((luaranProsiding) =>
-            luaranProsiding.penulis.some(
-                (penulis) => penulis.fakultas_id === item.id,
-            ),
-        ).length,
-    }));
+export default function LuaranProsiding({
+    data,
+    filters,
+    totalLuaranProsidingPerFakultas,
+    totalLuaranProsiding,
+}: Props) {
+    const statistikFakultas = totalLuaranProsidingPerFakultas.map(
+        (item: any) => ({
+            label: item.label,
+            count: item.count,
+        }),
+    );
+
+    const [search, setSearch] = useState(filters.search ?? "");
+
+    const handleSearch = (e: FormEvent) => {
+        e.preventDefault();
+        router.get(
+            route("admin.luaran_prosiding.index"),
+            { search },
+            { preserveState: true, replace: true },
+        );
+    };
 
     return (
         <>
@@ -43,7 +63,10 @@ export default function LuaranProsiding({ data, fakultas }: Props) {
 
                 <StatisticsCard
                     dataCard={[
-                        { label: "Total Luaran Prosiding", count: data.total },
+                        {
+                            label: "Total Luaran Prosiding",
+                            count: totalLuaranProsiding,
+                        },
                         ...statistikFakultas,
                     ]}
                 />
@@ -65,16 +88,35 @@ export default function LuaranProsiding({ data, fakultas }: Props) {
                             </div>
                         </div>
 
-                        <Link
-                            href={route("admin.luaran_prosiding.create")}
-                            viewTransition
-                            className="w-full sm:w-auto"
-                        >
-                            <Button className="w-full sm:w-auto">
-                                <Plus />
-                                Tambah Luaran Prosiding
-                            </Button>
-                        </Link>
+                        <div className="grid gap-3 items-center lg:block xl:flex">
+                            <form
+                                onSubmit={handleSearch}
+                                className="flex gap-3 mb-[10px] xl:mb-[0px]"
+                            >
+                                <Field orientation="horizontal">
+                                    <Input
+                                        type="search"
+                                        placeholder="Search..."
+                                        value={search}
+                                        onChange={(e) =>
+                                            setSearch(e.target.value)
+                                        }
+                                    />
+                                    <Button type="submit">Cari</Button>
+                                </Field>
+                            </form>
+
+                            <Link
+                                href={route("admin.luaran_prosiding.create")}
+                                viewTransition
+                                className="w-full sm:w-auto"
+                            >
+                                <Button className="w-full sm:w-auto">
+                                    <Plus />
+                                    Tambah Luaran Prosiding
+                                </Button>
+                            </Link>
+                        </div>
                     </CardHeader>
                     <CardContent className="pt-6">
                         <TablePage<LuaranProsidingInterface>

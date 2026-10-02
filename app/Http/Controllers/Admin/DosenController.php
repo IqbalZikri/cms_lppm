@@ -28,6 +28,8 @@ class DosenController extends Controller
             ->withQueryString();
         $fakultas = Fakultas::with('dosen')->get();
         $prodi = Prodi::get();
+
+        $totalDosen = Dosen::count();
         $totalLaki = Dosen::where('jenis_kelamin', "L")->count();
         $totalPerempuan = Dosen::where("jenis_kelamin", "P")->count();
 
@@ -35,6 +37,7 @@ class DosenController extends Controller
             'data' => $data,
             'fakultas' => $fakultas,
             'prodi' => $prodi,
+            'totalDosen' => $totalDosen,
             'totalLaki' => $totalLaki,
             'totalPerempuan' => $totalPerempuan,
             'filters' => $request->only('search'),

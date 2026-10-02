@@ -19,7 +19,6 @@ class Pkm extends Model
     protected $fillable = [
         'jenis_pkm',
         'judul',
-        'slug',
         'abstrak',
         'semester',
         'tahun',

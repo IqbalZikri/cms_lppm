@@ -3,7 +3,6 @@ import { Penulis } from "./penulis";
 export interface Kegiatan {
     id: number;
     judul: string;
-    slug: string;
     abstrak: string;
     semester: string;
     tahun: number;

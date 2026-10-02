@@ -38,7 +38,6 @@ class PkmController extends Controller
         $validated = $request->validate([
             'jenis_pkm' => ['required', Rule::in(['pelaksanaan', 'jurnal'])],
             'judul' => 'required',
-            'slug' => 'required',
             'gambar' => 'nullable|max:2048|mimes:png,jpg,jpeg',
             'abstrak' => 'required',
             'semester' => 'required',
@@ -52,7 +51,7 @@ class PkmController extends Controller
         ], [
             'jenis_pkm.required' => 'Silahkan pilih jenis pkm',
             'judul.required' => 'Silahkan isi judul',
-            'slug.required' => 'Silahkan isi slug',
+
             'gambar.max' => 'Gambar tidak bisa lebih dari 2 MB',
             'gambar.mimes' => 'Format file harus berupa jpg / jpeg / png',
             'abstrak.required' => 'Silahkan isi abstrak',
@@ -75,7 +74,6 @@ class PkmController extends Controller
             $pkm = Pkm::create([
                 'jenis_pkm' => $validated['jenis_pkm'],
                 'judul' => $validated['judul'],
-                'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],

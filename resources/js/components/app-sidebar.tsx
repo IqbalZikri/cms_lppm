@@ -1,13 +1,11 @@
 import { Link } from "@inertiajs/react";
 import {
     Activity,
-    BookOpen,
     BookOpenIcon,
     Building2,
     Database,
     FileBadge,
     FileText,
-    FolderGit2,
     GraduationCap,
     HandHeart,
     LayoutGrid,
@@ -19,7 +17,6 @@ import {
     Tags,
     User,
 } from "lucide-react";
-import AppLogo from "@/components/app-logo";
 import { NavFooter } from "@/components/nav-footer";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -34,7 +31,7 @@ import {
 } from "@/components/ui/sidebar";
 import type { NavItem } from "@/types";
 import { route } from "ziggy-js";
-import pkm from "@/routes/dosen/pkm";
+import AppLogoSidebar from "./app-logo-sidebar";
 
 const mainNavItems: NavItem[] = [
     {
@@ -158,7 +155,7 @@ export function AppSidebar() {
                                 prefetch
                                 viewTransition
                             >
-                                <AppLogo />
+                                <AppLogoSidebar />
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>

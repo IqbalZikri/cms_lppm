@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Dosen;
 use App\Models\Fakultas;
+use App\Models\Penulis;
 use App\Models\Pkm;
 use DB;
 use Illuminate\Http\Request;
@@ -16,13 +17,21 @@ class PkmController extends Controller
 {
     public function index(Request $request)
     {
-        $data = Pkm::query()->with('penulis.fakultas', 'penulis.dosen')->search($request->query('search'))->latest()->paginate(10)->withQueryString();
-        $data->load('penulis.fakultas', 'penulis.dosen');
+        $pkm = Pkm::query()->with('penulis.fakultas', 'penulis.dosen');
+        $data = $pkm->clone()->search($request->query('search'))->latest()->paginate(10)->withQueryString();
         $fakultas = Fakultas::get();
+
+        $totalPkm = $pkm->clone()->count();
+        $totalPkmPerFakultas = [];
+        foreach ($fakultas as $f) {
+            $penulisSesuai = Penulis::where('penulisable_type', 'App\Models\Pkm')->where("fakultas_id", $f->id)->get();
+            $totalPkmPerFakultas[] = ["label" => $f->nama_fakultas, "count" => $penulisSesuai->count()];
+        }
         return Inertia::render('admin/pkm/index', [
             'data' => $data,
-            'fakultas' => $fakultas,
-            'filters' => $request->only('search')
+            'filters' => $request->only('search'),
+            'totalPkm' => $totalPkm,
+            'totalPkmPerFakultas' => $totalPkmPerFakultas,
         ]);
     }
 
@@ -39,7 +48,6 @@ class PkmController extends Controller
         $validated = $request->validate([
             'jenis_pkm' => ['required', Rule::in(['pelaksanaan', 'jurnal'])],
             'judul' => 'required',
-            'slug' => 'required',
             'gambar' => 'nullable|max:2048|mimes:png,jpg,jpeg',
             'abstrak' => 'required',
             'semester' => 'required',
@@ -53,7 +61,6 @@ class PkmController extends Controller
         ], [
             'jenis_pkm.required' => 'Silahkan pilih jenis pkm',
             'judul.required' => 'Silahkan isi judul',
-            'slug.required' => 'Silahkan isi slug',
             'gambar.max' => 'Gambar tidak bisa lebih dari 2 MB',
             'gambar.mimes' => 'Format file harus berupa jpg / jpeg / png',
             'abstrak.required' => 'Silahkan isi abstrak',
@@ -76,7 +83,6 @@ class PkmController extends Controller
             $pkm = Pkm::create([
                 'jenis_pkm' => $validated['jenis_pkm'],
                 'judul' => $validated['judul'],
-                'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],

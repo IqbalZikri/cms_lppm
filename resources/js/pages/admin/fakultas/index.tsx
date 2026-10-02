@@ -9,7 +9,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import {
     Dialog,
     DialogClose,
@@ -43,10 +43,22 @@ interface Fakultas {
 
 type FakultasPageProps = {
     data: PaginatedData<Fakultas>;
+    filters: any;
 };
 
-export default function Fakultas({ data }: FakultasPageProps) {
+export default function Fakultas({ data, filters }: FakultasPageProps) {
     const [open, setOpen] = useState(false);
+
+    const [search, setSearch] = useState(filters.search ?? "");
+
+    const handleSearch = (e: FormEvent) => {
+        e.preventDefault();
+        router.get(
+            route("admin.fakultas.index"),
+            { search },
+            { preserveState: true, replace: true },
+        );
+    };
 
     return (
         <>
@@ -96,100 +108,118 @@ export default function Fakultas({ data }: FakultasPageProps) {
                             </div>
                         </div>
 
-                        <Dialog open={open} onOpenChange={setOpen}>
-                            <DialogTrigger asChild>
-                                <Button
-                                    type="button"
-                                    className="mb-[20px] w-[200px]"
-                                >
-                                    <Plus className="h-4 w-4" />
-                                    Tambah Fakultas
-                                </Button>
-                            </DialogTrigger>
+                        <div className="grid gap-3 items-center lg:block xl:flex">
+                            <form
+                                onSubmit={handleSearch}
+                                className="flex gap-3 mb-[10px] xl:mb-[0px]"
+                            >
+                                <Field orientation={"horizontal"}>
+                                    <Input
+                                        type="search"
+                                        placeholder="Cari Disini..."
+                                        value={search}
+                                        onChange={(e) =>
+                                            setSearch(e.target.value)
+                                        }
+                                    />
+                                    <Button type="submit">Cari</Button>
+                                </Field>
+                            </form>
+                            <Dialog open={open} onOpenChange={setOpen}>
+                                <DialogTrigger asChild>
+                                    <Button
+                                        type="button"
+                                        className="w-[200px]"
+                                    >
+                                        <Plus className="h-4 w-4" />
+                                        Tambah Fakultas
+                                    </Button>
+                                </DialogTrigger>
 
-                            <DialogContent>
-                                <Form
-                                    action={route("admin.fakultas.store")}
-                                    method="post"
-                                    onSuccess={() => setOpen(false)}
-                                    resetOnSuccess
-                                >
-                                    {({ errors, processing }) => (
-                                        <>
-                                            <DialogHeader className="mb-[25px]">
-                                                <DialogTitle>
-                                                    Tambah Data Fakultas
-                                                </DialogTitle>
-                                            </DialogHeader>
-                                            <FieldGroup>
-                                                <Field>
-                                                    <Label htmlFor="kode_fakultas">
-                                                        Kode Fakultas{" "}
-                                                        <span className="text-destructive">
-                                                            *
-                                                        </span>
-                                                    </Label>
-                                                    <Input
-                                                        name="kode_fakultas"
-                                                        id="kode_fakultas"
-                                                        placeholder="Kode Fakultas"
-                                                        autoComplete="off"
-                                                        required
-                                                    />
-                                                    {errors.kode_fakultas && (
-                                                        <p className="text-sm text-red-500">
-                                                            {
-                                                                errors.kode_fakultas
-                                                            }
-                                                        </p>
-                                                    )}
-                                                </Field>
-                                                <Field>
-                                                    <Label htmlFor="nama_fakultas">
-                                                        Nama Fakultas{" "}
-                                                        <span className="text-destructive">
-                                                            *
-                                                        </span>
-                                                    </Label>
-                                                    <Input
-                                                        name="nama_fakultas"
-                                                        id="nama_fakultas"
-                                                        placeholder="Nama Fakultas"
-                                                        autoComplete="off"
-                                                        required
-                                                    />
-                                                    {errors.nama_fakultas && (
-                                                        <p className="text-sm text-red-500">
-                                                            {
-                                                                errors.nama_fakultas
-                                                            }
-                                                        </p>
-                                                    )}
-                                                </Field>
-                                            </FieldGroup>
-                                            <DialogFooter>
-                                                <DialogClose asChild>
+                                <DialogContent>
+                                    <Form
+                                        action={route("admin.fakultas.store")}
+                                        method="post"
+                                        onSuccess={() => setOpen(false)}
+                                        resetOnSuccess
+                                    >
+                                        {({ errors, processing }) => (
+                                            <>
+                                                <DialogHeader className="mb-[25px]">
+                                                    <DialogTitle>
+                                                        Tambah Data Fakultas
+                                                    </DialogTitle>
+                                                </DialogHeader>
+                                                <FieldGroup>
+                                                    <Field>
+                                                        <Label htmlFor="kode_fakultas">
+                                                            Kode Fakultas{" "}
+                                                            <span className="text-destructive">
+                                                                *
+                                                            </span>
+                                                        </Label>
+                                                        <Input
+                                                            name="kode_fakultas"
+                                                            id="kode_fakultas"
+                                                            placeholder="Kode Fakultas"
+                                                            autoComplete="off"
+                                                            required
+                                                        />
+                                                        {errors.kode_fakultas && (
+                                                            <p className="text-sm text-red-500">
+                                                                {
+                                                                    errors.kode_fakultas
+                                                                }
+                                                            </p>
+                                                        )}
+                                                    </Field>
+                                                    <Field>
+                                                        <Label htmlFor="nama_fakultas">
+                                                            Nama Fakultas{" "}
+                                                            <span className="text-destructive">
+                                                                *
+                                                            </span>
+                                                        </Label>
+                                                        <Input
+                                                            name="nama_fakultas"
+                                                            id="nama_fakultas"
+                                                            placeholder="Nama Fakultas"
+                                                            autoComplete="off"
+                                                            required
+                                                        />
+                                                        {errors.nama_fakultas && (
+                                                            <p className="text-sm text-red-500">
+                                                                {
+                                                                    errors.nama_fakultas
+                                                                }
+                                                            </p>
+                                                        )}
+                                                    </Field>
+                                                </FieldGroup>
+                                                <DialogFooter>
+                                                    <DialogClose asChild>
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                        >
+                                                            Kembali
+                                                        </Button>
+                                                    </DialogClose>
                                                     <Button
-                                                        type="button"
-                                                        variant="outline"
+                                                        type="submit"
+                                                        disabled={processing}
                                                     >
-                                                        Kembali
+                                                        {processing
+                                                            ? "Menyimpan..."
+                                                            : "Simpan"}
                                                     </Button>
-                                                </DialogClose>
-                                                <Button
-                                                    type="submit"
-                                                    disabled={processing}
-                                                >
-                                                    {processing
-                                                        ? "Menyimpan..."
-                                                        : "Simpan"}
-                                                </Button>
-                                            </DialogFooter>
-                                        </>
-                                    )}
-                                </Form>
-                            </DialogContent>
-                        </Dialog>
+                                                </DialogFooter>
+                                            </>
+                                        )}
+                                    </Form>
+                                </DialogContent>
+                            </Dialog>
+                        </div>
                     </CardHeader>
 
                     <CardContent>

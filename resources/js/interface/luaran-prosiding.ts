@@ -4,7 +4,6 @@ import { Penulis } from "./penulis";
 export interface LuaranProsiding {
     id: number;
     judul: string;
-    slug: string;
     abstrak: string;
     semester: string;
     tahun: number;

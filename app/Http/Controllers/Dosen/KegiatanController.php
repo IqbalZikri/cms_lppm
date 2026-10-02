@@ -41,7 +41,6 @@ class KegiatanController extends Controller
     {
         $validated = $request->validate([
             'judul' => 'required',
-            'slug' => 'required',
             'abstrak' => 'required',
             'semester' => 'required',
             'tahun' => 'required',
@@ -53,7 +52,6 @@ class KegiatanController extends Controller
             'authors.*.dosen_id' => 'required|exists:dosens,id',
         ], [
             'judul.required' => 'Silahkan isi judul kegiatan',
-            'slug.required' => 'Silahkan isi slug',
             'abstrak.required' => 'Silahkan isi abstrak',
             'semester.required' => 'Silahkan isi semester',
             'tahun.required' => 'Silahkan isi tahun',
@@ -71,7 +69,6 @@ class KegiatanController extends Controller
         try {
             $kegiatan = Kegiatan::create([
                 'judul' => $validated['judul'],
-                'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],

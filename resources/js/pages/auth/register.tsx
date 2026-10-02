@@ -265,14 +265,14 @@ function RegisterSteps({
                                             done ? " (selesai)" : ""
                                         }`}
                                         className={cn(
-                                            "flex size-11 shrink-0 items-center justify-center rounded-full border-2 text-lg font-semibold",
+                                            "flex size-11 shrink-0 items-center justify-center rounded-full border-2 bg-white text-lg font-semibold",
                                             done &&
-                                                "border-primary bg-primary text-primary-foreground",
+                                                "border-[#4E7C66] bg-[#4E7C66] text-white",
                                             current &&
-                                                "border-primary text-primary",
+                                                "border-[#4E7C66] text-[#3A6350] ring-4 ring-[#4E7C66]/15",
                                             !done &&
                                                 !current &&
-                                                "border-border text-muted-foreground",
+                                                "border-stone-300 text-stone-400",
                                         )}
                                     >
                                         {done ? (
@@ -287,8 +287,8 @@ function RegisterSteps({
                                             className={cn(
                                                 "mx-2 h-1 flex-1 rounded-full",
                                                 done
-                                                    ? "bg-primary"
-                                                    : "bg-border",
+                                                    ? "bg-[#4E7C66]"
+                                                    : "bg-stone-200",
                                             )}
                                         />
                                     )}
@@ -376,10 +376,10 @@ function RegisterSteps({
                                     key={o.value}
                                     htmlFor={`jk-${o.value}`}
                                     className={cn(
-                                        "flex h-12 cursor-pointer items-center gap-3 rounded-md border-2 px-4 text-base font-normal",
+                                        "flex h-12 cursor-pointer items-center gap-3 rounded-xl border-2 bg-white px-4 text-base font-normal shadow-sm transition-colors",
                                         gender === o.value
-                                            ? "border-primary bg-primary/5 font-medium"
-                                            : "border-input",
+                                            ? "border-[#4E7C66] bg-[#EEF4F0] font-medium"
+                                            : "border-stone-300 hover:border-[#4E7C66]/60",
                                         err("jenis_kelamin") &&
                                             "border-destructive",
                                     )}
@@ -712,7 +712,7 @@ function RegisterSteps({
                     <Button
                         key="submit"
                         type="submit"
-                        className="h-12 flex-1 text-base"
+                        className="h-12 flex-1 text-base bg-[#bf9f62] transition duration-300 ease-in-out"
                         data-test="register-user-button"
                         onClick={(e) => {
                             if (!validateStep(step)) e.preventDefault();
@@ -726,7 +726,7 @@ function RegisterSteps({
                         key="next"
                         type="button"
                         onClick={next}
-                        className="h-12 flex-1 text-base"
+                        className="h-12 flex-1 text-base bg-[#bf9f62] transition duration-300 ease-in-out"
                     >
                         Lanjut
                         <ArrowRight className="size-5" />
@@ -736,7 +736,11 @@ function RegisterSteps({
 
             <div className="text-muted-foreground text-center text-base">
                 Sudah punya akun?{" "}
-                <TextLink href={route("login")} className="font-medium">
+                <TextLink
+                    href={route("login")}
+                    className="font-medium"
+                    viewTransition
+                >
                     Masuk di sini
                 </TextLink>
             </div>

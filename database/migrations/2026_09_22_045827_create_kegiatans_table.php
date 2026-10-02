@@ -13,7 +13,6 @@ return new class extends Migration {
         Schema::create('kegiatans', function (Blueprint $table) {
             $table->id();
             $table->string('judul');
-            $table->string('slug');
             $table->text('abstrak');
             $table->string('semester');
             $table->year('tahun');

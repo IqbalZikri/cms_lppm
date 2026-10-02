@@ -9,10 +9,14 @@ import {
     BreadcrumbLink,
     BreadcrumbList,
 } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { PaginatedData } from "@/interface/pagination";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import { BookOpenIcon } from "lucide-react";
+import { FormEvent, useState } from "react";
 import { route } from "ziggy-js";
 
 interface Prodi {
@@ -31,9 +35,20 @@ interface Fakultas {
 type ProdiPageProps = {
     data: PaginatedData<Prodi>;
     fakultas: Fakultas[];
+    filters: any;
 };
 
-export default function Prodi({ data, fakultas }: ProdiPageProps) {
+export default function Prodi({ data, fakultas, filters }: ProdiPageProps) {
+    const [search, setSearch] = useState(filters.search ?? "");
+
+    const handleSearch = (e: FormEvent) => {
+        e.preventDefault();
+        router.get(
+            route("admin.prodi.index"),
+            { search },
+            { preserveState: true, replace: true },
+        );
+    };
     return (
         <>
             <Head title="Prodi" />
@@ -73,48 +88,63 @@ export default function Prodi({ data, fakultas }: ProdiPageProps) {
                             </div>
 
                             <div>
-                                <CardTitle>
-                                    Daftar Prodi
-                                </CardTitle>
+                                <CardTitle>Daftar Prodi</CardTitle>
 
                                 <p className="text-muted-foreground mt-1 text-sm">
-                                    Informasi prodi yang
-                                    terdaftar dalam sistem.
+                                    Informasi prodi yang terdaftar dalam sistem.
                                 </p>
                             </div>
                         </div>
 
-                        <DialogFormCreate
-                            page="Prodi"
-                            actionUrl="admin.prodi.store"
-                            kolomInput={[
-                                {
-                                    name: "fakultas_id",
-                                    label: "Fakultas",
-                                    type: "select",
-                                    placeholder: "fakultas",
-                                    // required: true,
-                                    options: fakultas.map((f) => ({
-                                        value: f.id,
-                                        label: f.nama_fakultas,
-                                    })),
-                                },
-                                {
-                                    name: "kode_prodi",
-                                    label: "Kode Prodi",
-                                    type: "text",
-                                    required: true,
-                                    placeholder: "Kode Prodi",
-                                    autoComplete: "off",
-                                },
-                                {
-                                    name: "nama_prodi",
-                                    label: "Nama Prodi",
-                                    // required: true,
-                                    placeholder: "Nama Prodi",
-                                },
-                            ]}
-                        />
+                        <div className="grid gap-3 items-center lg:block xl:flex">
+                            <form
+                                onSubmit={handleSearch}
+                                className="flex gap-3 mb-[10px] xl:mb-[0px]"
+                            >
+                                <Field orientation={"horizontal"}>
+                                    <Input
+                                        type="search"
+                                        placeholder="Cari Disini..."
+                                        value={search}
+                                        onChange={(e) =>
+                                            setSearch(e.target.value)
+                                        }
+                                    />
+                                    <Button type="submit">Cari</Button>
+                                </Field>
+                            </form>
+                            <DialogFormCreate
+                                page="Prodi"
+                                actionUrl="admin.prodi.store"
+                                kolomInput={[
+                                    {
+                                        name: "fakultas_id",
+                                        label: "Fakultas",
+                                        type: "select",
+                                        placeholder: "fakultas",
+                                        // required: true,
+                                        options: fakultas.map((f) => ({
+                                            value: f.id,
+                                            label: f.nama_fakultas,
+                                        })),
+                                    },
+                                    {
+                                        name: "kode_prodi",
+                                        label: "Kode Prodi",
+                                        type: "text",
+                                        required: true,
+                                        placeholder: "Kode Prodi",
+                                        autoComplete: "off",
+                                    },
+                                    {
+                                        name: "nama_prodi",
+                                        label: "Nama Prodi",
+                                        // required: true,
+                                        placeholder: "Nama Prodi",
+                                    },
+                                ]}
+                            />
+                        </div>
                     </CardHeader>
                     <CardContent>
                         <TablePage<Prodi>

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Concerns\Searchable;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -33,7 +34,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 class User extends Authenticatable implements PasskeyUser, MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
+    use HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable, Searchable;
 
     /**
      * Get the attributes that should be cast.
@@ -49,7 +50,18 @@ class User extends Authenticatable implements PasskeyUser, MustVerifyEmail
         ];
     }
 
+    protected array $searchable = [
+        "name",
+        "email",
+        "role",
+        "fakultas.nama_fakultas"
+    ];
+
     public function dosen(){
         return $this->hasOne(Dosen::class);
+    }
+
+    public function fakultas(){
+        return $this->belongsTo(Fakultas::class);
     }
 }

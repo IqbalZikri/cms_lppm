@@ -44,7 +44,6 @@ class LuaranProsidingController extends Controller
     {
         $validated = $request->validate([
             'judul' => 'required',
-            'slug' => 'required',
             'abstrak' => 'required',
             'semester' => 'required',
             'tahun' => 'required',
@@ -68,7 +67,6 @@ class LuaranProsidingController extends Controller
         try {
             $data = LuaranProsiding::create([
                 'judul' => $validated['judul'],
-                'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],
@@ -125,7 +123,6 @@ class LuaranProsidingController extends Controller
     {
         $validated = $request->validate([
             'judul' => 'required',
-            'slug' => 'required',
             'abstrak' => 'required',
             'semester' => 'required',
             'tahun' => 'required',
@@ -149,7 +146,6 @@ class LuaranProsidingController extends Controller
         try {
             $luaranProsiding->update([
                 'judul' => $validated['judul'],
-                'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],

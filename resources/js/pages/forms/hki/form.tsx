@@ -38,7 +38,6 @@ import {
     InputGroupInput,
 } from "@/components/ui/input-group";
 import { Combobox } from "@/components/ui/combobox";
-import { generateSlug } from "@/pages/admin/berita/form";
 import { formatRupiah } from "@/pages/forms/pkm/form";
 
 interface Props {
@@ -125,11 +124,6 @@ export default function FormHki({ fakultas, hki, role }: Props) {
     const [jumlahDana, setJumlahDana] = useState(
         hki?.jumlah_dana ? String(hki?.jumlah_dana) : "",
     );
-    const [slug, setSlug] = useState(hki?.slug ?? "");
-
-    const handleJudulChange = (value: string) => {
-        setSlug(generateSlug(value));
-    };
 
     const actionAdmin = isEdit
         ? route("admin.hki.update", hki!.id)
@@ -307,51 +301,12 @@ export default function FormHki({ fakultas, hki, role }: Props) {
                                                 name="judul"
                                                 defaultValue={hki?.judul}
                                                 placeholder="Contoh: Analisis Implementasi..."
-                                                onChange={(e) =>
-                                                    handleJudulChange(
-                                                        e.target.value,
-                                                    )
-                                                }
                                                 className="h-11 text-base"
                                                 aria-invalid={!!errors.judul}
                                             />
                                             {errors.judul && (
                                                 <p className="text-sm text-red-500">
                                                     {errors.judul}
-                                                </p>
-                                            )}
-                                        </Field>
-                                    </FieldGroup>
-                                </div>
-
-                                <div className="space-y-2 sm:pl-12">
-                                    <FieldGroup>
-                                        <Field>
-                                            <Label
-                                                htmlFor="slug"
-                                                className="text-base"
-                                            >
-                                                Slug
-                                                <RequiredMark />
-                                            </Label>
-                                            <Input
-                                                id="slug"
-                                                name="slug"
-                                                value={slug}
-                                                onChange={(e) =>
-                                                    setSlug(
-                                                        generateSlug(
-                                                            e.target.value,
-                                                        ),
-                                                    )
-                                                }
-                                                placeholder="judul-penelitian-otomatis"
-                                                className="h-11 text-base"
-                                                aria-invalid={!!errors.slug}
-                                            />
-                                            {errors.slug && (
-                                                <p className="text-sm text-red-500">
-                                                    {errors.slug}
                                                 </p>
                                             )}
                                         </Field>

@@ -40,7 +40,6 @@ import { Penulis } from "@/interface/penulis";
 import { Field, FieldGroup } from "@/components/ui/field";
 import { LuaranJurnal } from "@/interface/luaran-jurnal";
 import { Combobox } from "@/components/ui/combobox";
-import { generateSlug } from "../../admin/berita/form";
 
 interface Props {
     fakultas: Fakultas[];
@@ -128,11 +127,6 @@ export default function FormLuaranJurnal({
         luaranJurnal?.jenis_luaran_jurnal ?? "",
     );
     const [semester, setSemester] = useState(luaranJurnal?.semester ?? "");
-    const [slug, setSlug] = useState(luaranJurnal?.slug ?? "");
-
-    const handleJudulChange = (value: string) => {
-        setSlug(generateSlug(value));
-    };
 
     const actionAdmin = isEdit
         ? route("admin.luaran_jurnal.update", luaranJurnal!.id)
@@ -338,51 +332,12 @@ export default function FormLuaranJurnal({
                                                     luaranJurnal?.judul
                                                 }
                                                 placeholder="Contoh: Analisis Implementasi..."
-                                                onChange={(e) =>
-                                                    handleJudulChange(
-                                                        e.target.value,
-                                                    )
-                                                }
                                                 className="h-11 text-base"
                                                 aria-invalid={!!errors.judul}
                                             />
                                             {errors.judul && (
                                                 <p className="text-sm text-red-500">
                                                     {errors.judul}
-                                                </p>
-                                            )}
-                                        </Field>
-                                    </FieldGroup>
-                                </div>
-
-                                <div className="space-y-2 sm:pl-12">
-                                    <FieldGroup>
-                                        <Field>
-                                            <Label
-                                                htmlFor="slug"
-                                                className="text-base"
-                                            >
-                                                Slug
-                                                <RequiredMark />
-                                            </Label>
-                                            <Input
-                                                id="slug"
-                                                name="slug"
-                                                value={slug}
-                                                onChange={(e) =>
-                                                    setSlug(
-                                                        generateSlug(
-                                                            e.target.value,
-                                                        ),
-                                                    )
-                                                }
-                                                placeholder="judul-penelitian-otomatis"
-                                                className="h-11 text-base"
-                                                aria-invalid={!!errors.slug}
-                                            />
-                                            {errors.slug && (
-                                                <p className="text-sm text-red-500">
-                                                    {errors.slug}
                                                 </p>
                                             )}
                                         </Field>

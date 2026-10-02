@@ -64,9 +64,6 @@ export default function Show({ data }: Props) {
                     <CardHeader>
                         <CardTitle className="text-xl">
                             {data.judul}
-                            <small className="text-base font-thin">
-                                slug: {data.slug}
-                            </small>
                         </CardTitle>
                         <CardDescription>
                             Detail Pengabdian Kepada Masyarakat ( PKM )

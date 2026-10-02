@@ -17,18 +17,17 @@ import { route } from "ziggy-js";
 
 interface Props {
     data: PaginatedData<KegiatanInterface>;
-    fakultas: Fakultas[];
     filters: any;
     totalKegiatanPerFakultas: any;
+    totalKegiatan: number;
 }
 
 export default function Kegiatan({
     data,
-    fakultas,
     filters,
     totalKegiatanPerFakultas,
+    totalKegiatan,
 }: Props) {
-    const totalKegiatan = data.total;
 
     const statistikFakultas = totalKegiatanPerFakultas.map((item: any) => ({
         label: item.label,
@@ -103,7 +102,7 @@ export default function Kegiatan({
                                             setSearch(e.target.value)
                                         }
                                     />
-                                    <Button type="submit">Search</Button>
+                                    <Button type="submit">Cari</Button>
                                 </Field>
                             </form>
 

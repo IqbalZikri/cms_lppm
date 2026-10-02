@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Dosen;
 use App\Models\Fakultas;
 use App\Models\LuaranProsiding;
+use App\Models\Penulis;
 use DB;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,14 +17,23 @@ class LuaranProsidingController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data = LuaranProsiding::latest()->paginate(10)->withQueryString();
-        $data->load('penulis.fakultas', 'penulis.dosen');
+        $queryLuaranProsiding = LuaranProsiding::query()->with("penulis.fakultas", "penulis.dosen");
+        $data = $queryLuaranProsiding->clone()->search($request->query("search"))->latest()->paginate(10)->withQueryString();
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
+
+        $totalLuaranProsiding = $queryLuaranProsiding->clone()->count();
+        $totalLuaranProsidingPerFakultas = [];
+        foreach ($fakultas as $f) {
+            $penulisSesuai = Penulis::where('penulisable_type', 'App\Models\LuaranProsiding')->where("fakultas_id", $f->id)->get();
+            $totalLuaranProsidingPerFakultas[] = ["label" => $f->nama_fakultas, "count" => $penulisSesuai->count()];
+        }
         return Inertia::render('admin/luaran-prosiding/index', [
             'data' => $data,
-            'fakultas' => $fakultas
+            "filters" => $request->only("search"),
+            "totalLuaranProsidingPerFakultas" => $totalLuaranProsidingPerFakultas,
+            "totalLuaranProsiding" => $totalLuaranProsiding,
         ]);
     }
 
@@ -45,7 +55,6 @@ class LuaranProsidingController extends Controller
     {
         $validated = $request->validate([
             'judul' => 'required',
-            'slug' => 'required',
             'abstrak' => 'required',
             'semester' => 'required',
             'tahun' => 'required',
@@ -69,7 +78,6 @@ class LuaranProsidingController extends Controller
         try {
             $data = LuaranProsiding::create([
                 'judul' => $validated['judul'],
-                'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],
@@ -125,7 +133,6 @@ class LuaranProsidingController extends Controller
     {
         $validated = $request->validate([
             'judul' => 'required',
-            'slug' => 'required',
             'abstrak' => 'required',
             'semester' => 'required',
             'tahun' => 'required',
@@ -149,7 +156,6 @@ class LuaranProsidingController extends Controller
         try {
             $luaranProsiding->update([
                 'judul' => $validated['judul'],
-                'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],

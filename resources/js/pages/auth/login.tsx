@@ -33,7 +33,7 @@ export default function Login({ status, canResetPassword }: Props) {
     }, [flash]);
     return (
         <>
-            <Toaster richColors position="top-right"/>
+            <Toaster richColors position="top-right" />
             <Head title="Log in" />
 
             {/* <PasskeyVerify /> */}
@@ -42,7 +42,7 @@ export default function Login({ status, canResetPassword }: Props) {
                 action={route("authenticate")}
                 method="POST"
                 resetOnSuccess={["password"]}
-                className="flex flex-col gap-6"
+                className="flex flex-col gap-6 bg-["
             >
                 {({ processing, errors }) => (
                     <>
@@ -86,18 +86,18 @@ export default function Login({ status, canResetPassword }: Props) {
                                 <InputError message={errors.password} />
                             </div>
 
-                            <div className="flex items-center space-x-3">
+                            {/* <div className="flex items-center space-x-3">
                                 <Checkbox
                                     id="remember"
                                     name="remember"
                                     tabIndex={3}
                                 />
                                 <Label htmlFor="remember">Remember me</Label>
-                            </div>
+                            </div> */}
 
                             <Button
                                 type="submit"
-                                className="mt-4 w-full"
+                                className="mt-4 w-full bg-[#bf9f62] transition duration-300 ease-in-out"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
@@ -112,6 +112,7 @@ export default function Login({ status, canResetPassword }: Props) {
                             <TextLink
                                 href={route("sesi.register")}
                                 tabIndex={5}
+                                viewTransition
                             >
                                 Sign up
                             </TextLink>

@@ -64,7 +64,6 @@ export default function Show({ data }: Props) {
                     <CardHeader>
                         <CardTitle className="text-xl flex justify-between">
                             {data.judul}
-                            <small className="text-base font-thin">slug: {data.slug}</small>
                         </CardTitle>
                         <CardDescription>
                             Detail kegiatan penelitian

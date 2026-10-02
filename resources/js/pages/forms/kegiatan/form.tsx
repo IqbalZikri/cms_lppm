@@ -39,7 +39,6 @@ import { route } from "ziggy-js";
 import { Penulis } from "@/interface/penulis";
 import { Field, FieldGroup } from "@/components/ui/field";
 import { Kegiatan } from "@/interface/kegiatan";
-import { generateSlug } from "../../admin/berita/form";
 import {
     InputGroup,
     InputGroupAddon,
@@ -137,11 +136,6 @@ export default function FormKegiatan({
     const [jumlahDana, setJumlahDana] = useState(
         kegiatan?.jumlah_dana ? String(kegiatan?.jumlah_dana) : "",
     );
-    const [slug, setSlug] = useState(kegiatan?.slug ?? "");
-
-    const handleJudulChange = (value: string) => {
-        setSlug(generateSlug(value));
-    };
 
     const actionAdmin = isEdit
         ? route("admin.kegiatan.update", kegiatan!.id)
@@ -277,51 +271,12 @@ export default function FormKegiatan({
                                                 name="judul"
                                                 defaultValue={kegiatan?.judul}
                                                 placeholder="Contoh: Analisis Implementasi..."
-                                                onChange={(e) =>
-                                                    handleJudulChange(
-                                                        e.target.value,
-                                                    )
-                                                }
                                                 className="h-11 text-base"
                                                 aria-invalid={!!errors.judul}
                                             />
                                             {errors.judul && (
                                                 <p className="text-sm text-red-500">
                                                     {errors.judul}
-                                                </p>
-                                            )}
-                                        </Field>
-                                    </FieldGroup>
-                                </div>
-
-                                <div className="space-y-2 sm:pl-12">
-                                    <FieldGroup>
-                                        <Field>
-                                            <Label
-                                                htmlFor="slug"
-                                                className="text-base"
-                                            >
-                                                Slug
-                                                <RequiredMark />
-                                            </Label>
-                                            <Input
-                                                id="slug"
-                                                name="slug"
-                                                value={slug}
-                                                onChange={(e) =>
-                                                    setSlug(
-                                                        generateSlug(
-                                                            e.target.value,
-                                                        ),
-                                                    )
-                                                }
-                                                placeholder="judul-penelitian-otomatis"
-                                                className="h-11 text-base"
-                                                aria-invalid={!!errors.slug}
-                                            />
-                                            {errors.slug && (
-                                                <p className="text-sm text-red-500">
-                                                    {errors.slug}
                                                 </p>
                                             )}
                                         </Field>

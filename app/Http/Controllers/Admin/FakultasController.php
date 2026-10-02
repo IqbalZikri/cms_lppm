@@ -10,12 +10,13 @@ use Inertia\Inertia;
 
 class FakultasController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $fakultas = Fakultas::paginate(10)->withQueryString();
+        $fakultas = Fakultas::query()->search($request->query('search'))->paginate(10)->withQueryString();
 
         return Inertia::render('admin/fakultas/index', [
             'data' => $fakultas,
+            'filters' => $request->only('input')
         ]);
     }
 

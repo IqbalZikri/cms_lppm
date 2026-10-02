@@ -14,9 +14,9 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::whereIn('role', ['admin', 'uppm'])->oldest('id')->paginate(10)->withQueryString();
+        $users = User::query()->whereIn('role', ['admin', 'uppm'])->search($request->query("search"))->oldest('id')->paginate(10)->withQueryString();
         $totalUser = $users->total();
         $totalUppm = User::where('role', 'uppm')->count();
         $totalAdmin = User::where('role', 'admin')->count();
@@ -27,6 +27,7 @@ class UserController extends Controller
             'totalUppm' => $totalUppm,
             'totalAdmin' => $totalAdmin,
             'fakultas' => $fakultas,
+            'filters' => $request->only('search'),
         ]);
     }
 

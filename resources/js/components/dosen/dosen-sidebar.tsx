@@ -28,6 +28,7 @@ const mainNavItems: NavItem[] = [
         title: "Dashboard",
         href: route("dosen.dashboard"),
         icon: LayoutGrid,
+        exact: true,
     },
     {
         title: "Penelitian",

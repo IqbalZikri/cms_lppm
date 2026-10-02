@@ -20,7 +20,6 @@ class LuaranProsidingFactory extends Factory
     {
         return [
             'judul' => fake()->sentence(),
-            'slug' => fake()->unique()->slug(),
             'abstrak' => fake()->paragraph(),
             'semester' => fake()->randomElement(["Ganjil", "Genap"]),
             'tahun' => fake()->numberBetween(now()->subYears(3)->year, now()->year),

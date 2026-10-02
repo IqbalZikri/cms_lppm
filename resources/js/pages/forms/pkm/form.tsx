@@ -89,16 +89,6 @@ function buildInitialAuthors(penulis: Penulis[] | undefined): AuthorRow[] {
     }));
 }
 
-function generateSlug(text: string) {
-    return text
-        .toLowerCase()
-        .trim()
-        .replace(/[^a-z0-9\s-]/g, "")
-        .replace(/\s+/g, "-")
-        .replace(/-+/g, "-")
-        .replace(/^-+|-+$/g, "");
-}
-
 export function formatRupiah(inputAngka: number) {
     return new Intl.NumberFormat("id-ID").format(inputAngka);
 }
@@ -143,7 +133,6 @@ export default function FormPkm({ fakultas, pkm, role }: Props) {
     const [jumlahDana, setJumlahDana] = useState(
         pkm?.jumlah_dana ? String(pkm?.jumlah_dana) : "",
     );
-    const [slug, setSlug] = useState(pkm?.slug ?? "");
 
     const actionAdmin = isEdit
         ? route("admin.pkm.update", pkm!.id)
@@ -167,10 +156,6 @@ export default function FormPkm({ fakultas, pkm, role }: Props) {
         );
         return data;
     }
-
-    const handleJudulChange = (value: string) => {
-        setSlug(generateSlug(value));
-    };
 
     // Kalau mode edit dan baris sudah punya fakultasId dari awal,
     // langsung fetch daftar dosennya begitu komponen mount.
@@ -325,51 +310,12 @@ export default function FormPkm({ fakultas, pkm, role }: Props) {
                                                 name="judul"
                                                 defaultValue={pkm?.judul}
                                                 placeholder="Contoh: Analisis Implementasi..."
-                                                onChange={(e) =>
-                                                    handleJudulChange(
-                                                        e.target.value,
-                                                    )
-                                                }
                                                 className="h-11 text-base"
                                                 aria-invalid={!!errors.judul}
                                             />
                                             {errors.judul && (
                                                 <p className="text-sm text-red-500">
                                                     {errors.judul}
-                                                </p>
-                                            )}
-                                        </Field>
-                                    </FieldGroup>
-                                </div>
-
-                                <div className="space-y-2 sm:pl-12">
-                                    <FieldGroup>
-                                        <Field>
-                                            <Label
-                                                htmlFor="slug"
-                                                className="text-base"
-                                            >
-                                                Slug PKM
-                                                <RequiredMark />
-                                            </Label>
-                                            <Input
-                                                id="slug"
-                                                name="slug"
-                                                value={slug}
-                                                onChange={(e) =>
-                                                    setSlug(
-                                                        generateSlug(
-                                                            e.target.value,
-                                                        ),
-                                                    )
-                                                }
-                                                placeholder="judul-penelitian-otomatis"
-                                                className="h-11 text-base"
-                                                aria-invalid={!!errors.slug}
-                                            />
-                                            {errors.slug && (
-                                                <p className="text-sm text-red-500">
-                                                    {errors.slug}
                                                 </p>
                                             )}
                                         </Field>

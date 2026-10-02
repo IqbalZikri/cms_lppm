@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Dosen;
 use App\Models\Fakultas;
 use App\Models\LuaranJurnal;
+use App\Models\Penulis;
 use DB;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,14 +17,23 @@ class LuaranJurnalController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data = LuaranJurnal::latest()->paginate(10)->withQueryString();
-        $data->load('penulis.fakultas', 'penulis.dosen');
+        $queryLuaranJurnal = LuaranJurnal::query()->with('penulis.fakultas', 'penulis.dosen');
+        $data = $queryLuaranJurnal->clone()->latest()->search($request->query("search"))->paginate(10)->withQueryString();
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
+        $totalLuaranJurnal = $queryLuaranJurnal->clone()->count();
+        $totalLuaranJurnalPerFakultas = [];
+        foreach ($fakultas as $f) {
+            $penulisSesuai = Penulis::where('penulisable_type', 'App\Models\LuaranJurnal')->where("fakultas_id", $f->id)->get();
+            $totalLuaranJurnalPerFakultas[] = ["label" => $f->nama_fakultas, "count" => $penulisSesuai->count()];
+        }
         return Inertia::render('admin/luaran-jurnal/index', [
             'data' => $data,
-            'fakultas' => $fakultas
+            'fakultas' => $fakultas,
+            "totalLuaranJurnal" => $totalLuaranJurnal,
+            "totalLuaranJurnalPerFakultas" => $totalLuaranJurnalPerFakultas,
+            "filters" => $request->only("search")
         ]);
     }
 
@@ -46,7 +56,6 @@ class LuaranJurnalController extends Controller
         $validated = $request->validate([
             'jenis_luaran_jurnal' => "required",
             'judul' => "required",
-            'slug' => "required",
             'abstrak' => "required",
             'semester' => "required",
             'tahun' => "required",
@@ -59,7 +68,6 @@ class LuaranJurnalController extends Controller
         ], [
             "jenis_luaran_jurnal.required" => "Silahkan isi luaran jurnal",
             "judul.required" => "Silahkan isi judul",
-            "slug.required" => "Silahkan isi slug",
             "abstrak.required" => "Silahkan isi abstrak",
             "semester.required" => "Silahkan isi semester",
             "tahun.required" => "Silahkan isi tahun",
@@ -76,7 +84,6 @@ class LuaranJurnalController extends Controller
             $luaranJurnal = LuaranJurnal::create([
                 'jenis_luaran_jurnal' => $validated['jenis_luaran_jurnal'],
                 'judul' => $validated['judul'],
-                'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],
@@ -133,7 +140,6 @@ class LuaranJurnalController extends Controller
         $validated = $request->validate([
             'jenis_luaran_jurnal' => "required",
             'judul' => "required",
-            'slug' => "required",
             'abstrak' => "required",
             'semester' => "required",
             'tahun' => "required",
@@ -146,7 +152,6 @@ class LuaranJurnalController extends Controller
         ], [
             "jenis_luaran_jurnal.required" => "Silahkan isi luaran jurnal",
             "judul.required" => "Silahkan isi judul",
-            "slug.required" => "Silahkan isi slug",
             "abstrak.required" => "Silahkan isi abstrak",
             "semester.required" => "Silahkan isi semester",
             "tahun.required" => "Silahkan isi tahun",
@@ -163,7 +168,6 @@ class LuaranJurnalController extends Controller
             $luaranJurnal->update([
                 'jenis_luaran_jurnal' => $validated['jenis_luaran_jurnal'],
                 'judul' => $validated['judul'],
-                'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],

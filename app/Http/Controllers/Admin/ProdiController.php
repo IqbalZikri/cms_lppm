@@ -11,14 +11,15 @@ use Log;
 
 class ProdiController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = Prodi::paginate(10)->withQueryString();
+        $data = Prodi::query()->search($request->query('search'))->paginate(10)->withQueryString();
         $fakultas = Fakultas::get();
 
         return Inertia::render('admin/prodi/index', [
             'data' => $data,
             'fakultas' => $fakultas,
+            'filters' => $request->only('search')
         ]);
     }
 

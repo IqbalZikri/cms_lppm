@@ -14,7 +14,6 @@ return new class extends Migration {
             $table->id();
             $table->enum('jenis_luaran_jurnal', ['scopus q1', 'scopus q2', 'scopus q3', 'sinta 1', 'sinta 2', 'sinta 3', 'sinta 4', 'sinta 5', 'non sinta', 'non scopus']);
             $table->string('judul');
-            $table->string('slug');
             $table->text('abstrak');
             $table->string('semester');
             $table->year('tahun');

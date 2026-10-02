@@ -31,6 +31,7 @@ interface DosenPageProps {
     data: PaginatedData<DosenTypes>;
     fakultas: Fakultas[];
     prodi: Prodi[];
+    totalDosen: number;
     totalLaki: number;
     totalPerempuan: number;
     filters: any;
@@ -40,6 +41,7 @@ export default function Dosen({
     data,
     fakultas,
     prodi,
+    totalDosen,
     totalLaki,
     totalPerempuan,
     filters,
@@ -100,7 +102,7 @@ export default function Dosen({
 
                         <CardContent>
                             <div className="text-2xl font-bold">
-                                {data.total}
+                                {totalDosen}
                             </div>
 
                             <p className="text-muted-foreground text-xs">

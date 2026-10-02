@@ -5,27 +5,44 @@ import TablePage from "@/components/table-page";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { Fakultas } from "@/interface/fakultas";
 import { LuaranJurnal as LuaranJurnalInterface } from "@/interface/luaran-jurnal";
 import { PaginatedData } from "@/interface/pagination";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import { FileText, Notebook, Plus } from "lucide-react";
+import { FormEvent, useState } from "react";
 import { route } from "ziggy-js";
 
 interface Props {
     data: PaginatedData<LuaranJurnalInterface>;
-    fakultas: Fakultas[];
+    totalLuaranJurnal: number;
+    totalLuaranJurnalPerFakultas: string[];
+    filters: any;
 }
 
-export default function LuaranJurnal({ data, fakultas }: Props) {
-    const statistikFakultas = fakultas.map((item) => ({
-        label: item.nama_fakultas,
-        count: data.data.filter((luaran_jurnal) =>
-            luaran_jurnal.penulis.some(
-                (penulis) => penulis.fakultas_id === item.id,
-            ),
-        ).length,
+export default function LuaranJurnal({
+    data,
+    totalLuaranJurnal,
+    totalLuaranJurnalPerFakultas,
+    filters,
+}: Props) {
+    const statistikFakultas = totalLuaranJurnalPerFakultas.map((item: any) => ({
+        label: item.label,
+        count: item.count,
     }));
+
+    const [search, setSearch] = useState(filters.search ?? "");
+
+    const handleSearch = (e: FormEvent) => {
+        e.preventDefault();
+        router.get(
+            route("admin.luaran_jurnal.index"),
+            { search },
+            { preserveState: true, replace: true },
+        );
+    };
 
     return (
         <>
@@ -45,7 +62,7 @@ export default function LuaranJurnal({ data, fakultas }: Props) {
                     dataCard={[
                         {
                             label: "Luaran Jurnal",
-                            count: data.total,
+                            count: totalLuaranJurnal,
                         },
                         ...statistikFakultas,
                     ]}
@@ -68,16 +85,35 @@ export default function LuaranJurnal({ data, fakultas }: Props) {
                             </div>
                         </div>
 
-                        <Link
-                            href={route("admin.luaran_jurnal.create")}
-                            viewTransition
-                            className="w-full sm:w-auto"
-                        >
-                            <Button className="w-full sm:w-auto">
-                                <Plus />
-                                Tambah Luaran Jurnal
-                            </Button>
-                        </Link>
+                        <div className="grid gap-3 items-center lg:block xl:flex">
+                            <form
+                                onSubmit={handleSearch}
+                                className="flex gap-3 mb-[10px] xl:mb-[0px]"
+                            >
+                                <Field orientation="horizontal">
+                                    <Input
+                                        type="search"
+                                        placeholder="Search..."
+                                        value={search}
+                                        onChange={(e) =>
+                                            setSearch(e.target.value)
+                                        }
+                                    />
+                                    <Button type="submit">Cari</Button>
+                                </Field>
+                            </form>
+
+                            <Link
+                                href={route("admin.luaran_jurnal.create")}
+                                viewTransition
+                                className="w-full sm:w-auto"
+                            >
+                                <Button className="w-full sm:w-auto">
+                                    <Plus />
+                                    Tambah Luaran Jurnal
+                                </Button>
+                            </Link>
+                        </div>
                     </CardHeader>
                     <CardContent className="pt-6">
                         <TablePage<LuaranJurnalInterface>
@@ -108,7 +144,10 @@ export default function LuaranJurnal({ data, fakultas }: Props) {
                                                     className="flex flex-wrap items-center gap-1.5"
                                                 >
                                                     <Badge className="whitespace-nowrap text-[13px]">
-                                                        {penulis.fakultas.nama_fakultas}
+                                                        {
+                                                            penulis.fakultas
+                                                                .nama_fakultas
+                                                        }
                                                     </Badge>
                                                 </div>
                                             ))}
@@ -127,7 +166,10 @@ export default function LuaranJurnal({ data, fakultas }: Props) {
                                                     className="flex flex-wrap items-center gap-1.5"
                                                 >
                                                     <Badge className="whitespace-nowrap text-[13px]">
-                                                        {penulis.dosen.nama_dosen}
+                                                        {
+                                                            penulis.dosen
+                                                                .nama_dosen
+                                                        }
                                                     </Badge>
                                                 </div>
                                             ))}
@@ -164,7 +206,10 @@ export default function LuaranJurnal({ data, fakultas }: Props) {
                             renderActions={(item) => (
                                 <div className="flex items-center gap-3">
                                     <Link
-                                        href={route("admin.luaran_jurnal.show", item.id)}
+                                        href={route(
+                                            "admin.luaran_jurnal.show",
+                                            item.id,
+                                        )}
                                         viewTransition
                                     >
                                         <Button
@@ -175,7 +220,10 @@ export default function LuaranJurnal({ data, fakultas }: Props) {
                                         </Button>
                                     </Link>
                                     <Link
-                                        href={route("admin.luaran_jurnal.edit", item.id)}
+                                        href={route(
+                                            "admin.luaran_jurnal.edit",
+                                            item.id,
+                                        )}
                                         viewTransition
                                     >
                                         <Button title="Edit">Edit</Button>

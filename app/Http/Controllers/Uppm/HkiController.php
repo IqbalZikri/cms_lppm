@@ -46,7 +46,6 @@ class HkiController extends Controller
         $validated = $request->validate([
             'jenis_hki' => ['required', Rule::in(['paten', 'haki'])],
             'judul' => 'required',
-            'slug' => 'required',
             'abstrak' => 'required',
             'semester' => 'required',
             'tahun' => 'required',
@@ -64,7 +63,6 @@ class HkiController extends Controller
             'jenis_hki.required' => 'Silahkan pilih salah satu jenis HKI',
             'jenis_hki.in' => 'Jenis HKI tidak valid',
             'judul.required' => 'Silahkan isi judul',
-            'slug.required' => 'Silahkan isi slug',
             'abstrak.required' => 'Silahkan isi abstrak',
             'semester.required' => 'Silahkan isi semester',
             'tahun.required' => 'Silahkan isi tahun',
@@ -84,7 +82,6 @@ class HkiController extends Controller
             $hki = Hki::create([
                 'jenis_hki' => $validated['jenis_hki'],
                 'judul' => $validated['judul'],
-                'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],

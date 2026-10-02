@@ -23,6 +23,8 @@ class KegiatanController extends Controller
         $queryKegiatan = Kegiatan::query()->with('penulis.fakultas', 'penulis.dosen');
         $data = $queryKegiatan->clone()->search($request->query('search'))->latest()->paginate(10)->withQueryString();
         $fakultas = Fakultas::get();
+
+        $totalKegiatan = $queryKegiatan->clone()->count();
         $totalKegiatanPerFakultas = [];
         foreach ($fakultas as $f) {
             $penulisSesuai = Penulis::where('penulisable_type', 'App\Models\Kegiatan')->where("fakultas_id", $f->id)->get();
@@ -31,9 +33,9 @@ class KegiatanController extends Controller
 
         return Inertia::render('admin/kegiatan/index', [
             'data' => $data,
-            'fakultas' => $fakultas,
             'filters' => $request->only('search'),
-            'totalKegiatanPerFakultas' => $totalKegiatanPerFakultas
+            'totalKegiatanPerFakultas' => $totalKegiatanPerFakultas,
+            'totalKegiatan' => $totalKegiatan
         ]);
     }
 
@@ -55,7 +57,6 @@ class KegiatanController extends Controller
     {
         $validated = $request->validate([
             'judul' => 'required',
-            'slug' => 'required',
             'abstrak' => 'required',
             'semester' => 'required',
             'tahun' => 'required',
@@ -67,7 +68,6 @@ class KegiatanController extends Controller
             'authors.*.dosen_id' => 'required|exists:dosens,id',
         ], [
             'judul.required' => 'Silahkan isi judul kegiatan',
-            'slug.required' => 'Silahkan isi slug',
             'abstrak.required' => 'Silahkan isi abstrak',
             'semester.required' => 'Silahkan isi semester',
             'tahun.required' => 'Silahkan isi tahun',
@@ -85,7 +85,6 @@ class KegiatanController extends Controller
         try {
             $kegiatan = Kegiatan::create([
                 'judul' => $validated['judul'],
-                'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],

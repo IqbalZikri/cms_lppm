@@ -47,7 +47,6 @@ class LuaranJurnalController extends Controller
         $validated = $request->validate([
             'jenis_luaran_jurnal' => "required",
             'judul' => "required",
-            'slug' => "required",
             'abstrak' => "required",
             'semester' => "required",
             'tahun' => "required",
@@ -60,7 +59,6 @@ class LuaranJurnalController extends Controller
         ], [
             "jenis_luaran_jurnal.required" => "Silahkan isi luaran jurnal",
             "judul.required" => "Silahkan isi judul",
-            "slug.required" => "Silahkan isi slug",
             "abstrak.required" => "Silahkan isi abstrak",
             "semester.required" => "Silahkan isi semester",
             "tahun.required" => "Silahkan isi tahun",
@@ -77,7 +75,6 @@ class LuaranJurnalController extends Controller
             $luaranJurnal = LuaranJurnal::create([
                 'jenis_luaran_jurnal' => $validated['jenis_luaran_jurnal'],
                 'judul' => $validated['judul'],
-                'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],
@@ -135,7 +132,6 @@ class LuaranJurnalController extends Controller
         $validated = $request->validate([
             'jenis_luaran_jurnal' => "required",
             'judul' => "required",
-            'slug' => "required",
             'abstrak' => "required",
             'semester' => "required",
             'tahun' => "required",
@@ -148,7 +144,6 @@ class LuaranJurnalController extends Controller
         ], [
             "jenis_luaran_jurnal.required" => "Silahkan isi luaran jurnal",
             "judul.required" => "Silahkan isi judul",
-            "slug.required" => "Silahkan isi slug",
             "abstrak.required" => "Silahkan isi abstrak",
             "semester.required" => "Silahkan isi semester",
             "tahun.required" => "Silahkan isi tahun",
@@ -165,7 +160,6 @@ class LuaranJurnalController extends Controller
             $luaranJurnal->update([
                 'jenis_luaran_jurnal' => $validated['jenis_luaran_jurnal'],
                 'judul' => $validated['judul'],
-                'slug' => $validated['slug'],
                 'abstrak' => $validated['abstrak'],
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],

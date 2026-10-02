@@ -7,13 +7,11 @@ import { Button } from "@/components/ui/button";
 import {
     Card,
     CardContent,
-    CardDescription,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Fakultas } from "@/interface/fakultas";
 import { PaginatedData } from "@/interface/pagination";
 import { Pkm as PkmInterface } from "@/interface/pkm";
 import { Head, Link, router } from "@inertiajs/react";
@@ -23,16 +21,20 @@ import { route } from "ziggy-js";
 
 interface Props {
     data: PaginatedData<PkmInterface>;
-    fakultas: Fakultas[];
     filters: any;
+    totalPkm: number;
+    totalPkmPerFakultas: string[];
 }
 
-export default function Pkm({ data, fakultas, filters }: Props) {
-    const statistikFakultas = fakultas.map((item) => ({
-        label: item.nama_fakultas,
-        count: data.data.filter((pkm) =>
-            pkm.penulis.some((penulis) => penulis.fakultas_id === item.id),
-        ).length,
+export default function Pkm({
+    data,
+    filters,
+    totalPkm,
+    totalPkmPerFakultas,
+}: Props) {
+    const statistikFakultas = totalPkmPerFakultas.map((item: any) => ({
+        label: item.label,
+        count: item.count,
     }));
 
     const [search, setSearch] = useState(filters.search ?? "");
@@ -63,7 +65,7 @@ export default function Pkm({ data, fakultas, filters }: Props) {
                     dataCard={[
                         {
                             label: "Total PKM",
-                            count: data.total,
+                            count: totalPkm,
                         },
                         ...statistikFakultas,
                     ]}

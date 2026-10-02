@@ -1,15 +1,18 @@
-import { DialogDelete, DialogUpdateStatus } from '@/components/dialog-form';
-import Header from '@/components/header';
-import TablePage from '@/components/table-page';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Berita } from '@/interface/berita';
-import { Kategori } from '@/interface/kategori';
-import { PaginatedData } from '@/interface/pagination';
-import { Form, Head, Link } from '@inertiajs/react';
-import { Newspaper, Plus } from 'lucide-react';
-import { route } from 'ziggy-js';
+import { DialogDelete, DialogUpdateStatus } from "@/components/dialog-form";
+import Header from "@/components/header";
+import TablePage from "@/components/table-page";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Berita } from "@/interface/berita";
+import { Kategori } from "@/interface/kategori";
+import { PaginatedData } from "@/interface/pagination";
+import { Form, Head, Link, router } from "@inertiajs/react";
+import { Newspaper, Plus } from "lucide-react";
+import { FormEvent, useState } from "react";
+import { route } from "ziggy-js";
 
 interface BeritaProps {
     data: PaginatedData<Berita>;
@@ -17,6 +20,7 @@ interface BeritaProps {
     beritaDraft: number;
     beritaPublished: number;
     beritaArchived: number;
+    filters: any;
 }
 
 export default function BeritaPage({
@@ -25,11 +29,23 @@ export default function BeritaPage({
     beritaDraft,
     beritaPublished,
     beritaArchived,
+    filters,
 }: BeritaProps) {
     const statusStyle = {
-        draft: 'bg-gray-500 text-white hover:bg-gray-600',
-        published: 'bg-green-500 text-white hover:bg-green-600',
-        rejected: 'bg-red-500 text-white hover:bg-red-600',
+        draft: "bg-gray-500 text-white hover:bg-gray-600",
+        published: "bg-green-500 text-white hover:bg-green-600",
+        rejected: "bg-red-500 text-white hover:bg-red-600",
+    };
+
+    const [search, setSearch] = useState(filters.search ?? "");
+
+    const handleSearch = (e: FormEvent) => {
+        e.preventDefault();
+        router.get(
+            route("admin.berita.index"),
+            { search },
+            { preserveState: true, replace: true },
+        );
     };
 
     return (
@@ -40,8 +56,8 @@ export default function BeritaPage({
                     page="Berita"
                     breadcrumb={[
                         {
-                            label: 'Berita',
-                            href: 'admin.berita.index',
+                            label: "Berita",
+                            href: "admin.berita.index",
                         },
                     ]}
                 />
@@ -110,57 +126,74 @@ export default function BeritaPage({
                 </div>
 
                 <Card>
-                   <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
+                    <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-3">
                             <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
                                 <Newspaper className="h-5 w-5" />
                             </div>
 
                             <div>
-                                <CardTitle>
-                                    Daftar Berita
-                                </CardTitle>
+                                <CardTitle>Daftar Berita</CardTitle>
 
                                 <p className="text-muted-foreground mt-1 text-sm">
-                                    Informasi berita yang
-                                    terdaftar dalam sistem.
+                                    Informasi berita yang terdaftar dalam
+                                    sistem.
                                 </p>
                             </div>
                         </div>
 
-                        <Link
-                            href={route("admin.berita.create")}
-                            viewTransition
-                            className="w-full sm:w-auto"
-                        >
-                            <Button className="w-full sm:w-auto">
-                                <Plus />
-                                Tambah Berita
-                            </Button>
-                        </Link>
+                        <div className="grid gap-3 items-center lg:block xl:flex">
+                            <form
+                                onSubmit={handleSearch}
+                                className="flex gap-3 mb-[10px] xl:mb-[0px]"
+                            >
+                                <Field orientation={"horizontal"}>
+                                    <Input
+                                        type="search"
+                                        placeholder="Cari Disini..."
+                                        value={search}
+                                        onChange={(e) =>
+                                            setSearch(e.target.value)
+                                        }
+                                    />
+                                    <Button type="submit">Cari</Button>
+                                </Field>
+                            </form>
+
+                            <Link
+                                href={route("admin.berita.create")}
+                                viewTransition
+                                className="w-full sm:w-auto"
+                            >
+                                <Button className="w-full sm:w-auto">
+                                    <Plus />
+                                    Tambah Berita
+                                </Button>
+                            </Link>
+                        </div>
                     </CardHeader>
                     <CardContent>
                         <TablePage<Berita>
                             data={data}
                             columns={[
                                 {
-                                    key: 'kategori_id',
-                                    label: 'Kategori',
+                                    key: "kategori_id",
+                                    label: "Kategori",
                                     render: (value) =>
                                         kategori.find((k) => k.id === value)
-                                            ?.nama_kategori ?? '-',
+                                            ?.nama_kategori ?? "-",
                                 },
                                 {
-                                    key: 'judul_berita',
-                                    label: 'Judul Berita',
+                                    key: "judul_berita",
+                                    label: "Judul Berita",
                                 },
                                 {
-                                    key: 'views',
-                                    label: 'views',
+                                    key: "views",
+                                    label: "views",
                                 },
                                 {
-                                    key: 'status_published',
-                                    label: 'Status',
+                                    key: "status_published",
+                                    label: "Status",
                                     render: (value: any) => {
                                         return (
                                             <Badge
@@ -181,7 +214,7 @@ export default function BeritaPage({
                                 <div className="flex items-center gap-2">
                                     <DialogUpdateStatus
                                         actionUrl={route(
-                                            'admin.berita.updateStatus',
+                                            "admin.berita.updateStatus",
                                             item.id,
                                         )}
                                         page="Berita"
@@ -191,7 +224,7 @@ export default function BeritaPage({
                                     />
                                     <Link
                                         href={route(
-                                            'admin.berita.show',
+                                            "admin.berita.show",
                                             item.id,
                                         )}
                                         viewTransition
@@ -202,7 +235,7 @@ export default function BeritaPage({
                                     </Link>
                                     <Link
                                         href={route(
-                                            'admin.berita.edit',
+                                            "admin.berita.edit",
                                             item.id,
                                         )}
                                         viewTransition
@@ -213,7 +246,7 @@ export default function BeritaPage({
                                     </Link>
                                     <DialogDelete
                                         actionUrl={route(
-                                            'admin.berita.destroy',
+                                            "admin.berita.destroy",
                                             item.id,
                                         )}
                                         page="berita"
@@ -233,8 +266,8 @@ export default function BeritaPage({
 BeritaPage.layout = {
     breadcrumbs: [
         {
-            title: 'Berita',
-            href: route('admin.berita.index'),
+            title: "Berita",
+            href: route("admin.berita.index"),
         },
     ],
 };

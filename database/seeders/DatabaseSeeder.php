@@ -44,7 +44,7 @@ class DatabaseSeeder extends Seeder
             PkmSeeder::class,
             HkiSeeder::class,
             LuaranJurnalSeeder::class,
-            LuaranPRosidingSeeder::class
+            LuaranProsidingSeeder::class
         ]);
 
     }

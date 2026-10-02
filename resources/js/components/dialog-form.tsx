@@ -91,7 +91,7 @@ export default function DialogFormCreate({
             }}
         >
             <DialogTrigger asChild>
-                <Button type="button" className="mb-[20px] w-[200px]">
+                <Button type="button" className="w-[200px]">
                     <Plus className="h-4 w-4" />
                     Tambah {page}
                 </Button>

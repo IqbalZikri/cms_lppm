@@ -2,17 +2,26 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Searchable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Hki extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable;
+
+    protected array $searchable = [
+        "jenis_hki",
+        "judul",
+        "tahun",
+        "penulis.fakultas.nama_fakultas",
+        "penulis.dosen.nama_dosen"
+    ];
+
     protected $fillable = [
         'jenis_hki',
         'judul',
-        'slug',
         'abstrak',
         'semester',
         'tahun',

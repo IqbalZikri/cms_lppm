@@ -24,6 +24,8 @@ Route::post('register', [SesiController::class, 'registerAccount'])->name('sesi.
 Route::get('login', [SesiController::class, 'login'])->name('login');
 Route::post('login', [SesiController::class, 'authenticate'])->name('authenticate');
 
+Route::get('get-prodi/{id}', [ProdiController::class, 'getProdi'])->name('prodi.getProdi');
+
 Route::middleware('auth')->group(function () {
     Route::get('get-dosen/{id}', [DosenController::class, 'getDosen'])->name('dosen.getDosen');
 });
@@ -115,7 +117,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::put('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'update'])->name('luaran_jurnal.update');
         Route::delete('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'destroy'])->name('luaran_jurnal.destroy');
 
-        Route::get('get-prodi/{id}', [ProdiController::class, 'getProdi'])->name('prodi.getProdi');
     });
 });
 

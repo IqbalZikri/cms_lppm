@@ -4,7 +4,6 @@ export interface Hki {
     id: number;
     jenis_hki: string;
     judul: string;
-    slug: string;
     abstrak: string;
     semester: string;
     tahun: number;

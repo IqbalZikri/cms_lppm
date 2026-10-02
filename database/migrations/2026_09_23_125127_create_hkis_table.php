@@ -14,7 +14,6 @@ return new class extends Migration {
             $table->id();
             $table->enum('jenis_hki', ['paten', 'haki']);
             $table->string('judul');
-            $table->string('slug');
             $table->text('abstrak');
             $table->string('semester');
             $table->year('tahun');

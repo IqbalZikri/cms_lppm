@@ -21,7 +21,6 @@ class PkmFactory extends Factory
         return [
             'jenis_pkm' => fake()->randomElement(['pelaksanaan', 'jurnal']),
             'judul' => fake()->sentence(),
-            'slug' => fake()->slug(),
             'abstrak' => fake()->paragraph(),
             'semester' => fake()->randomElement(["ganjil", "genap"]),
             'tahun' => fake()->numberBetween(now()->subYears(3)->year, now()->year),
