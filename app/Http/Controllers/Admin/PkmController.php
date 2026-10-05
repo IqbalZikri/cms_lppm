@@ -18,18 +18,31 @@ class PkmController extends Controller
     public function index(Request $request)
     {
         $pkm = Pkm::query()->with('penulis.fakultas', 'penulis.dosen');
-        $data = $pkm->clone()->search($request->query('search'))->latest()->paginate(10)->withQueryString();
-        $fakultas = Fakultas::get();
 
-        $totalPkm = $pkm->clone()->count();
-        $totalPkmPerFakultas = [];
-        foreach ($fakultas as $f) {
-            $penulisSesuai = Penulis::where('penulisable_type', 'App\Models\Pkm')->where("fakultas_id", $f->id)->get();
-            $totalPkmPerFakultas[] = ["label" => $f->nama_fakultas, "count" => $penulisSesuai->count()];
+        if ($request->filled('cari_fakultas')) {
+            $pkm->whereHas('penulis', function ($q) use ($request) {
+                $q->where('fakultas_id', $request->cari_fakultas);
+            });
         }
+
+        $data = $pkm->clone()->search($request->query('search'))->latest()->paginate(10)->withQueryString();
+        $fakultas = Fakultas::select('id', "nama_fakultas")->get();
+
+        $totalPkm = Pkm::count();
+        $counts = Penulis::where('penulisable_type', Pkm::class)
+            ->selectRaw('fakultas_id, count(*) as total')
+            ->groupBy('fakultas_id')
+            ->pluck('total', 'fakultas_id');
+
+        $totalPkmPerFakultas = $fakultas->map(fn($f) => [
+            'label' => $f->nama_fakultas,
+            'count' => $counts[$f->id] ?? 0,
+        ])->values();
+
         return Inertia::render('admin/pkm/index', [
             'data' => $data,
-            'filters' => $request->only('search'),
+            'fakultas' => $fakultas,
+            'filters' => $request->only('search', 'cari_fakultas'),
             'totalPkm' => $totalPkm,
             'totalPkmPerFakultas' => $totalPkmPerFakultas,
         ]);

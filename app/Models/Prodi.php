@@ -23,6 +23,6 @@ class Prodi extends Model
 
     public function fakultas()
     {
-        return $this->hasMany(Fakultas::class);
+        return $this->belongsTo(Fakultas::class);
     }
 }

@@ -9,7 +9,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import {
     Dialog,
     DialogClose,
@@ -51,14 +51,28 @@ export default function Fakultas({ data, filters }: FakultasPageProps) {
 
     const [search, setSearch] = useState(filters.search ?? "");
 
-    const handleSearch = (e: FormEvent) => {
-        e.preventDefault();
-        router.get(
-            route("admin.fakultas.index"),
-            { search },
-            { preserveState: true, replace: true },
-        );
-    };
+    useEffect(() => {
+        const sama = search === (filters.search ?? "");
+
+        // tidak ada perubahan, jangan request (ini yang menjaga page tetap)
+        if (sama) return;
+
+        const timeout = setTimeout(() => {
+            router.get(
+                route("admin.fakultas.index"),
+                {
+                    ...(search && { search }),
+                },
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    replace: true,
+                },
+            );
+        }, 300);
+
+        return () => clearTimeout(timeout);
+    }, [search]);
 
     return (
         <>
@@ -109,10 +123,6 @@ export default function Fakultas({ data, filters }: FakultasPageProps) {
                         </div>
 
                         <div className="grid gap-3 items-center lg:block xl:flex">
-                            <form
-                                onSubmit={handleSearch}
-                                className="flex gap-3 mb-[10px] xl:mb-[0px]"
-                            >
                                 <Field orientation={"horizontal"}>
                                     <Input
                                         type="search"
@@ -122,15 +132,10 @@ export default function Fakultas({ data, filters }: FakultasPageProps) {
                                             setSearch(e.target.value)
                                         }
                                     />
-                                    <Button type="submit">Cari</Button>
                                 </Field>
-                            </form>
                             <Dialog open={open} onOpenChange={setOpen}>
                                 <DialogTrigger asChild>
-                                    <Button
-                                        type="button"
-                                        className="w-[200px]"
-                                    >
+                                    <Button type="button" className="w-[200px]">
                                         <Plus className="h-4 w-4" />
                                         Tambah Fakultas
                                     </Button>

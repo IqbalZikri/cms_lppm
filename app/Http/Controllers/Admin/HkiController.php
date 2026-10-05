@@ -21,23 +21,32 @@ class HkiController extends Controller
     public function index(Request $request)
     {
         $queryHki = Hki::query()->with('penulis.fakultas', 'penulis.dosen');
+        if ($request->filled('cari_fakultas')) {
+            $queryHki->whereHas('penulis', function ($q) use ($request) {
+                $q->where('fakultas_id', $request->cari_fakultas);
+            });
+        }
         $data = $queryHki->clone()->search($request->query("search"))->latest()->paginate(10)->withQueryString();
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
         $totalPaten = Hki::where('jenis_hki', 'paten')->count();
         $totalHaki = Hki::where('jenis_hki', 'haki')->count();
         $totalHki = Hki::count();
-        $totalHkiPerFakultas = [];
-        foreach ($fakultas as $f) {
-            $penulisSesuai = Penulis::where('penulisable_type', 'App\Models\Hki')->where("fakultas_id", $f->id)->get();
-            $totalHkiPerFakultas[] = ["label" => $f->nama_fakultas, "count" => $penulisSesuai->count()];
-        }
+        $counts = Penulis::where('penulisable_type', Hki::class)
+            ->selectRaw('fakultas_id, count(*) as total')
+            ->groupBy('fakultas_id')
+            ->pluck('total', 'fakultas_id');
+
+        $totalHkiPerFakultas = $fakultas->map(fn($f) => [
+            'label' => $f->nama_fakultas,
+            'count' => $counts[$f->id] ?? 0,
+        ])->values();
 
         return Inertia::render('admin/hki/index', [
             'data' => $data,
             'fakultas' => $fakultas,
             'totalPaten' => $totalPaten,
             'totalHaki' => $totalHaki,
-            "filters" => $request->only("search"),
+            "filters" => $request->only("search", "cari_fakultas"),
             "totalHkiPerFakultas" => $totalHkiPerFakultas,
             "totalHki" => $totalHki
         ]);

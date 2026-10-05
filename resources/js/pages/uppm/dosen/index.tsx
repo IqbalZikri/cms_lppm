@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Fakultas } from "@/interface/fakultas";
 import { PaginatedData } from "@/interface/pagination";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import {
     Building2,
     GraduationCap,
@@ -23,12 +23,18 @@ import { route } from "ziggy-js";
 import { DialogDelete } from "@/components/dialog-form";
 import { Prodi } from "@/interface/prodi";
 import { Dosen as DosenTypes } from "@/types/dosen";
+import { useEffect, useState } from "react";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 
 interface DosenPageProps {
     totalDosen: number;
     totalLaki: number;
     totalPerempuan: number;
     data: PaginatedData<DosenTypes>;
+    filters: {
+        search?: string;
+    };
 }
 
 export default function Dosen({
@@ -36,7 +42,32 @@ export default function Dosen({
     totalLaki,
     totalPerempuan,
     data,
+    filters,
 }: DosenPageProps) {
+    const [search, setSearch] = useState(filters.search ?? "");
+
+    useEffect(() => {
+        const sama = search === (filters.search ?? "");
+
+        if (sama) return;
+
+        const timeout = setTimeout(() => {
+            router.get(
+                route("uppm.dosen.index"),
+                {
+                    ...(search && { search }),
+                },
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    replace: true,
+                },
+            );
+        }, 300);
+
+        return () => clearTimeout(timeout);
+    }, [search]);
+
     return (
         <>
             <Head title="Dosen" />
@@ -151,6 +182,17 @@ export default function Dosen({
                                 </p>
                             </div>
                         </div>
+
+                        <div className="grid gap-3 items-center lg:block xl:flex">
+                            <Field orientation="horizontal">
+                                <Input
+                                    type="search"
+                                    placeholder="Cari Disini..."
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                />
+                            </Field>
+                        </div>
                     </CardHeader>
 
                     <CardContent>
@@ -160,7 +202,8 @@ export default function Dosen({
                                 {
                                     key: "prodi",
                                     label: "Prodi",
-                                    render: (value) => value.nama_prodi ?? "-",
+                                    render: (value: any) =>
+                                        value.nama_prodi ?? "-",
                                 },
                                 {
                                     key: "nidn",

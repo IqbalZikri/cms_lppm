@@ -10,10 +10,13 @@ import {
     BreadcrumbList,
 } from "@/components/ui/breadcrumb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { Fakultas } from "@/interface/fakultas";
 import { PaginatedData } from "@/interface/pagination";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import { BookOpenIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 import { route } from "ziggy-js";
 
 interface Prodi {
@@ -25,9 +28,35 @@ interface Prodi {
 
 type ProdiPageProps = {
     data: PaginatedData<Prodi>;
+    filters: {
+        search?: string;
+    };
 };
 
-export default function Prodi({ data }: ProdiPageProps) {
+export default function Prodi({ data, filters }: ProdiPageProps) {
+    const [search, setSearch] = useState(filters.search ?? "");
+
+    useEffect(() => {
+        const sama = search === (filters.search ?? "");
+
+        if (sama) return;
+
+        const timeout = setTimeout(() => {
+            router.get(
+                route("uppm.prodi.index"),
+                {
+                    ...(search && { search }),
+                },
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    replace: true,
+                },
+            );
+        }, 300);
+
+        return () => clearTimeout(timeout);
+    }, [search]);
     return (
         <>
             <Head title="Prodi" />
@@ -73,6 +102,17 @@ export default function Prodi({ data }: ProdiPageProps) {
                                     Informasi prodi yang terdaftar dalam sistem.
                                 </p>
                             </div>
+                        </div>
+
+                        <div className="grid gap-3 items-center lg:block xl:flex">
+                            <Field orientation="horizontal">
+                                <Input
+                                    type="search"
+                                    placeholder="Cari Disini..."
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                />
+                            </Field>
                         </div>
                     </CardHeader>
                     <CardContent>

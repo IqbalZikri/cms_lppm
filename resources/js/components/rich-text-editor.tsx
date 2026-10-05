@@ -44,7 +44,7 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
         },
         editorProps: {
             attributes: {
-                class: 'prose prose-sm max-w-none outline-none min-h-[250px] p-4',
+                class: 'prose prose-sm max-w-none outline-none min-h-[250px] p-4 dark:text-white',
             },
         },
     });

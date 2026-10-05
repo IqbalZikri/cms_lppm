@@ -70,6 +70,14 @@ type DialogUpdateStatusProps<T extends { id: number }> = {
     status_published: string;
 };
 
+type DialogArchivedProps<T extends { id: number }> = {
+    page: string;
+    actionUrl: string;
+    item: T;
+    label: string;
+    status_published: string;
+};
+
 export default function DialogFormCreate({
     page,
     actionUrl,
@@ -571,7 +579,14 @@ export function DialogUpdateStatus<T extends { id: number }>({
                         type="submit"
                         className="bg-green-500 text-white hover:bg-green-600"
                     >
-                        Published
+                        Publish
+                    </Button>
+                ) : status_published === "archived" ? (
+                    <Button
+                        type="submit"
+                        className="bg-green-500 text-white hover:bg-green-600"
+                    >
+                        Publish
                     </Button>
                 ) : (
                     <Button type="submit" variant="default">
@@ -611,6 +626,80 @@ export function DialogUpdateStatus<T extends { id: number }>({
                                     variant={"default"}
                                 >
                                     {processing ? "...Mengupdate" : "Update"}
+                                </Button>
+                            </DialogFooter>
+                        </>
+                    )}
+                </Form>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+export function DialogArchived<T extends { id: number }>({
+    page,
+    actionUrl,
+    item,
+    label,
+    status_published,
+}: DialogArchivedProps<T>) {
+    const [statusId, setStatusId] = useState<number | null>(null);
+
+    return (
+        <Dialog
+            open={statusId === item.id}
+            onOpenChange={(isOpen) => {
+                setStatusId(isOpen ? item.id : null);
+            }}
+        >
+            <DialogTrigger asChild>
+                {status_published === "archived" ? (
+                    <Button className="bg-gray-600 text-white" disabled>
+                        Diarsipkan
+                    </Button>
+                ) : (
+                    <Button
+                        type="submit"
+                        className="bg-gray-500 text-white hover:bg-gray-600"
+                    >
+                        Arsipkan
+                    </Button>
+                )}
+            </DialogTrigger>
+            <DialogContent>
+                <Form
+                    action={actionUrl}
+                    method="PUT"
+                    onSuccess={() => setStatusId(null)}
+                    resetOnSuccess
+                >
+                    {({ processing }) => (
+                        <>
+                            <DialogHeader>
+                                <DialogTitle>
+                                    Update Status{" "}
+                                    {page.charAt(0).toUpperCase() +
+                                        page.slice(1)}
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Apakah anda yakin ingin mengarsipkan {page}{" "}
+                                    {label}?
+                                </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button type="button" variant={"outline"}>
+                                        Kembali
+                                    </Button>
+                                </DialogClose>
+                                <Button
+                                    type="submit"
+                                    disabled={processing}
+                                    variant={"default"}
+                                >
+                                    {processing
+                                        ? "...Mengarsipkan"
+                                        : "Arsipkan"}
                                 </Button>
                             </DialogFooter>
                         </>

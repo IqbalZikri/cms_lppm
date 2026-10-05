@@ -13,10 +13,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { PaginatedData } from "@/interface/pagination";
 import { Head, Link, router } from "@inertiajs/react";
 import { BookOpenIcon } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { route } from "ziggy-js";
 
 interface Prodi {
@@ -35,20 +43,42 @@ interface Fakultas {
 type ProdiPageProps = {
     data: PaginatedData<Prodi>;
     fakultas: Fakultas[];
-    filters: any;
+    filters: {
+        search?: string;
+        cari_fakultas?: string;
+    };
 };
 
 export default function Prodi({ data, fakultas, filters }: ProdiPageProps) {
     const [search, setSearch] = useState(filters.search ?? "");
+    const [fakultasId, setFakultasId] = useState(filters.cari_fakultas ?? "");
 
-    const handleSearch = (e: FormEvent) => {
-        e.preventDefault();
-        router.get(
-            route("admin.prodi.index"),
-            { search },
-            { preserveState: true, replace: true },
-        );
-    };
+    useEffect(() => {
+        const sama =
+            search === (filters.search ?? "") &&
+            fakultasId === (filters.cari_fakultas ?? "");
+
+        // tidak ada perubahan, jangan request (ini yang menjaga page tetap)
+        if (sama) return;
+
+        const timeout = setTimeout(() => {
+            router.get(
+                route("admin.prodi.index"),
+                {
+                    ...(search && { search }),
+                    ...(fakultasId && { cari_fakultas: fakultasId }),
+                },
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    replace: true,
+                },
+            );
+        }, 300);
+
+        return () => clearTimeout(timeout);
+    }, [search, fakultasId]);
+
     return (
         <>
             <Head title="Prodi" />
@@ -97,22 +127,39 @@ export default function Prodi({ data, fakultas, filters }: ProdiPageProps) {
                         </div>
 
                         <div className="grid gap-3 items-center lg:block xl:flex">
-                            <form
-                                onSubmit={handleSearch}
-                                className="flex gap-3 mb-[10px] xl:mb-[0px]"
+                            <Select
+                                value={fakultasId || "all"}
+                                onValueChange={(value) =>
+                                    setFakultasId(value === "all" ? "" : value)
+                                }
                             >
-                                <Field orientation={"horizontal"}>
-                                    <Input
-                                        type="search"
-                                        placeholder="Cari Disini..."
-                                        value={search}
-                                        onChange={(e) =>
-                                            setSearch(e.target.value)
-                                        }
-                                    />
-                                    <Button type="submit">Cari</Button>
-                                </Field>
-                            </form>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Cari Fakultas..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem value="all">
+                                            Semua Fakultas
+                                        </SelectItem>
+                                        {fakultas.map((item) => (
+                                            <SelectItem
+                                                key={item.id}
+                                                value={String(item.id)}
+                                            >
+                                                {item.nama_fakultas}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                            <Field orientation={"horizontal"}>
+                                <Input
+                                    type="search"
+                                    placeholder="Cari Disini..."
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                />
+                            </Field>
                             <DialogFormCreate
                                 page="Prodi"
                                 actionUrl="admin.prodi.store"

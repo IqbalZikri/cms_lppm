@@ -1,4 +1,4 @@
-import { DialogDelete, DialogUpdateStatus } from "@/components/dialog-form";
+import { DialogArchived, DialogDelete, DialogUpdateStatus } from "@/components/dialog-form";
 import Header from "@/components/header";
 import TablePage from "@/components/table-page";
 import { Badge } from "@/components/ui/badge";
@@ -215,6 +215,16 @@ export default function BeritaPage({
                                     <DialogUpdateStatus
                                         actionUrl={route(
                                             "admin.berita.updateStatus",
+                                            item.id,
+                                        )}
+                                        page="Berita"
+                                        item={item}
+                                        label={item.judul_berita}
+                                        status_published={item.status_published}
+                                    />
+                                    <DialogArchived
+                                        actionUrl={route(
+                                            "admin.berita.archivedBerita",
                                             item.id,
                                         )}
                                         page="Berita"

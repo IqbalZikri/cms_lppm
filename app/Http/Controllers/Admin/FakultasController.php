@@ -16,7 +16,7 @@ class FakultasController extends Controller
 
         return Inertia::render('admin/fakultas/index', [
             'data' => $fakultas,
-            'filters' => $request->only('input')
+            'filters' => $request->only('search')
         ]);
     }
 

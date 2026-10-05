@@ -5,18 +5,48 @@ import TablePage from "@/components/table-page";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { Fakultas } from "@/interface/fakultas";
 import { LuaranJurnal as LuaranJurnalInterface } from "@/interface/luaran-jurnal";
 import { PaginatedData } from "@/interface/pagination";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import { FileText, Notebook, Plus } from "lucide-react";
+import { useEffect, useState } from "react";
 import { route } from "ziggy-js";
 
 interface Props {
     data: PaginatedData<LuaranJurnalInterface>;
+    filters: {
+        search?: string;
+    };
 }
 
-export default function LuaranJurnal({ data }: Props) {
+export default function LuaranJurnal({ data, filters }: Props) {
+    const [search, setSearch] = useState(filters.search ?? "");
+
+    useEffect(() => {
+        const sama = search === (filters.search ?? "");
+
+        if (sama) return;
+
+        const timeout = setTimeout(() => {
+            router.get(
+                route("dosen.luaran_jurnal.index"),
+                {
+                    ...(search && { search }),
+                },
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    replace: true,
+                },
+            );
+        }, 300);
+
+        return () => clearTimeout(timeout);
+    }, [search]);
+
     return (
         <>
             <Head title="Luaran Jurnal" />
@@ -48,16 +78,26 @@ export default function LuaranJurnal({ data }: Props) {
                             </div>
                         </div>
 
-                        <Link
-                            href={route("dosen.luaran_jurnal.create")}
-                            viewTransition
-                            className="w-full sm:w-auto"
-                        >
-                            <Button className="w-full sm:w-auto">
-                                <Plus />
-                                Tambah Luaran Jurnal
-                            </Button>
-                        </Link>
+                        <div className="grid gap-3 items-center lg:block xl:flex">
+                            <Field orientation="horizontal">
+                                <Input
+                                    type="search"
+                                    placeholder="Cari Disini..."
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                />
+                            </Field>
+                            <Link
+                                href={route("dosen.luaran_jurnal.create")}
+                                viewTransition
+                                className="w-full sm:w-auto"
+                            >
+                                <Button className="w-full sm:w-auto">
+                                    <Plus />
+                                    Tambah Luaran Jurnal
+                                </Button>
+                            </Link>
+                        </div>
                     </CardHeader>
                     <CardContent className="pt-6">
                         <TablePage<LuaranJurnalInterface>
@@ -88,7 +128,10 @@ export default function LuaranJurnal({ data }: Props) {
                                                     className="flex flex-wrap items-center gap-1.5"
                                                 >
                                                     <Badge className="whitespace-nowrap text-[13px]">
-                                                        {penulis.fakultas.nama_fakultas}
+                                                        {
+                                                            penulis.fakultas
+                                                                .nama_fakultas
+                                                        }
                                                     </Badge>
                                                 </div>
                                             ))}
@@ -107,7 +150,10 @@ export default function LuaranJurnal({ data }: Props) {
                                                     className="flex flex-wrap items-center gap-1.5"
                                                 >
                                                     <Badge className="whitespace-nowrap text-[13px]">
-                                                        {penulis.dosen.nama_dosen}
+                                                        {
+                                                            penulis.dosen
+                                                                .nama_dosen
+                                                        }
                                                     </Badge>
                                                 </div>
                                             ))}
@@ -144,7 +190,10 @@ export default function LuaranJurnal({ data }: Props) {
                             renderActions={(item) => (
                                 <div className="flex items-center gap-3">
                                     <Link
-                                        href={route("dosen.luaran_jurnal.show", item.id)}
+                                        href={route(
+                                            "dosen.luaran_jurnal.show",
+                                            item.id,
+                                        )}
                                         viewTransition
                                     >
                                         <Button
@@ -155,7 +204,10 @@ export default function LuaranJurnal({ data }: Props) {
                                         </Button>
                                     </Link>
                                     <Link
-                                        href={route("dosen.luaran_jurnal.edit", item.id)}
+                                        href={route(
+                                            "dosen.luaran_jurnal.edit",
+                                            item.id,
+                                        )}
                                         viewTransition
                                     >
                                         <Button title="Edit">Edit</Button>

@@ -87,7 +87,7 @@ export default function Dashboard({
                                 {totalDosen}
                             </div>
 
-                            <p className="text-muted-foreground text-xs">
+                            <p className="text-muted-foreground">
                                 Total dosen terdaftar dalam sistem
                             </p>
                         </CardContent>
@@ -107,7 +107,7 @@ export default function Dashboard({
                                 {totalKegiatan}
                             </div>
 
-                            <p className="text-muted-foreground text-xs">
+                            <p className="text-muted-foreground">
                                 Total kegiatan penelitian terdaftar dalam sistem
                             </p>
                         </CardContent>
@@ -125,7 +125,7 @@ export default function Dashboard({
                         <CardContent>
                             <div className="text-2xl font-bold">{totalPkm}</div>
 
-                            <p className="text-muted-foreground text-xs">
+                            <p className="text-muted-foreground">
                                 Total PKM terdaftar dalam sistem
                             </p>
                         </CardContent>
@@ -143,7 +143,7 @@ export default function Dashboard({
                         <CardContent>
                             <div className="text-2xl font-bold">{totalHki}</div>
 
-                            <p className="text-muted-foreground text-xs">
+                            <p className="text-muted-foreground">
                                 Total HKI terdaftar dalam sistem
                             </p>
                         </CardContent>
@@ -163,7 +163,7 @@ export default function Dashboard({
                                 {totalLuaranJurnal}
                             </div>
 
-                            <p className="text-muted-foreground text-xs">
+                            <p className="text-muted-foreground">
                                 Total luaran jurnal terdaftar dalam sistem
                             </p>
                         </CardContent>
@@ -183,7 +183,7 @@ export default function Dashboard({
                                 {totalLuaranProsiding}
                             </div>
 
-                            <p className="text-muted-foreground text-xs">
+                            <p className="text-muted-foreground">
                                 Total luaran prosiding terdaftar dalam sistem
                             </p>
                         </CardContent>
@@ -356,7 +356,7 @@ export default function Dashboard({
                                                                             key={
                                                                                 i
                                                                             }
-                                                                            className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                            className="rounded-md bg-muted px-2 py-1"
                                                                         >
                                                                             {
                                                                                 p
@@ -380,7 +380,7 @@ export default function Dashboard({
                                                                             key={
                                                                                 i
                                                                             }
-                                                                            className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                            className="rounded-md bg-muted px-2 py-1"
                                                                         >
                                                                             {
                                                                                 p
@@ -463,7 +463,7 @@ export default function Dashboard({
                                                                             key={
                                                                                 i
                                                                             }
-                                                                            className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                            className="rounded-md bg-muted px-2 py-1"
                                                                         >
                                                                             {
                                                                                 p
@@ -487,7 +487,7 @@ export default function Dashboard({
                                                                             key={
                                                                                 i
                                                                             }
-                                                                            className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                            className="rounded-md bg-muted px-2 py-1"
                                                                         >
                                                                             {
                                                                                 p
@@ -570,7 +570,7 @@ export default function Dashboard({
                                                                             key={
                                                                                 i
                                                                             }
-                                                                            className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                            className="rounded-md bg-muted px-2 py-1"
                                                                         >
                                                                             {
                                                                                 p
@@ -594,7 +594,7 @@ export default function Dashboard({
                                                                             key={
                                                                                 i
                                                                             }
-                                                                            className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                            className="rounded-md bg-muted px-2 py-1"
                                                                         >
                                                                             {
                                                                                 p
@@ -681,7 +681,7 @@ export default function Dashboard({
                                                                                 key={
                                                                                     i
                                                                                 }
-                                                                                className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                                className="rounded-md bg-muted px-2 py-1"
                                                                             >
                                                                                 {
                                                                                     p
@@ -708,7 +708,7 @@ export default function Dashboard({
                                                                                 key={
                                                                                     i
                                                                                 }
-                                                                                className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                                className="rounded-md bg-muted px-2 py-1"
                                                                             >
                                                                                 {
                                                                                     p
@@ -796,7 +796,7 @@ export default function Dashboard({
                                                                                 key={
                                                                                     i
                                                                                 }
-                                                                                className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                                className="rounded-md bg-muted px-2 py-1"
                                                                             >
                                                                                 {
                                                                                     p
@@ -823,7 +823,7 @@ export default function Dashboard({
                                                                                 key={
                                                                                     i
                                                                                 }
-                                                                                className="rounded-md bg-muted px-2 py-1 text-xs"
+                                                                                className="rounded-md bg-muted px-2 py-1"
                                                                             >
                                                                                 {
                                                                                     p

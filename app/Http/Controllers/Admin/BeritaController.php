@@ -85,7 +85,7 @@ class BeritaController extends Controller
     public function updateStatus(Berita $berita)
     {
         try {
-            if ($berita->status_published === 'draft') {
+            if ($berita->status_published === 'draft' || $berita->status_published === 'archived') {
                 $berita->update([
                     'status_published' => 'published',
                     'published_at' => now(),
@@ -177,7 +177,6 @@ class BeritaController extends Controller
             return redirect()->route('admin.berita.index')->with('success', 'Berhasil mengedit berita');
         } catch (\Throwable $th) {
             Log::info($th->getMessage());
-
             return back()->with('error', 'Terjadi Kesalahan');
         }
     }
@@ -186,11 +185,22 @@ class BeritaController extends Controller
     {
         try {
             $berita->delete();
-
             return back()->with('success', 'Berhasil hapus berita');
         } catch (\Throwable $th) {
             Log::info($th->getMessage());
+            return back()->with('error', 'Terjadi Kesalahan');
+        }
+    }
 
+    public function archivedBerita(Berita $berita)
+    {
+        try {
+            $berita->update([
+                "status_published" => "archived"
+            ]);
+            return back()->with('success', "Berhasil mengarsipkan berita");
+        } catch (\Throwable $th) {
+            Log::info($th->getMessage());
             return back()->with('error', 'Terjadi Kesalahan');
         }
     }

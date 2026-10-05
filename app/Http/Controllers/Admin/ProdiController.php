@@ -13,13 +13,22 @@ class ProdiController extends Controller
 {
     public function index(Request $request)
     {
-        $data = Prodi::query()->search($request->query('search'))->paginate(10)->withQueryString();
+        $queryProdi = Prodi::query()->with('fakultas');
+
+        if ($request->filled("cari_fakultas")) {
+            $queryProdi->whereHas("fakultas", function ($q) use ($request) {
+                $q->where('fakultas_id', $request->input("cari_fakultas"));
+            });
+        }
+
+        $data = $queryProdi->clone()->search($request->query('search'))->paginate(10)->withQueryString();
+
         $fakultas = Fakultas::get();
 
         return Inertia::render('admin/prodi/index', [
             'data' => $data,
             'fakultas' => $fakultas,
-            'filters' => $request->only('search')
+            'filters' => $request->only('search', 'cari_fakultas')
         ]);
     }
 
@@ -55,7 +64,7 @@ class ProdiController extends Controller
     {
         $request->validate([
             'fakultas_id' => 'required',
-            'kode_prodi' => 'required|unique:prodis,kode_prodi,'.$id,
+            'kode_prodi' => 'required|unique:prodis,kode_prodi,' . $id,
             'nama_prodi' => 'required',
         ], [
             'fakultas_id.required' => 'Pilih salah satu fakultas',

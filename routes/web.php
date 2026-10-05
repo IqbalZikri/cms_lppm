@@ -76,6 +76,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::put('berita/ubah_status/{berita}', [BeritaController::class, 'updateStatus'])->name('berita.updateStatus');
         Route::put('berita/{berita}', [BeritaController::class, 'update'])->name('berita.update');
         Route::delete('berita/{berita}', [BeritaController::class, 'destroy'])->name('berita.destroy');
+        Route::put('berita/archived/{berita}', [BeritaController::class, 'archivedBerita'])->name('berita.archivedBerita');
 
         Route::get('kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.index');
         Route::get('kegiatan/create', [KegiatanController::class, 'create'])->name('kegiatan.create');

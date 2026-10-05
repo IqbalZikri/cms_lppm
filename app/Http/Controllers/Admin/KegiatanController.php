@@ -21,19 +21,31 @@ class KegiatanController extends Controller
     public function index(Request $request)
     {
         $queryKegiatan = Kegiatan::query()->with('penulis.fakultas', 'penulis.dosen');
-        $data = $queryKegiatan->clone()->search($request->query('search'))->latest()->paginate(10)->withQueryString();
-        $fakultas = Fakultas::get();
 
-        $totalKegiatan = $queryKegiatan->clone()->count();
-        $totalKegiatanPerFakultas = [];
-        foreach ($fakultas as $f) {
-            $penulisSesuai = Penulis::where('penulisable_type', 'App\Models\Kegiatan')->where("fakultas_id", $f->id)->get();
-            $totalKegiatanPerFakultas[] = ["label" => $f->nama_fakultas, "count" => $penulisSesuai->count()];
+        if ($request->filled('cari_fakultas')) {
+            $queryKegiatan->whereHas('penulis', function ($q) use ($request) {
+                $q->where('fakultas_id', $request->cari_fakultas);
+            });
         }
+
+        $data = $queryKegiatan->clone()->search($request->query('search'))->latest()->paginate(10)->withQueryString();
+        $fakultas = Fakultas::select("id", "nama_fakultas")->get();
+
+        $totalKegiatan = Kegiatan::count();
+        $counts = Penulis::where('penulisable_type', Kegiatan::class)
+            ->selectRaw('fakultas_id, count(*) as total')
+            ->groupBy('fakultas_id')
+            ->pluck('total', 'fakultas_id');
+
+        $totalKegiatanPerFakultas = $fakultas->map(fn($f) => [
+            'label' => $f->nama_fakultas,
+            'count' => $counts[$f->id] ?? 0,
+        ])->values();
 
         return Inertia::render('admin/kegiatan/index', [
             'data' => $data,
-            'filters' => $request->only('search'),
+            'filters' => $request->only('search', 'cari_fakultas'),
+            "fakultas" => $fakultas,
             'totalKegiatanPerFakultas' => $totalKegiatanPerFakultas,
             'totalKegiatan' => $totalKegiatan
         ]);

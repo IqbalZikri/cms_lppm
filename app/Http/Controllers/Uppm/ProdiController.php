@@ -12,59 +12,12 @@ class ProdiController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data = Prodi::where('fakultas_id', auth()->user()->fakultas_id)->paginate(10)->withQueryString();
+        $data = Prodi::where('fakultas_id', auth()->user()->fakultas_id)->search($request->query("search"))->with("fakultas")->paginate(10)->withQueryString();
         return Inertia::render("uppm/prodi/index", [
-            'data' => $data
+            'data' => $data,
+            'filters' => $request->only("search")
         ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

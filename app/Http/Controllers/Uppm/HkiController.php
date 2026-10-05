@@ -16,13 +16,14 @@ class HkiController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $data = Hki::whereHas('penulis', function ($query) {
             $query->where('fakultas_id', auth()->user()->fakultas_id);
-        })->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10)->withQueryString();
+        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10)->withQueryString();
         return Inertia::render('uppm/hki/index', [
             'data' => $data,
+            'filters' => $request->only("search")
         ]);
     }
 

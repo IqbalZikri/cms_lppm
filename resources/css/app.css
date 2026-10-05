@@ -158,6 +158,9 @@
 }
 
 .theme-uca {
+    --text-sm: 1rem;
+    --text-sm--line-height: 1.5rem;
+    
     --background: #f6f4ee;
     --foreground: #16241c;
     --font-size: 20px;
@@ -203,6 +206,8 @@
 }
 
 .dark.theme-uca {
+    --text-sm: 1rem;
+    --text-sm--line-height: 1.5rem;
     --background: #0e1a13;
     --foreground: #f3f1ea;
 
@@ -238,5 +243,6 @@
 
     body {
         @apply bg-background text-foreground;
+        @apply text-base;
     }
 }

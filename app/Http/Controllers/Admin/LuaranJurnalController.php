@@ -20,20 +20,30 @@ class LuaranJurnalController extends Controller
     public function index(Request $request)
     {
         $queryLuaranJurnal = LuaranJurnal::query()->with('penulis.fakultas', 'penulis.dosen');
+        if ($request->filled('cari_fakultas')) {
+            $queryLuaranJurnal->whereHas('penulis', function ($q) use ($request) {
+                $q->where('fakultas_id', $request->cari_fakultas);
+            });
+        }
         $data = $queryLuaranJurnal->clone()->latest()->search($request->query("search"))->paginate(10)->withQueryString();
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
-        $totalLuaranJurnal = $queryLuaranJurnal->clone()->count();
-        $totalLuaranJurnalPerFakultas = [];
-        foreach ($fakultas as $f) {
-            $penulisSesuai = Penulis::where('penulisable_type', 'App\Models\LuaranJurnal')->where("fakultas_id", $f->id)->get();
-            $totalLuaranJurnalPerFakultas[] = ["label" => $f->nama_fakultas, "count" => $penulisSesuai->count()];
-        }
+        $totalLuaranJurnal = LuaranJurnal::count();
+        $counts = Penulis::where('penulisable_type', LuaranJurnal::class)
+            ->selectRaw('fakultas_id, count(*) as total')
+            ->groupBy('fakultas_id')
+            ->pluck('total', 'fakultas_id');
+
+        $totalLuaranJurnalPerFakultas = $fakultas->map(fn($f) => [
+            'label' => $f->nama_fakultas,
+            'count' => $counts[$f->id] ?? 0,
+        ])->values();
+
         return Inertia::render('admin/luaran-jurnal/index', [
             'data' => $data,
             'fakultas' => $fakultas,
             "totalLuaranJurnal" => $totalLuaranJurnal,
             "totalLuaranJurnalPerFakultas" => $totalLuaranJurnalPerFakultas,
-            "filters" => $request->only("search")
+            "filters" => $request->only("search", "cari_fakultas")
         ]);
     }
 

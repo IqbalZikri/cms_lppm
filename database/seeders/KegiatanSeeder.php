@@ -21,6 +21,6 @@ class KegiatanSeeder extends Seeder
                     ->sequence(fn($seq) => ['urutan' => $seq->index + 1]),
                 'penulis' // nama method relasi di model Kegiatan
             )
-            ->count(20)->create();
+            ->count(100)->create();
     }
 }

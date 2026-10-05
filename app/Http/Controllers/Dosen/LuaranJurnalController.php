@@ -16,14 +16,15 @@ class LuaranJurnalController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $dosen = Dosen::where('user_id', auth()->user()->id)->with('penulis', 'fakultas')->first();
         $data = LuaranJurnal::whereHas('penulis', function ($query) use ($dosen) {
             $query->where('dosen_id', $dosen->id);
-        })->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10);
+        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10);
         return Inertia::render('dosen/luaran-jurnal/index', [
             'data' => $data,
+            'filters' => $request->only("search"),
         ]);
     }
 

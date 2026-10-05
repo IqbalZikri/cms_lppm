@@ -14,14 +14,15 @@ use Log;
 
 class KegiatanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $dosen = Dosen::where('user_id', auth()->user()->id)->with('penulis', 'fakultas')->first();
+        $dosen = Dosen::where('user_id', auth()->user()->id)->first();
         $kegiatan = Kegiatan::whereHas('penulis', function ($query) use ($dosen) {
             $query->where('dosen_id', $dosen->id);
-        })->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10);
+        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10);
         return Inertia::render('dosen/kegiatan/index', [
-            'kegiatan' => $kegiatan
+            'kegiatan' => $kegiatan,
+            'filters' => $request->only("search")
         ]);
     }
 

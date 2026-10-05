@@ -13,6 +13,7 @@ class Kegiatan extends Model
 
     protected array $searchable = [
         'judul',
+        'tahun',
         'penulis.fakultas.nama_fakultas',
         'penulis.dosen.nama_dosen'
     ];

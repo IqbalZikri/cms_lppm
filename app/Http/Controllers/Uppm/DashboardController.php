@@ -21,23 +21,23 @@ class DashboardController extends Controller
 
         $queryKegiatan = Kegiatan::whereHas('penulis', function ($query) use ($fakultasSesuai) {
             $query->where('fakultas_id', $fakultasSesuai->id);
-        });
+        })->with('penulis.fakultas', 'penulis.dosen');
 
         $queryPkm = Pkm::whereHas('penulis', function ($query) use ($fakultasSesuai) {
             $query->where('fakultas_id', $fakultasSesuai->id);
-        });
+        })->with('penulis.fakultas', 'penulis.dosen');
 
         $queryHki = Hki::whereHas('penulis', function ($query) use ($fakultasSesuai) {
             $query->where('fakultas_id', $fakultasSesuai->id);
-        });
+        })->with('penulis.fakultas', 'penulis.dosen');
 
         $queryLuaranJurnal = LuaranJurnal::whereHas('penulis', function ($query) use ($fakultasSesuai) {
             $query->where('fakultas_id', $fakultasSesuai->id);
-        });
+        })->with('penulis.fakultas', 'penulis.dosen');
 
         $queryLuaranProsiding = LuaranProsiding::whereHas('penulis', function ($query) use ($fakultasSesuai) {
             $query->where('fakultas_id', $fakultasSesuai->id);
-        });
+        })->with('penulis.fakultas', 'penulis.dosen');
 
         $totalDosen = Dosen::where('fakultas_id', $fakultasSesuai->id)->count();
         $totalKegiatan = $queryKegiatan->clone()->count();
@@ -46,7 +46,7 @@ class DashboardController extends Controller
         $totalLuaranJurnal = $queryLuaranJurnal->clone()->count();
         $totalLuaranProsiding = $queryLuaranProsiding->clone()->count();
 
-        $dosenTerbaru = Dosen::where("fakultas_id", $fakultasSesuai->id)->with('user')->latest()->take(5)->get();
+        $dosenTerbaru = Dosen::where("fakultas_id", $fakultasSesuai->id)->with('user', 'fakultas', 'prodi')->latest()->take(5)->get();
         $kegiatanTerbaru = $queryKegiatan->clone()->latest()->take(5)->get();
         $pkmTerbaru = $queryPkm->clone()->latest()->take(5)->get();
         $hkiTerbaru = $queryHki->clone()->latest()->take(5)->get();

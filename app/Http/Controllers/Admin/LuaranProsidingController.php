@@ -20,18 +20,29 @@ class LuaranProsidingController extends Controller
     public function index(Request $request)
     {
         $queryLuaranProsiding = LuaranProsiding::query()->with("penulis.fakultas", "penulis.dosen");
+        if ($request->filled('cari_fakultas')) {
+            $queryLuaranProsiding->whereHas('penulis', function ($q) use ($request) {
+                $q->where('fakultas_id', $request->cari_fakultas);
+            });
+        }
         $data = $queryLuaranProsiding->clone()->search($request->query("search"))->latest()->paginate(10)->withQueryString();
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
 
-        $totalLuaranProsiding = $queryLuaranProsiding->clone()->count();
-        $totalLuaranProsidingPerFakultas = [];
-        foreach ($fakultas as $f) {
-            $penulisSesuai = Penulis::where('penulisable_type', 'App\Models\LuaranProsiding')->where("fakultas_id", $f->id)->get();
-            $totalLuaranProsidingPerFakultas[] = ["label" => $f->nama_fakultas, "count" => $penulisSesuai->count()];
-        }
+        $totalLuaranProsiding = LuaranProsiding::count();
+        $counts = Penulis::where('penulisable_type', LuaranProsiding::class)
+            ->selectRaw('fakultas_id, count(*) as total')
+            ->groupBy('fakultas_id')
+            ->pluck('total', 'fakultas_id');
+
+        $totalLuaranProsidingPerFakultas = $fakultas->map(fn($f) => [
+            'label' => $f->nama_fakultas,
+            'count' => $counts[$f->id] ?? 0,
+        ])->values();
+
         return Inertia::render('admin/luaran-prosiding/index', [
             'data' => $data,
-            "filters" => $request->only("search"),
+            "fakultas" => $fakultas,
+            "filters" => $request->only("search", "cari_fakultas"),
             "totalLuaranProsidingPerFakultas" => $totalLuaranProsidingPerFakultas,
             "totalLuaranProsiding" => $totalLuaranProsiding,
         ]);
