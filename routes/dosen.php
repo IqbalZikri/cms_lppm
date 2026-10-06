@@ -2,10 +2,10 @@
 
 use App\Http\Controllers\Dosen\DashboardController;
 use App\Http\Controllers\Dosen\HkiController;
-use App\Http\Controllers\Dosen\KegiatanController;
 use App\Http\Controllers\Dosen\LuaranJurnalController;
 use App\Http\Controllers\Dosen\LuaranProsidingController;
 use App\Http\Controllers\Dosen\PkmController;
+use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\LuaranBukuController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,7 +15,7 @@ Route::middleware(['auth', 'role:dosen'])
     ->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-        Route::get('kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.index');
+        Route::get('kegiatan', [KegiatanController::class, 'indexDosen'])->name('kegiatan.index');
         Route::get('kegiatan/create', [KegiatanController::class, 'create'])->name('kegiatan.create');
         Route::post('kegiatan/create', [KegiatanController::class, 'store'])->name('kegiatan.store');
         Route::get('kegiatan//detail/{id}', [KegiatanController::class, 'show'])->name('kegiatan.show');

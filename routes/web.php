@@ -8,7 +8,7 @@ use App\Http\Controllers\Admin\DosenController;
 use App\Http\Controllers\Admin\FakultasController;
 use App\Http\Controllers\Admin\HkiController;
 use App\Http\Controllers\Admin\KategoriController;
-use App\Http\Controllers\Admin\KegiatanController;
+use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\Admin\LuaranProsidingController;
 use App\Http\Controllers\Admin\ProdiController;
 use App\Http\Controllers\Admin\SesiController;
@@ -79,7 +79,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::delete('berita/{berita}', [BeritaController::class, 'destroy'])->name('berita.destroy');
         Route::put('berita/archived/{berita}', [BeritaController::class, 'archivedBerita'])->name('berita.archivedBerita');
 
-        Route::get('kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.index');
+        Route::get('kegiatan', [KegiatanController::class, 'indexAdmin'])->name('kegiatan.index');
         Route::get('kegiatan/create', [KegiatanController::class, 'create'])->name('kegiatan.create');
         Route::post('kegiatan/create', [KegiatanController::class, 'store'])->name('kegiatan.store');
         Route::get('kegiatan//detail/{id}', [KegiatanController::class, 'show'])->name('kegiatan.show');

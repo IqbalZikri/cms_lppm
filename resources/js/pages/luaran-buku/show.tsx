@@ -24,15 +24,6 @@ interface Props {
     role: string;
 }
 
-function formatRupiah(value: string | number) {
-    const number = Number(value);
-    if (Number.isNaN(number)) return "-";
-    return new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-    }).format(number);
-}
 type PenulisRow =
     | {
           tipe: "internal";

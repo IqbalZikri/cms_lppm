@@ -131,21 +131,6 @@ export default function FormPenulis({
         return data;
     }
 
-    // Kalau mode edit dan baris sudah punya fakultasId dari awal,
-    // langsung fetch daftar dosennya begitu komponen mount.
-    useEffect(() => {
-        authors.forEach((author) => {
-            if (
-                author.tipe === "internal" &&
-                author.fakultasId &&
-                author.dosenOptions.length === 0
-            ) {
-                handleFakultasChange(author.key, author.fakultasId, false);
-            }
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     async function handleFakultasChange(
         key: string,
         fakultasId: string,
@@ -183,6 +168,21 @@ export default function FormPenulis({
             );
         }
     }
+
+    // Kalau mode edit dan baris sudah punya fakultasId dari awal,
+    // langsung fetch daftar dosennya begitu komponen mount.
+    useEffect(() => {
+        authors.forEach((author) => {
+            if (
+                author.tipe === "internal" &&
+                author.fakultasId &&
+                author.dosenOptions.length === 0
+            ) {
+                handleFakultasChange(author.key, author.fakultasId, false);
+            }
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     function updateAuthorDosen(key: string, dosenId: string) {
         setAuthors((prev) =>

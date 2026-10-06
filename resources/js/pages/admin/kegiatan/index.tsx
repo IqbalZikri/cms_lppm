@@ -41,6 +41,8 @@ export default function Kegiatan({
     totalKegiatanPerFakultas,
     totalKegiatan,
 }: Props) {
+    console.log(data);
+
     const statistikFakultas = totalKegiatanPerFakultas.map((item: any) => ({
         label: item.label,
         count: item.count,
@@ -214,6 +216,45 @@ export default function Kegiatan({
                                                     </Badge>
                                                 </div>
                                             ))}
+                                        </div>
+                                    ),
+                                },
+                                {
+                                    id: "penulis_luar",
+                                    key: "penulis_luar",
+                                    label: "Penulis Luar Universitas",
+                                    render: (_, item) => (
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {item.penulis_luar.length !== 0 ? (
+                                                <>
+                                                    {item.penulis_luar.map(
+                                                        (penulis, i) => (
+                                                            <div
+                                                                key={i}
+                                                                className="flex flex-wrap items-center gap-1.5"
+                                                            >
+                                                                <Badge
+                                                                    className="whitespace-nowrap text-[13px]"
+                                                                    variant={
+                                                                        "outline"
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        penulis.nama_universitas
+                                                                    }
+                                                                </Badge>
+                                                                <Badge className="whitespace-nowrap text-[13px]">
+                                                                    {
+                                                                        penulis.nama_dosen
+                                                                    }
+                                                                </Badge>
+                                                            </div>
+                                                        ),
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <>-</>
+                                            )}
                                         </div>
                                     ),
                                 },

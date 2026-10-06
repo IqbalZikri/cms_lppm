@@ -15,7 +15,9 @@ class Kegiatan extends Model
         'judul',
         'tahun',
         'penulis.fakultas.nama_fakultas',
-        'penulis.dosen.nama_dosen'
+        'penulis.dosen.nama_dosen',
+        'penulisLuar.nama_universitas',
+        'penulisLuar.nama_dosen',
     ];
 
     protected $fillable = [
@@ -31,5 +33,10 @@ class Kegiatan extends Model
     public function penulis(): MorphMany
     {
         return $this->morphMany(Penulis::class, 'penulisable')->orderBy('urutan');
+    }
+
+    public function penulisLuar(): MorphMany
+    {
+        return $this->morphMany(PenulisLuar::class, 'penulisable_luar')->orderBy('urutan');
     }
 }

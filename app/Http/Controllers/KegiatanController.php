@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Dosen;
@@ -18,9 +18,9 @@ class KegiatanController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function indexAdmin(Request $request)
     {
-        $queryKegiatan = Kegiatan::query()->with('penulis.fakultas', 'penulis.dosen');
+        $queryKegiatan = Kegiatan::query()->with('penulis.fakultas', 'penulis.dosen','penulisLuar');
 
         if ($request->filled('cari_fakultas')) {
             $queryKegiatan->whereHas('penulis', function ($q) use ($request) {
@@ -51,14 +51,37 @@ class KegiatanController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    public function indexDosen(Request $request)
+    {
+        $dosen = Dosen::where('user_id', auth()->user()->id)->first();
+        $kegiatan = Kegiatan::whereHas('penulis', function ($query) use ($dosen) {
+            $query->where('dosen_id', $dosen->id);
+        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10);
+        return Inertia::render('dosen/kegiatan/index', [
+            'kegiatan' => $kegiatan,
+            'filters' => $request->only("search")
+        ]);
+    }
+
+    public function indexUppm(Request $request)
+    {
+        $data = Kegiatan::whereHas('penulis', function ($query) {
+            $query->where('fakultas_id', auth()->user()->fakultas_id);
+        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10)->withQueryString();
+
+        return Inertia::render('uppm/kegiatan/index', [
+            'kegiatan' => $data,
+            "filters" => $request->only("search")
+        ]);
+    }
+
     public function create()
     {
         $fakultas = Fakultas::get();
-        return Inertia::render('admin/kegiatan/create', [
+        $role = auth()->user()->role;
+        return Inertia::render('kegiatan/create', [
             'fakultas' => $fakultas,
+            'role' => $role,
         ]);
     }
 
@@ -76,8 +99,11 @@ class KegiatanController extends Controller
             'sumber_dana' => 'required',
             'jumlah_dana' => 'required|numeric',
             'authors' => 'required|array|min:1',
-            'authors.*.fakultas_id' => 'required|exists:fakultas,id',
-            'authors.*.dosen_id' => 'required|exists:dosens,id',
+            'authors.*.tipe' => 'required|in:internal,luar',
+            'authors.*.fakultas_id' => 'required_if:authors.*.tipe,internal|nullable|exists:fakultas,id',
+            'authors.*.dosen_id' => 'required_if:authors.*.tipe,internal|nullable|exists:dosens,id',
+            'authors.*.nama_universitas' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
+            'authors.*.nama_dosen' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
         ], [
             'judul.required' => 'Silahkan isi judul kegiatan',
             'abstrak.required' => 'Silahkan isi abstrak',
@@ -88,8 +114,10 @@ class KegiatanController extends Controller
             'jumlah_dana.required' => 'Silahkan isi jumlah dana',
             'jumlah_dana.numeric' => 'Jumlah dana harus berupa angka',
             'authors.required' => 'Silahkan tambahkan minimal satu penulis',
-            'authors.*.fakultas_id.required' => 'Silahkan pilih fakultas untuk setiap penulis',
-            'authors.*.dosen_id.required' => 'Silahkan pilih dosen untuk setiap penulis',
+            'authors.*.fakultas_id.required_if' => 'Silahkan pilih fakultas',
+            'authors.*.dosen_id.required_if' => 'Silahkan pilih dosen',
+            'authors.*.nama_universitas.required_if' => 'Silahkan isi nama universitas',
+            'authors.*.nama_dosen.required_if' => 'Silahkan isi nama dosen',
         ]);
 
         DB::beginTransaction();
@@ -106,16 +134,24 @@ class KegiatanController extends Controller
             ]);
 
             foreach ($validated['authors'] as $i => $author) {
-                $kegiatan->penulis()->create([
-                    'fakultas_id' => $author['fakultas_id'],
-                    'dosen_id' => $author['dosen_id'],
-                    'urutan' => $i + 1,
-                ]);
+                if ($author['tipe'] === 'internal') {
+                    $kegiatan->penulis()->create([
+                        'fakultas_id' => $author['fakultas_id'],
+                        'dosen_id' => $author['dosen_id'],
+                        'urutan' => $i + 1,
+                    ]);
+                } else {
+                    $kegiatan->penulisLuar()->create([
+                        'nama_universitas' => $author['nama_universitas'],
+                        'nama_dosen' => $author['nama_dosen'],
+                        'urutan' => $i + 1,
+                    ]);
+                }
             }
 
             DB::commit();
 
-            return redirect()->route('admin.kegiatan.index')->with('success', 'Berhasil menambahkan penelitian kegiatan');
+            return redirect()->route(auth()->user()->role . '.kegiatan.index')->with('success', 'Berhasil menambahkan penelitian kegiatan');
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
@@ -129,11 +165,12 @@ class KegiatanController extends Controller
     public function show(string $id)
     {
         $data = Kegiatan::findOrFail($id);
-        $data->load('penulis.fakultas', 'penulis.dosen');
+        $data->load('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
         $fakultas = Fakultas::get();
-        return Inertia::render('admin/kegiatan/show', [
+        return Inertia::render('kegiatan/show', [
             'data' => $data,
-            'fakultas' => $fakultas
+            'fakultas' => $fakultas,
+            'role' => auth()->user()->role,
         ]);
     }
 
@@ -143,13 +180,14 @@ class KegiatanController extends Controller
     public function edit(string $id)
     {
         $kegiatan = Kegiatan::findOrFail($id);
-        $kegiatan->load('penulis');
+        $kegiatan->load('penulis', 'penulisLuar');
         $fakultas = Fakultas::get();
         $dosen = Dosen::get();
-        return Inertia::render('admin/kegiatan/edit', [
+        return Inertia::render('kegiatan/edit', [
             'kegiatan' => $kegiatan,
             'fakultas' => $fakultas,
-            'dosen' => $dosen
+            'dosen' => $dosen,
+            'role' => auth()->user()->role
         ]);
     }
 
@@ -166,11 +204,14 @@ class KegiatanController extends Controller
             'semester' => 'required',
             'tahun' => 'required',
             'link_berkas' => 'required',
-            'sumber_dana' => ['required', Rule::in(['internal', 'eksternal'])],
+            'sumber_dana' => 'required',
             'jumlah_dana' => 'required|numeric',
             'authors' => 'required|array|min:1',
-            'authors.*.fakultas_id' => 'required|exists:fakultas,id',
-            'authors.*.dosen_id' => 'required|exists:dosens,id|distinct',
+            'authors.*.tipe' => 'required|in:internal,luar',
+            'authors.*.fakultas_id' => 'required_if:authors.*.tipe,internal|nullable|exists:fakultas,id',
+            'authors.*.dosen_id' => 'required_if:authors.*.tipe,internal|nullable|exists:dosens,id',
+            'authors.*.nama_universitas' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
+            'authors.*.nama_dosen' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
         ], [
             'judul.required' => 'Silahkan isi judul kegiatan',
             'abstrak.required' => 'Silahkan isi abstrak',
@@ -178,13 +219,13 @@ class KegiatanController extends Controller
             'tahun.required' => 'Silahkan isi tahun',
             'link_berkas.required' => 'Silahkan isi link berkas',
             'sumber_dana.required' => 'Silahkan isi sumber dana',
-            'sumber_dana.in' => 'Sumber dana tidak valid',
             'jumlah_dana.required' => 'Silahkan isi jumlah dana',
             'jumlah_dana.numeric' => 'Jumlah dana harus berupa angka',
             'authors.required' => 'Silahkan tambahkan minimal satu penulis',
-            'authors.*.fakultas_id.required' => 'Silahkan pilih fakultas untuk setiap penulis',
-            'authors.*.dosen_id.required' => 'Silahkan pilih dosen untuk setiap penulis',
-            'authors.*.dosen_id.distinct' => 'Duplikat nama dosen',
+            'authors.*.fakultas_id.required_if' => 'Silahkan pilih fakultas',
+            'authors.*.dosen_id.required_if' => 'Silahkan pilih dosen',
+            'authors.*.nama_universitas.required_if' => 'Silahkan isi nama universitas',
+            'authors.*.nama_dosen.required_if' => 'Silahkan isi nama dosen',
         ]);
 
         DB::beginTransaction();
@@ -201,18 +242,27 @@ class KegiatanController extends Controller
             ]);
 
             $kegiatan->penulis()->delete();
+            $kegiatan->penulisLuar()->delete();
 
             foreach ($validated['authors'] as $i => $author) {
-                $kegiatan->penulis()->create([
-                    'fakultas_id' => $author['fakultas_id'],
-                    'dosen_id' => $author['dosen_id'],
-                    'urutan' => $i + 1,
-                ]);
+                if ($author['tipe'] === 'internal') {
+                    $kegiatan->penulis()->create([
+                        'fakultas_id' => $author['fakultas_id'],
+                        'dosen_id' => $author['dosen_id'],
+                        'urutan' => $i + 1,
+                    ]);
+                } else {
+                    $kegiatan->penulisLuar()->create([
+                        'nama_universitas' => $author['nama_universitas'],
+                        'nama_dosen' => $author['nama_dosen'],
+                        'urutan' => $i + 1,
+                    ]);
+                }
             }
 
             DB::commit();
 
-            return redirect()->route('admin.kegiatan.index')->with('success', 'Berhasil memperbarui kegiatan penelitian');
+            return redirect()->route(auth()->user()->role . '.kegiatan.index')->with('success', 'Berhasil memperbarui kegiatan penelitian');
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
@@ -228,6 +278,7 @@ class KegiatanController extends Controller
         $data = Kegiatan::findOrFail($id);
         try {
             $data->penulis()->delete();
+            $data->penulisLuar()->delete();
             $data->delete();
             return back()->with('success', 'Berhasil menghapus kegiatan penelitian');
         } catch (\Throwable $th) {

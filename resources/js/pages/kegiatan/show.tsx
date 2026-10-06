@@ -22,6 +22,7 @@ import { Kegiatan } from "@/interface/kegiatan";
 
 interface Props {
     data: Kegiatan;
+    role: string;
 }
 
 function formatRupiah(value: string | number) {
@@ -34,7 +35,7 @@ function formatRupiah(value: string | number) {
     }).format(number);
 }
 
-export default function Show({ data }: Props) {
+export default function Show({ data, role }: Props) {
     const penulis = data.penulis ?? [];
 
     return (
@@ -42,7 +43,7 @@ export default function Show({ data }: Props) {
             <Head title={`Detail - ${data.judul}`} />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
-                    <Link href={route("admin.kegiatan.index")} viewTransition>
+                    <Link href={route(role + ".kegiatan.index")} viewTransition>
                         <Button variant="outline" size="sm">
                             <ArrowLeft className="mr-1 h-4 w-4" />
                             Kembali
@@ -50,7 +51,7 @@ export default function Show({ data }: Props) {
                     </Link>
 
                     <Link
-                        href={route("admin.kegiatan.edit", data.id)}
+                        href={route(role + ".kegiatan.edit", data.id)}
                         viewTransition
                     >
                         <Button size="sm">
@@ -185,7 +186,6 @@ Show.layout = {
     breadcrumbs: [
         {
             title: "Kegiatan Penelitian",
-            href: route("admin.kegiatan.index"),
         },
         {
             title: "Detail",
