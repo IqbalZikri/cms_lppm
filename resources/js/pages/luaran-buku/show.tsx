@@ -7,7 +7,6 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
     Table,
@@ -18,10 +17,11 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { ArrowLeft, FileText, Pencil } from "lucide-react";
-import { LuaranProsiding } from "@/interface/luaran-prosiding";
+import { LuaranBuku } from "@/interface/luaran-buku";
 
 interface Props {
-    data: LuaranProsiding;
+    data: LuaranBuku;
+    role: string;
 }
 
 function formatRupiah(value: string | number) {
@@ -33,9 +33,35 @@ function formatRupiah(value: string | number) {
         minimumFractionDigits: 0,
     }).format(number);
 }
+type PenulisRow =
+    | {
+          tipe: "internal";
+          urutan: number;
+          nama_dosen: string;
+          asal: string;
+      }
+    | {
+          tipe: "luar";
+          urutan: number;
+          nama_dosen: string;
+          asal: string;
+      };
 
-export default function Show({ data }: Props) {
-    const penulis = data.penulis ?? [];
+export default function Show({ data, role }: Props) {
+    const daftarPenulis: PenulisRow[] = [
+        ...(data.penulis ?? []).map((p) => ({
+            tipe: "internal" as const,
+            urutan: p.urutan,
+            nama_dosen: p.dosen?.nama_dosen ?? "-",
+            asal: p.fakultas?.nama_fakultas ?? "-",
+        })),
+        ...(data.penulis_luar ?? []).map((p) => ({
+            tipe: "luar" as const,
+            urutan: p.urutan,
+            nama_dosen: p.nama_dosen ?? "-",
+            asal: p.nama_universitas ?? "-",
+        })),
+    ].sort((a, b) => a.urutan - b.urutan);
 
     return (
         <>
@@ -43,7 +69,7 @@ export default function Show({ data }: Props) {
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
                     <Link
-                        href={route("admin.luaran_prosiding.index")}
+                        href={route(role + ".luaran_buku.index")}
                         viewTransition
                     >
                         <Button variant="outline" size="sm">
@@ -53,7 +79,7 @@ export default function Show({ data }: Props) {
                     </Link>
 
                     <Link
-                        href={route("admin.luaran_prosiding.edit", data.id)}
+                        href={route(role + ".luaran_buku.edit", data.id)}
                         viewTransition
                     >
                         <Button size="sm">
@@ -72,33 +98,22 @@ export default function Show({ data }: Props) {
                     </CardHeader>
 
                     <CardContent className="space-y-6">
-                        {/* Info ringkas */}
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div>
-                                <p className="text-muted-foreground text-sm">
-                                    Semester
-                                </p>
-                                <p className="font-medium">{data.semester}</p>
-                            </div>
                             <div>
                                 <p className="text-muted-foreground text-sm">
                                     Tahun
                                 </p>
                                 <p className="font-medium">{data.tahun}</p>
                             </div>
+
+                            <div>
+                                <p className="text-muted-foreground text-sm">
+                                    ISBN
+                                </p>
+                                <p className="font-medium">{data.isbn}</p>
+                            </div>
                         </div>
 
-                        {/* Abstrak */}
-                        <div>
-                            <p className="text-muted-foreground mb-1 text-sm">
-                                Abstrak
-                            </p>
-                            <p className="text-sm leading-relaxed">
-                                {data.abstrak}
-                            </p>
-                        </div>
-
-                        {/* Link berkas */}
                         <div>
                             <p className="text-muted-foreground mb-1 text-sm">
                                 Link Berkas
@@ -115,13 +130,12 @@ export default function Show({ data }: Props) {
                             </Link>
                         </div>
 
-                        {/* Daftar penulis */}
                         <div>
                             <p className="text-muted-foreground mb-2 text-sm">
                                 Penulis
                             </p>
 
-                            {penulis.length === 0 ? (
+                            {daftarPenulis.length === 0 ? (
                                 <p className="text-muted-foreground text-sm">
                                     Belum ada data penulis.
                                 </p>
@@ -133,23 +147,30 @@ export default function Show({ data }: Props) {
                                                 No.
                                             </TableHead>
                                             <TableHead>Nama Dosen</TableHead>
-                                            <TableHead>Fakultas</TableHead>
+                                            <TableHead>
+                                                Fakultas / Universitas
+                                            </TableHead>
+                                            <TableHead>Keterangan</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {penulis.map((p, index) => (
+                                        {daftarPenulis.map((p, index) => (
                                             <TableRow
-                                                key={`${p.dosen_id}-${index}`}
+                                                key={`${p.tipe}-${p.urutan}-${index}`}
                                             >
                                                 <TableCell>
                                                     {index + 1}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {p.dosen.nama_dosen ?? "-"}
+                                                    {p.nama_dosen}
                                                 </TableCell>
+                                                <TableCell>{p.asal}</TableCell>
                                                 <TableCell>
-                                                    {p.fakultas.nama_fakultas ??
-                                                        "-"}
+                                                    <span className="rounded-full border px-2 py-0.5 text-xs text-muted-foreground">
+                                                        {p.tipe === "internal"
+                                                            ? "Internal"
+                                                            : "Luar Universitas"}
+                                                    </span>
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -167,7 +188,7 @@ export default function Show({ data }: Props) {
 Show.layout = {
     breadcrumbs: [
         {
-            title: "Luaran Prosiding",
+            title: "Luaran Buku",
         },
         {
             title: "Detail",

@@ -227,16 +227,6 @@ export default function LuaranBuku({
                                     ),
                                 },
                                 {
-                                    id: "periode",
-                                    key: "semester",
-                                    label: "Periode",
-                                    render: (_, item) => (
-                                        <span className="whitespace-nowrap text-sm">
-                                            {item.semester} {item.tahun}
-                                        </span>
-                                    ),
-                                },
-                                {
                                     id: "berkas",
                                     key: "link_berkas",
                                     label: "Berkas",

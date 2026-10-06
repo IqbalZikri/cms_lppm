@@ -1,7 +1,9 @@
 import axios from "axios";
 import { useEffect } from "react";
 import {
+    ArrowDown,
     ArrowLeft,
+    ArrowUp,
     BookText,
     FileText,
     Link2,
@@ -10,25 +12,10 @@ import {
     Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Fakultas } from "@/interface/fakultas";
 import { Dosen } from "@/types/dosen";
 import { Form, Link } from "@inertiajs/react";
@@ -38,6 +25,7 @@ import { Field, FieldGroup } from "@/components/ui/field";
 import { Combobox } from "@/components/ui/combobox";
 import { Penulis } from "@/interface/penulis";
 import { LuaranBuku } from "@/interface/luaran-buku";
+import { PenulisLuar } from "@/interface/penulis-luar";
 
 interface Props {
     fakultas: Fakultas[];
@@ -45,38 +33,67 @@ interface Props {
     role?: string;
 }
 
+type TipePenulis = "internal" | "luar";
+
 interface AuthorRow {
     key: string;
+    tipe: TipePenulis;
+    // internal
     fakultasId: string;
     dosenId: string;
     dosenOptions: Dosen[];
     loadingDosen: boolean;
+    // luar
+    nama_universitas: string;
+    nama_dosen: string;
 }
 
 function makeKey() {
     return Math.random().toString(36).slice(2);
 }
 
-function buildInitialAuthors(penulis: Penulis[] | undefined): AuthorRow[] {
-    if (!penulis || penulis.length === 0) {
-        return [
-            {
-                key: makeKey(),
-                fakultasId: "",
-                dosenId: "",
-                dosenOptions: [],
-                loadingDosen: false,
-            },
-        ];
-    }
-
-    return penulis.map((p) => ({
+function emptyRow(tipe: TipePenulis): AuthorRow {
+    return {
         key: makeKey(),
-        fakultasId: String(p.fakultas_id),
-        dosenId: String(p.dosen_id),
+        tipe,
+        fakultasId: "",
+        dosenId: "",
         dosenOptions: [],
         loadingDosen: false,
+        nama_universitas: "",
+        nama_dosen: "",
+    };
+}
+
+// Gabungkan penulis internal dan luar, lalu urutkan berdasarkan `urutan`
+function buildInitialAuthors(
+    penulis: Penulis[] | undefined,
+    penulisLuar: PenulisLuar[] | undefined,
+): AuthorRow[] {
+    const internal = (penulis ?? []).map((p) => ({
+        urutan: p.urutan,
+        row: {
+            ...emptyRow("internal"),
+            fakultasId: String(p.fakultas_id),
+            dosenId: String(p.dosen_id),
+        },
     }));
+
+    const luar = (penulisLuar ?? []).map((p) => ({
+        urutan: p.urutan,
+        row: {
+            ...emptyRow("luar"),
+            nama_universitas: p.nama_universitas,
+            nama_dosen: p.nama_dosen,
+        },
+    }));
+
+    const merged = [...internal, ...luar]
+        .sort((a, b) => a.urutan - b.urutan)
+        .map((x) => x.row);
+
+    // Form baru: mulai dengan satu penulis internal kosong
+    return merged.length > 0 ? merged : [emptyRow("internal")];
 }
 
 function RequiredMark() {
@@ -115,6 +132,8 @@ function SectionHeading({
 export default function FormLuaranBuku({ fakultas, luaranBuku, role }: Props) {
     const isEdit = !!luaranBuku;
 
+    console.log(luaranBuku);
+    
     const actionAdmin = isEdit
         ? route("admin.luaran_buku.update", luaranBuku!.id)
         : route("admin.luaran_buku.store");
@@ -128,8 +147,36 @@ export default function FormLuaranBuku({ fakultas, luaranBuku, role }: Props) {
         : route("uppm.luaran_buku.store");
 
     const [authors, setAuthors] = useState<AuthorRow[]>(() =>
-        buildInitialAuthors(luaranBuku?.penulis),
+        buildInitialAuthors(luaranBuku?.penulis, luaranBuku?.penulis_luar),
     );
+
+    function addAuthor(tipe: TipePenulis) {
+        setAuthors((prev) => [...prev, emptyRow(tipe)]);
+    }
+
+    function removeAuthor(key: string) {
+        setAuthors((prev) => prev.filter((a) => a.key !== key));
+    }
+
+    function moveAuthor(index: number, dir: -1 | 1) {
+        setAuthors((prev) => {
+            const target = index + dir;
+            if (target < 0 || target >= prev.length) return prev;
+            const next = [...prev];
+            [next[index], next[target]] = [next[target], next[index]];
+            return next;
+        });
+    }
+
+    function updateAuthorLuar(
+        key: string,
+        field: "nama_universitas" | "nama_dosen",
+        value: string,
+    ) {
+        setAuthors((prev) =>
+            prev.map((a) => (a.key === key ? { ...a, [field]: value } : a)),
+        );
+    }
 
     async function fetchDosenByFakultas(fakultasId: string): Promise<Dosen[]> {
         const { data } = await axios.get<Dosen[]>(
@@ -142,29 +189,16 @@ export default function FormLuaranBuku({ fakultas, luaranBuku, role }: Props) {
     // langsung fetch daftar dosennya begitu komponen mount.
     useEffect(() => {
         authors.forEach((author) => {
-            if (author.fakultasId && author.dosenOptions.length === 0) {
+            if (
+                author.tipe === "internal" &&
+                author.fakultasId &&
+                author.dosenOptions.length === 0
+            ) {
                 handleFakultasChange(author.key, author.fakultasId, false);
             }
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    function addAuthor() {
-        setAuthors((prev) => [
-            ...prev,
-            {
-                key: makeKey(),
-                fakultasId: "",
-                dosenId: "",
-                dosenOptions: [],
-                loadingDosen: false,
-            },
-        ]);
-    }
-
-    function removeAuthor(key: string) {
-        setAuthors((prev) => prev.filter((a) => a.key !== key));
-    }
 
     async function handleFakultasChange(
         key: string,
@@ -259,6 +293,33 @@ export default function FormLuaranBuku({ fakultas, luaranBuku, role }: Props) {
                                         </Field>
                                     </FieldGroup>
                                 </div>
+
+                                <div className="space-y-2 sm:pl-12">
+                                    <FieldGroup>
+                                        <Field>
+                                            <Label
+                                                htmlFor="isbn"
+                                                className="text-base"
+                                            >
+                                                ISBN
+                                                <RequiredMark />
+                                            </Label>
+                                            <Input
+                                                id="isbn"
+                                                name="isbn"
+                                                defaultValue={luaranBuku?.isbn}
+                                                placeholder="ISBN"
+                                                className="h-11 text-base"
+                                                aria-invalid={!!errors.isbn}
+                                            />
+                                            {errors.isbn && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.isbn}
+                                                </p>
+                                            )}
+                                        </Field>
+                                    </FieldGroup>
+                                </div>
                             </div>
 
                             <Separator />
@@ -328,8 +389,15 @@ export default function FormLuaranBuku({ fakultas, luaranBuku, role }: Props) {
                             <SectionHeading
                                 icon={Users}
                                 title="Penulis"
-                                description="Tambahkan satu atau lebih dosen sebagai penulis."
+                                description="Urutan di sini adalah urutan penulis pada buku. Gunakan panah untuk menggeser."
                             />
+
+                            {authors.length === 0 && (
+                                <p className="rounded-lg border border-dashed p-4 text-center text-sm text-muted-foreground">
+                                    Belum ada penulis. Klik tombol di bawah
+                                    untuk menambahkan.
+                                </p>
+                            )}
 
                             <div className="space-y-4">
                                 {authors.map((author, index) => (
@@ -337,11 +405,49 @@ export default function FormLuaranBuku({ fakultas, luaranBuku, role }: Props) {
                                         key={author.key}
                                         className="relative rounded-lg border bg-muted/30 p-4"
                                     >
-                                        <div className="mb-3 flex items-center justify-between">
-                                            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-sm font-medium text-primary-foreground">
-                                                {index + 1}
-                                            </span>
-                                            {authors.length > 1 && (
+                                        {/* Header kartu */}
+                                        <div className="mb-3 flex items-center justify-between gap-2">
+                                            <div className="flex items-center gap-2">
+                                                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-sm font-medium text-primary-foreground">
+                                                    {index + 1}
+                                                </span>
+                                                <span className="rounded-full border px-2 py-0.5 text-xs text-muted-foreground">
+                                                    {author.tipe === "internal"
+                                                        ? "Dosen Internal"
+                                                        : "Luar Universitas"}
+                                                </span>
+                                            </div>
+
+                                            <div className="flex items-center">
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8"
+                                                    disabled={index === 0}
+                                                    onClick={() =>
+                                                        moveAuthor(index, -1)
+                                                    }
+                                                    aria-label={`Naikkan penulis ${index + 1}`}
+                                                >
+                                                    <ArrowUp className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8"
+                                                    disabled={
+                                                        index ===
+                                                        authors.length - 1
+                                                    }
+                                                    onClick={() =>
+                                                        moveAuthor(index, 1)
+                                                    }
+                                                    aria-label={`Turunkan penulis ${index + 1}`}
+                                                >
+                                                    <ArrowDown className="h-4 w-4" />
+                                                </Button>
                                                 <Button
                                                     type="button"
                                                     variant="ghost"
@@ -354,11 +460,12 @@ export default function FormLuaranBuku({ fakultas, luaranBuku, role }: Props) {
                                                 >
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>
-                                            )}
+                                            </div>
                                         </div>
 
-                                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                            <div className="space-y-2">
+                                        {/* Isi kartu sesuai tipe */}
+                                        {author.tipe === "internal" ? (
+                                            <div className="grid grid-cols-1 gap-3">
                                                 <FieldGroup>
                                                     <Field>
                                                         <Label className="text-sm text-muted-foreground">
@@ -400,9 +507,7 @@ export default function FormLuaranBuku({ fakultas, luaranBuku, role }: Props) {
                                                         )}
                                                     </Field>
                                                 </FieldGroup>
-                                            </div>
 
-                                            <div className="space-y-2">
                                                 <FieldGroup>
                                                     <Field>
                                                         <Label className="text-sm text-muted-foreground">
@@ -464,46 +569,136 @@ export default function FormLuaranBuku({ fakultas, luaranBuku, role }: Props) {
                                                     </Field>
                                                 </FieldGroup>
                                             </div>
-                                        </div>
+                                        ) : (
+                                            <div className="grid grid-cols-1 gap-3">
+                                                <FieldGroup>
+                                                    <Field>
+                                                        <Label className="text-sm text-muted-foreground">
+                                                            Universitas
+                                                        </Label>
+                                                        <Input
+                                                            value={
+                                                                author.nama_universitas
+                                                            }
+                                                            onChange={(e) =>
+                                                                updateAuthorLuar(
+                                                                    author.key,
+                                                                    "nama_universitas",
+                                                                    e.target
+                                                                        .value,
+                                                                )
+                                                            }
+                                                            placeholder="Nama Universitas"
+                                                        />
+                                                        {errors[
+                                                            `authors.${index}.nama_universitas`
+                                                        ] && (
+                                                            <p className="text-sm text-red-500">
+                                                                {
+                                                                    errors[
+                                                                        `authors.${index}.nama_universitas`
+                                                                    ]
+                                                                }
+                                                            </p>
+                                                        )}
+                                                    </Field>
+                                                </FieldGroup>
+
+                                                <FieldGroup>
+                                                    <Field>
+                                                        <Label className="text-sm text-muted-foreground">
+                                                            Nama Dosen
+                                                        </Label>
+                                                        <Input
+                                                            value={
+                                                                author.nama_dosen
+                                                            }
+                                                            onChange={(e) =>
+                                                                updateAuthorLuar(
+                                                                    author.key,
+                                                                    "nama_dosen",
+                                                                    e.target
+                                                                        .value,
+                                                                )
+                                                            }
+                                                            placeholder="Nama Dosen"
+                                                        />
+                                                        {errors[
+                                                            `authors.${index}.nama_dosen`
+                                                        ] && (
+                                                            <p className="text-sm text-red-500">
+                                                                {
+                                                                    errors[
+                                                                        `authors.${index}.nama_dosen`
+                                                                    ]
+                                                                }
+                                                            </p>
+                                                        )}
+                                                    </Field>
+                                                </FieldGroup>
+                                            </div>
+                                        )}
+
+                                        {/* Hidden input: semua pakai index dari posisi array */}
+                                        <input
+                                            type="hidden"
+                                            name={`authors[${index}][tipe]`}
+                                            value={author.tipe}
+                                        />
+                                        {author.tipe === "internal" ? (
+                                            <>
+                                                <input
+                                                    type="hidden"
+                                                    name={`authors[${index}][fakultas_id]`}
+                                                    value={author.fakultasId}
+                                                />
+                                                <input
+                                                    type="hidden"
+                                                    name={`authors[${index}][dosen_id]`}
+                                                    value={author.dosenId}
+                                                />
+                                            </>
+                                        ) : (
+                                            <>
+                                                <input
+                                                    type="hidden"
+                                                    name={`authors[${index}][nama_universitas]`}
+                                                    value={
+                                                        author.nama_universitas
+                                                    }
+                                                />
+                                                <input
+                                                    type="hidden"
+                                                    name={`authors[${index}][nama_dosen]`}
+                                                    value={author.nama_dosen}
+                                                />
+                                            </>
+                                        )}
                                     </div>
                                 ))}
                             </div>
 
-                            {authors.map((author, index) => (
-                                <div key={`hidden-${author.key}`}>
-                                    <input
-                                        type="hidden"
-                                        name={`authors[${index}][fakultas_id]`}
-                                        value={author.fakultasId}
-                                    />
-                                    <input
-                                        type="hidden"
-                                        name={`authors[${index}][dosen_id]`}
-                                        value={author.dosenId}
-                                    />
-                                    <input
-                                        type="hidden"
-                                        name={`authors[${index}][nama_dosen]`}
-                                        value={
-                                            author.dosenOptions.find(
-                                                (d) =>
-                                                    String(d.id) ===
-                                                    author.dosenId,
-                                            )?.nama_dosen ?? ""
-                                        }
-                                    />
-                                </div>
-                            ))}
-
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={addAuthor}
-                                className="h-10 w-full text-sm"
-                            >
-                                <Plus className="mr-1 h-4 w-4" />
-                                Tambah Penulis
-                            </Button>
+                            {/* Dua tombol tambah */}
+                            <div className="grid grid-cols-1 gap-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => addAuthor("internal")}
+                                    className="h-10 w-full text-sm"
+                                >
+                                    <Plus className="mr-1 h-4 w-4" />
+                                    Tambah Dosen Internal
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => addAuthor("luar")}
+                                    className="h-10 w-full text-sm"
+                                >
+                                    <Plus className="mr-1 h-4 w-4" />
+                                    Tambah Penulis Luar Universitas
+                                </Button>
+                            </div>
 
                             {errors.authors && (
                                 <p className="text-sm text-red-500">
@@ -538,9 +733,7 @@ export default function FormLuaranBuku({ fakultas, luaranBuku, role }: Props) {
                             disabled={processing}
                             className="h-11 w-full px-6 text-base sm:w-auto"
                         >
-                            {isEdit
-                                ? "Simpan Perubahan"
-                                : "Simpan Luaran Buku"}
+                            {isEdit ? "Simpan Perubahan" : "Simpan Luaran Buku"}
                         </Button>
                     </CardFooter>
                 </Card>

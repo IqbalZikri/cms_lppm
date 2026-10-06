@@ -21,4 +21,9 @@ class LuaranBuku extends Model
     {
         return $this->morphMany(Penulis::class, 'penulisable')->orderBy('urutan');
     }
+
+    public function penulisLuar(): MorphMany
+    {
+        return $this->morphMany(PenulisLuar::class, 'penulisable_luar')->orderBy("urutan");
+    }
 }

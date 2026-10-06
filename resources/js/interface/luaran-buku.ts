@@ -1,4 +1,5 @@
 import { Penulis } from "./penulis";
+import { PenulisLuar } from "./penulis-luar";
 
 
 export interface LuaranBuku {
@@ -8,4 +9,5 @@ export interface LuaranBuku {
     tahun: number;
     link_berkas: string;
     penulis: Penulis[];
+    penulis_luar: PenulisLuar[];
 }

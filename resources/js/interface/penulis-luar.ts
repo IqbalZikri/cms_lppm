@@ -1,7 +1,4 @@
-import { Dosen } from "@/types/dosen";
-import { Fakultas } from "./fakultas";
-
-export interface Penulis {
+export interface PenulisLuar {
     id: number;
     penulisable_type: string;
     penulisable_id: number;

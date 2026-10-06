@@ -96,45 +96,59 @@ class LuaranBukuController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'judul' => 'required',
-            'isbn' => 'required',
-            'tahun' => 'required',
-            'link_berkas' => 'required',
+            'judul' => 'required|string',
+            'isbn' => 'required|string',
+            'tahun' => 'required|integer',
+            'link_berkas' => 'required|url',
             'authors' => 'required|array|min:1',
-            'authors.*.fakultas_id' => 'required|exists:fakultas,id',
-            'authors.*.dosen_id' => 'required|exists:dosens,id',
+            'authors.*.tipe' => 'required|in:internal,luar',
+            'authors.*.fakultas_id' => 'required_if:authors.*.tipe,internal|nullable|exists:fakultas,id',
+            'authors.*.dosen_id' => 'required_if:authors.*.tipe,internal|nullable|exists:dosens,id',
+            'authors.*.nama_universitas' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
+            'authors.*.nama_dosen' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
         ], [
             'judul.required' => 'Silahkan isi judul',
-            'abstrak.required' => 'Silahkan isi abstrak',
+            'isbn.required' => 'Silahkan isi ISBN',
             'tahun.required' => 'Silahkan isi tahun',
             'link_berkas.required' => 'Silahkan isi link berkas',
-            'authors.required' => 'Silahkan tambahkan minimal satu  / pelaksana',
-            'authors.*.fakultas_id.required' => 'Silahkan pilih fakultas untuk setiap  / pelaksana',
+            'authors.required' => 'Silahkan tambahkan minimal satu penulis',
+            'authors.*.fakultas_id.required_if' => 'Silahkan pilih fakultas',
+            'authors.*.dosen_id.required_if' => 'Silahkan pilih dosen',
+            'authors.*.nama_universitas.required_if' => 'Silahkan isi nama universitas',
+            'authors.*.nama_dosen.required_if' => 'Silahkan isi nama dosen',
         ]);
 
         DB::beginTransaction();
 
         try {
             $data = LuaranBuku::create([
-                "judul" => $validated["judul"],
-                "abstrak" => $validated["abstrak"],
-                "tahun" => $validated["tahun"],
-                "link_berkas" => $validated["link_berkas"],
+                'judul' => $validated['judul'],
+                'isbn' => $validated['isbn'],
+                'tahun' => $validated['tahun'],
+                'link_berkas' => $validated['link_berkas'],
             ]);
 
             foreach ($validated['authors'] as $i => $author) {
-                $data->penulis()->create([
-                    'fakultas_id' => $author["fakultas_id"],
-                    "dosen_id" => $author["dosen_id"],
-                    "urutan" => $i++
-                ]);
+                if ($author['tipe'] === 'internal') {
+                    $data->penulis()->create([
+                        'fakultas_id' => $author['fakultas_id'],
+                        'dosen_id' => $author['dosen_id'],
+                        'urutan' => $i + 1,
+                    ]);
+                } else {
+                    $data->penulisLuar()->create([
+                        'nama_universitas' => $author['nama_universitas'],
+                        'nama_dosen' => $author['nama_dosen'],
+                        'urutan' => $i + 1,
+                    ]);
+                }
             }
 
             DB::commit();
 
-            $role = auth()->user()->role;
-
-            return redirect()->route($role . ".luaran_buku.index")->with("success", "Berhasil menambahkan luaran buku");
+            return redirect()
+                ->route(auth()->user()->role . '.luaran_buku.index')
+                ->with('success', 'Berhasil menambahkan luaran buku');
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
@@ -148,7 +162,7 @@ class LuaranBukuController extends Controller
     public function show(LuaranBuku $luaranBuku)
     {
         $role = auth()->user()->role;
-        $luaranBuku->with("penulis.fakultas", "penulis.dosen");
+        $luaranBuku->load("penulis.fakultas", "penulis.dosen", "penulisLuar");
         return Inertia::render("luaran-buku/show", [
             "role" => $role,
             "data" => $luaranBuku,
@@ -160,11 +174,13 @@ class LuaranBukuController extends Controller
      */
     public function edit(LuaranBuku $luaranBuku)
     {
-        $luaranBuku->with("penulis.fakultas", "penulis.dosen");
+        $luaranBuku->load("penulis.fakultas", "penulis.dosen", "penulisLuar");
         $role = auth()->user()->role;
-        return Inertia::render("luaran_buku/edit", [
+        $fakultas = Fakultas::select("id", "nama_fakultas")->get();
+        return Inertia::render("luaran-buku/edit", [
             "data" => $luaranBuku,
-            "role" => $role
+            "role" => $role,
+            "fakultas" => $fakultas
         ]);
     }
 
@@ -174,21 +190,30 @@ class LuaranBukuController extends Controller
     public function update(Request $request, LuaranBuku $luaranBuku)
     {
         $validated = $request->validate([
-            'judul' => 'required',
-            'abstrak' => 'required',
-            'tahun' => 'required',
-            'link_berkas' => 'required',
+            'judul' => 'required|string',
+            'isbn' => 'required|string',
+            'tahun' => 'required|integer',
+            'link_berkas' => 'required|url',
             'authors' => 'required|array|min:1',
-            'authors.*.fakultas_id' => 'required|exists:fakultas,id',
-            'authors.*.dosen_id' => 'required|exists:dosens,id',
+            'authors.*.tipe' => 'required|in:internal,luar',
+
+            // internal
+            'authors.*.fakultas_id' => 'required_if:authors.*.tipe,internal|nullable|exists:fakultas,id',
+            'authors.*.dosen_id' => 'required_if:authors.*.tipe,internal|nullable|exists:dosens,id',
+
+            // luar universitas
+            'authors.*.nama_universitas' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
+            'authors.*.nama_dosen' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
         ], [
             'judul.required' => 'Silahkan isi judul',
-            'abstrak.required' => 'Silahkan isi abstrak',
+            'isbn.required' => 'Silahkan isi ISBN',
             'tahun.required' => 'Silahkan isi tahun',
             'link_berkas.required' => 'Silahkan isi link berkas',
-            'authors.required' => 'Silahkan tambahkan minimal satu  / pelaksana',
-            'authors.*.fakultas_id.required' => 'Silahkan pilih fakultas untuk setiap  / pelaksana',
-            'authors.*.dosen_id.required' => 'Silahkan pilih dosen untuk setiap  / pelaksana',
+            'authors.required' => 'Silahkan tambahkan minimal satu penulis',
+            'authors.*.fakultas_id.required_if' => 'Silahkan pilih fakultas',
+            'authors.*.dosen_id.required_if' => 'Silahkan pilih dosen',
+            'authors.*.nama_universitas.required_if' => 'Silahkan isi nama universitas',
+            'authors.*.nama_dosen.required_if' => 'Silahkan isi nama dosen',
         ]);
 
         DB::beginTransaction();
@@ -196,18 +221,27 @@ class LuaranBukuController extends Controller
         try {
             $luaranBuku->update([
                 "judul" => $validated["judul"],
-                "abstrak" => $validated["abstrak"],
+                "isbn" => $validated["isbn"],
                 "tahun" => $validated["tahun"],
                 "link_berkas" => $validated["link_berkas"],
             ]);
 
             $luaranBuku->penulis()->delete();
-            foreach ($validated["authors"] as $i => $author) {
-                $luaranBuku->penulis()->create([
-                    "fakultas_id" => $author["fakultas_id"],
-                    "dosen_id" => $author["dosen_id"],
-                    "urutan" => $i++
-                ]);
+            $luaranBuku->penulisLuar()->delete();
+            foreach ($validated['authors'] as $i => $author) {
+                if ($author['tipe'] === 'internal') {
+                    $luaranBuku->penulis()->create([
+                        'fakultas_id' => $author['fakultas_id'],
+                        'dosen_id' => $author['dosen_id'],
+                        'urutan' => $i + 1,
+                    ]);
+                } else {
+                    $luaranBuku->penulisLuar()->create([
+                        'nama_universitas' => $author['nama_universitas'],
+                        'nama_dosen' => $author['nama_dosen'],
+                        'urutan' => $i + 1,
+                    ]);
+                }
             }
 
             DB::commit();
@@ -230,6 +264,7 @@ class LuaranBukuController extends Controller
         DB::beginTransaction();
         try {
             $luaranBuku->penulis()->delete();
+            $luaranBuku->penulisLuar()->delete();
             $luaranBuku->delete();
 
             DB::commit();
