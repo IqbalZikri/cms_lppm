@@ -26,6 +26,7 @@ import { Combobox } from "@/components/ui/combobox";
 import { Penulis } from "@/interface/penulis";
 import { LuaranBuku } from "@/interface/luaran-buku";
 import { PenulisLuar } from "@/interface/penulis-luar";
+import SectionHeading from "@/components/section-heading";
 
 interface Props {
     fakultas: Fakultas[];
@@ -98,35 +99,6 @@ function buildInitialAuthors(
 
 function RequiredMark() {
     return <span className="ml-0.5 text-red-500">*</span>;
-}
-
-/** Small section heading used to break the long form into readable groups. */
-function SectionHeading({
-    icon: Icon,
-    title,
-    description,
-}: {
-    icon: React.ElementType;
-    title: string;
-    description?: string;
-}) {
-    return (
-        <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <Icon className="h-4 w-4" />
-            </div>
-            <div>
-                <h3 className="text-base font-semibold leading-none">
-                    {title}
-                </h3>
-                {description && (
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        {description}
-                    </p>
-                )}
-            </div>
-        </div>
-    );
 }
 
 export default function FormLuaranBuku({ fakultas, luaranBuku, role }: Props) {
