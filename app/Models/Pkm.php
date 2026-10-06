@@ -14,7 +14,9 @@ class Pkm extends Model
     protected array $searchable = [
         'judul',
         'penulis.fakultas.nama_fakultas',
-        'penulis.dosen.nama_dosen'
+        'penulis.dosen.nama_dosen',
+        'penulis.nama_universitas',
+        'penulis.nama_dosen',
     ];
     protected $fillable = [
         'jenis_pkm',
@@ -32,7 +34,8 @@ class Pkm extends Model
         return $this->morphMany(Penulis::class, 'penulisable')->orderBy('urutan');
     }
 
-    protected $casts = [
-        'penulis' => 'array',
-    ];
+    public function penulisLuar(): MorphMany
+    {
+        return $this->morphMany(PenulisLuar::class, 'penulisable_luar')->orderBy('urutan');
+    }
 }

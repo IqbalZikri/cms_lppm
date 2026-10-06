@@ -3,7 +3,6 @@
 use App\Http\Controllers\Admin\BeritaController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LuaranJurnalController;
-use App\Http\Controllers\Admin\PkmController;
 use App\Http\Controllers\Admin\DosenController;
 use App\Http\Controllers\Admin\FakultasController;
 use App\Http\Controllers\Admin\HkiController;
@@ -15,6 +14,7 @@ use App\Http\Controllers\Admin\SesiController;
 use App\Http\Controllers\Admin\SiteSettingsController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\LuaranBukuController;
+use App\Http\Controllers\PkmController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -87,7 +87,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::put('kegiatan/{id}', [KegiatanController::class, 'update'])->name('kegiatan.update');
         Route::delete('kegiatan/{id}', [KegiatanController::class, 'destroy'])->name('kegiatan.destroy');
 
-        Route::get('pkm', [PkmController::class, 'index'])->name('pkm.index');
+        Route::get('pkm', [PkmController::class, 'indexAdmin'])->name('pkm.index');
         Route::get('pkm/create', [PkmController::class, 'create'])->name('pkm.create');
         Route::post('pkm/create', [PkmController::class, 'store'])->name('pkm.store');
         Route::get('pkm//detail/{id}', [PkmController::class, 'show'])->name('pkm.show');

@@ -7,7 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { PaginatedData } from "@/interface/pagination";
 import { Pkm as PkmInterface } from "@/interface/pkm";
 import { Fakultas } from "@/types/fakultas";
@@ -190,6 +197,45 @@ export default function Pkm({
                                                 {penulis.dosen.nama_dosen}
                                             </Badge>
                                         )),
+                                },
+                                {
+                                    id: "penulis_luar",
+                                    key: "penulis_luar",
+                                    label: "Penulis Luar Universitas",
+                                    render: (_, item) => (
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {item.penulis_luar.length !== 0 ? (
+                                                <>
+                                                    {item.penulis_luar.map(
+                                                        (penulis, i) => (
+                                                            <div
+                                                                key={i}
+                                                                className="flex flex-wrap items-center gap-1.5"
+                                                            >
+                                                                <Badge
+                                                                    className="whitespace-nowrap text-[13px]"
+                                                                    variant={
+                                                                        "outline"
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        penulis.nama_universitas
+                                                                    }
+                                                                </Badge>
+                                                                <Badge className="whitespace-nowrap text-[13px]">
+                                                                    {
+                                                                        penulis.nama_dosen
+                                                                    }
+                                                                </Badge>
+                                                            </div>
+                                                        ),
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <>-</>
+                                            )}
+                                        </div>
+                                    ),
                                 },
                             ]}
                             renderActions={(item) => (

@@ -1,4 +1,5 @@
 import { Penulis } from "./penulis";
+import { PenulisLuar } from "./penulis-luar";
 
 export interface Pkm {
     id: number;
@@ -11,4 +12,5 @@ export interface Pkm {
     sumber_dana: string;
     jumlah_dana: string;
     penulis: Penulis[];
+    penulis_luar: PenulisLuar[];
 }

@@ -195,7 +195,7 @@ export default function FormPenulis({
                 <SectionHeading
                     icon={Users}
                     title="Penulis"
-                    description="Urutan di sini adalah urutan penulis pada buku. Gunakan panah untuk menggeser."
+                    description="Urutan di sini adalah urutan penulis pada penelitian. Gunakan panah untuk menggeser."
                 />
 
                 {authors.length === 0 && (
