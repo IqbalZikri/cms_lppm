@@ -53,7 +53,6 @@ export default function Dashboard({
     luaranJurnalTerbaru,
     luaranProsidingTerbaru,
 }: Props) {
-    console.log(dosenLogin);
 
     return (
         <>

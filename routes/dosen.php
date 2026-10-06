@@ -6,6 +6,7 @@ use App\Http\Controllers\Dosen\KegiatanController;
 use App\Http\Controllers\Dosen\LuaranJurnalController;
 use App\Http\Controllers\Dosen\LuaranProsidingController;
 use App\Http\Controllers\Dosen\PkmController;
+use App\Http\Controllers\LuaranBukuController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:dosen'])
@@ -53,4 +54,12 @@ Route::middleware(['auth', 'role:dosen'])
         Route::get('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'edit'])->name('luaran_jurnal.edit');
         Route::put('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'update'])->name('luaran_jurnal.update');
         Route::delete('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'destroy'])->name('luaran_jurnal.destroy');
+
+        Route::get('luaran_buku', [LuaranBukuController::class, 'indexDosen'])->name('luaran_buku.index');
+        Route::get('luaran_buku/create', [LuaranBukuController::class, 'create'])->name('luaran_buku.create');
+        Route::post('luaran_buku/create', [LuaranBukuController::class, 'store'])->name('luaran_buku.store');
+        Route::get('luaran_buku//detail/{luaran_buku}', [LuaranBukuController::class, 'show'])->name('luaran_buku.show');
+        Route::get('luaran_buku/{luaran_buku}', [LuaranBukuController::class, 'edit'])->name('luaran_buku.edit');
+        Route::put('luaran_buku/{luaran_buku}', [LuaranBukuController::class, 'update'])->name('luaran_buku.update');
+        Route::delete('luaran_buku/{luaran_buku}', [LuaranBukuController::class, 'destroy'])->name('luaran_buku.destroy');
     });

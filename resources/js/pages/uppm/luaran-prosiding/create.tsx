@@ -18,7 +18,7 @@ interface Props {
 export default function CreateKegiatan({ fakultas, role }: Props) {
     return (
         <>
-            <Head title="Tambah Penelitian Kegiatan" />
+            <Head title="Tambah Luaran Prosiding" />
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 sm:p-6">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
@@ -46,7 +46,7 @@ export default function CreateKegiatan({ fakultas, role }: Props) {
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("dosen.kegiatan.create")}
+                                        href={route("dosen.luaran_prosiding.create")}
                                     >
                                         Tambah Luaran Prosiding
                                     </BreadcrumbLink>
@@ -64,7 +64,7 @@ export default function CreateKegiatan({ fakultas, role }: Props) {
 CreateKegiatan.layout = {
     breadcrumbs: [
         {
-            title: "Tambah Penelitian Kegiatan",
+            title: "Tambah Luaran Prosiding",
         },
     ],
 };

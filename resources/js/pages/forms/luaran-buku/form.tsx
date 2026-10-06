@@ -1,0 +1,550 @@
+import axios from "axios";
+import { useEffect } from "react";
+import {
+    ArrowLeft,
+    BookText,
+    FileText,
+    Link2,
+    Plus,
+    Trash2,
+    Users,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Fakultas } from "@/interface/fakultas";
+import { Dosen } from "@/types/dosen";
+import { Form, Link } from "@inertiajs/react";
+import { useState } from "react";
+import { route } from "ziggy-js";
+import { Field, FieldGroup } from "@/components/ui/field";
+import { Combobox } from "@/components/ui/combobox";
+import { Penulis } from "@/interface/penulis";
+import { LuaranBuku } from "@/interface/luaran-buku";
+
+interface Props {
+    fakultas: Fakultas[];
+    luaranBuku?: LuaranBuku;
+    role?: string;
+}
+
+interface AuthorRow {
+    key: string;
+    fakultasId: string;
+    dosenId: string;
+    dosenOptions: Dosen[];
+    loadingDosen: boolean;
+}
+
+function makeKey() {
+    return Math.random().toString(36).slice(2);
+}
+
+function buildInitialAuthors(penulis: Penulis[] | undefined): AuthorRow[] {
+    if (!penulis || penulis.length === 0) {
+        return [
+            {
+                key: makeKey(),
+                fakultasId: "",
+                dosenId: "",
+                dosenOptions: [],
+                loadingDosen: false,
+            },
+        ];
+    }
+
+    return penulis.map((p) => ({
+        key: makeKey(),
+        fakultasId: String(p.fakultas_id),
+        dosenId: String(p.dosen_id),
+        dosenOptions: [],
+        loadingDosen: false,
+    }));
+}
+
+function RequiredMark() {
+    return <span className="ml-0.5 text-red-500">*</span>;
+}
+
+/** Small section heading used to break the long form into readable groups. */
+function SectionHeading({
+    icon: Icon,
+    title,
+    description,
+}: {
+    icon: React.ElementType;
+    title: string;
+    description?: string;
+}) {
+    return (
+        <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <Icon className="h-4 w-4" />
+            </div>
+            <div>
+                <h3 className="text-base font-semibold leading-none">
+                    {title}
+                </h3>
+                {description && (
+                    <p className="mt-1 text-sm text-muted-foreground">
+                        {description}
+                    </p>
+                )}
+            </div>
+        </div>
+    );
+}
+
+export default function FormLuaranBuku({ fakultas, luaranBuku, role }: Props) {
+    const isEdit = !!luaranBuku;
+
+    const actionAdmin = isEdit
+        ? route("admin.luaran_buku.update", luaranBuku!.id)
+        : route("admin.luaran_buku.store");
+
+    const actionDosen = isEdit
+        ? route("dosen.luaran_buku.update", luaranBuku!.id)
+        : route("dosen.luaran_buku.store");
+
+    const actionUppm = isEdit
+        ? route("uppm.luaran_buku.update", luaranBuku!.id)
+        : route("uppm.luaran_buku.store");
+
+    const [authors, setAuthors] = useState<AuthorRow[]>(() =>
+        buildInitialAuthors(luaranBuku?.penulis),
+    );
+
+    async function fetchDosenByFakultas(fakultasId: string): Promise<Dosen[]> {
+        const { data } = await axios.get<Dosen[]>(
+            route("dosen.getDosen", fakultasId),
+        );
+        return data;
+    }
+
+    // Kalau mode edit dan baris sudah punya fakultasId dari awal,
+    // langsung fetch daftar dosennya begitu komponen mount.
+    useEffect(() => {
+        authors.forEach((author) => {
+            if (author.fakultasId && author.dosenOptions.length === 0) {
+                handleFakultasChange(author.key, author.fakultasId, false);
+            }
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    function addAuthor() {
+        setAuthors((prev) => [
+            ...prev,
+            {
+                key: makeKey(),
+                fakultasId: "",
+                dosenId: "",
+                dosenOptions: [],
+                loadingDosen: false,
+            },
+        ]);
+    }
+
+    function removeAuthor(key: string) {
+        setAuthors((prev) => prev.filter((a) => a.key !== key));
+    }
+
+    async function handleFakultasChange(
+        key: string,
+        fakultasId: string,
+        resetDosen = true,
+    ) {
+        setAuthors((prev) =>
+            prev.map((a) =>
+                a.key === key
+                    ? {
+                          ...a,
+                          fakultasId,
+                          dosenId: resetDosen ? "" : a.dosenId,
+                          loadingDosen: true,
+                      }
+                    : a,
+            ),
+        );
+
+        try {
+            const options = await fetchDosenByFakultas(fakultasId);
+            setAuthors((prev) =>
+                prev.map((a) =>
+                    a.key === key
+                        ? { ...a, dosenOptions: options, loadingDosen: false }
+                        : a,
+                ),
+            );
+        } catch (error) {
+            setAuthors((prev) =>
+                prev.map((a) =>
+                    a.key === key
+                        ? { ...a, dosenOptions: [], loadingDosen: false }
+                        : a,
+                ),
+            );
+        }
+    }
+
+    function updateAuthorDosen(key: string, dosenId: string) {
+        setAuthors((prev) =>
+            prev.map((a) => (a.key === key ? { ...a, dosenId } : a)),
+        );
+    }
+
+    return (
+        <Form
+            action={
+                role === "dosen"
+                    ? actionDosen
+                    : role === "uppm"
+                      ? actionUppm
+                      : actionAdmin
+            }
+            method={isEdit ? "put" : "post"}
+        >
+            {({ errors, processing }) => (
+                <Card className="w-full shadow-sm">
+                    <CardContent className="grid grid-cols-1 gap-8 pt-6 lg:grid-cols-3 lg:gap-10">
+                        {/* Kolom kiri: Informasi Publikasi + Detail Buku */}
+                        <div className="space-y-8 lg:col-span-2">
+                            <div className="space-y-5">
+                                <SectionHeading
+                                    icon={BookText}
+                                    title="Informasi Publikasi"
+                                    description="Judul dan ringkasan singkat dari Luaran Buku."
+                                />
+
+                                <div className="space-y-2 sm:pl-12">
+                                    <FieldGroup>
+                                        <Field>
+                                            <Label
+                                                htmlFor="judul"
+                                                className="text-base"
+                                            >
+                                                Judul
+                                                <RequiredMark />
+                                            </Label>
+                                            <Input
+                                                id="judul"
+                                                name="judul"
+                                                defaultValue={luaranBuku?.judul}
+                                                placeholder="Contoh: Analisis Implementasi..."
+                                                className="h-11 text-base"
+                                                aria-invalid={!!errors.judul}
+                                            />
+                                            {errors.judul && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.judul}
+                                                </p>
+                                            )}
+                                        </Field>
+                                    </FieldGroup>
+                                </div>
+                            </div>
+
+                            <Separator />
+
+                            <div className="space-y-5">
+                                <SectionHeading
+                                    icon={FileText}
+                                    title="Detail Buku"
+                                    description="Waktu terbit dan berkas pendukung."
+                                />
+
+                                <div className="grid grid-cols-1 gap-6 sm:pl-12 sm:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <Label
+                                            htmlFor="tahun"
+                                            className="text-base"
+                                        >
+                                            Tahun
+                                            <RequiredMark />
+                                        </Label>
+                                        <Input
+                                            id="tahun"
+                                            name="tahun"
+                                            type="number"
+                                            defaultValue={luaranBuku?.tahun}
+                                            placeholder="2026"
+                                            className="h-11 text-base"
+                                        />
+                                        {errors.tahun && (
+                                            <p className="text-sm text-red-500">
+                                                {errors.tahun}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2 sm:pl-12">
+                                    <Label
+                                        htmlFor="link_berkas"
+                                        className="text-base"
+                                    >
+                                        <span className="inline-flex items-center gap-1.5">
+                                            <Link2 className="h-3.5 w-3.5" />
+                                            Link Berkas
+                                        </span>
+                                        <RequiredMark />
+                                    </Label>
+                                    <Input
+                                        id="link_berkas"
+                                        name="link_berkas"
+                                        type="url"
+                                        defaultValue={luaranBuku?.link_berkas}
+                                        placeholder="https://drive.google.com/..."
+                                        className="h-11 text-base"
+                                    />
+                                    {errors.link_berkas && (
+                                        <p className="text-sm text-red-500">
+                                            {errors.link_berkas}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Kolom kanan: Penulis — panel terpisah agar ruang lebar dashboard tidak kosong */}
+                        <div className="space-y-5 rounded-xl border bg-muted/20 p-5 lg:col-span-1 lg:self-start">
+                            <SectionHeading
+                                icon={Users}
+                                title="Penulis"
+                                description="Tambahkan satu atau lebih dosen sebagai penulis."
+                            />
+
+                            <div className="space-y-4">
+                                {authors.map((author, index) => (
+                                    <div
+                                        key={author.key}
+                                        className="relative rounded-lg border bg-muted/30 p-4"
+                                    >
+                                        <div className="mb-3 flex items-center justify-between">
+                                            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-sm font-medium text-primary-foreground">
+                                                {index + 1}
+                                            </span>
+                                            {authors.length > 1 && (
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 rounded-full text-red-500 hover:bg-red-50 hover:text-red-600"
+                                                    onClick={() =>
+                                                        removeAuthor(author.key)
+                                                    }
+                                                    aria-label={`Hapus penulis ${index + 1}`}
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            )}
+                                        </div>
+
+                                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                            <div className="space-y-2">
+                                                <FieldGroup>
+                                                    <Field>
+                                                        <Label className="text-sm text-muted-foreground">
+                                                            Fakultas
+                                                        </Label>
+                                                        <Combobox
+                                                            options={fakultas.map(
+                                                                (f) => ({
+                                                                    value: String(
+                                                                        f.id,
+                                                                    ),
+                                                                    label: f.nama_fakultas,
+                                                                }),
+                                                            )}
+                                                            value={
+                                                                author.fakultasId
+                                                            }
+                                                            onValueChange={(
+                                                                value,
+                                                            ) =>
+                                                                handleFakultasChange(
+                                                                    author.key,
+                                                                    value,
+                                                                )
+                                                            }
+                                                            placeholder="Pilih fakultas"
+                                                            searchPlaceholder="Cari fakultas..."
+                                                        />
+                                                        {errors[
+                                                            `authors.${index}.fakultas_id`
+                                                        ] && (
+                                                            <p className="text-sm text-red-500">
+                                                                {
+                                                                    errors[
+                                                                        `authors.${index}.fakultas_id`
+                                                                    ]
+                                                                }
+                                                            </p>
+                                                        )}
+                                                    </Field>
+                                                </FieldGroup>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <FieldGroup>
+                                                    <Field>
+                                                        <Label className="text-sm text-muted-foreground">
+                                                            Nama Dosen
+                                                        </Label>
+                                                        <Combobox
+                                                            options={author.dosenOptions.map(
+                                                                (d) => ({
+                                                                    value: String(
+                                                                        d.id,
+                                                                    ),
+                                                                    label: d.nama_dosen,
+                                                                }),
+                                                            )}
+                                                            value={
+                                                                author.dosenId
+                                                            }
+                                                            onValueChange={(
+                                                                value,
+                                                            ) =>
+                                                                updateAuthorDosen(
+                                                                    author.key,
+                                                                    value,
+                                                                )
+                                                            }
+                                                            placeholder={
+                                                                !author.fakultasId
+                                                                    ? "Pilih fakultas dulu"
+                                                                    : author.loadingDosen
+                                                                      ? "Memuat dosen..."
+                                                                      : author
+                                                                              .dosenOptions
+                                                                              .length ===
+                                                                          0
+                                                                        ? "Tidak ada data dosen"
+                                                                        : "Pilih dosen"
+                                                            }
+                                                            searchPlaceholder="Cari dosen..."
+                                                            disabled={
+                                                                !author.fakultasId ||
+                                                                author.loadingDosen ||
+                                                                author
+                                                                    .dosenOptions
+                                                                    .length ===
+                                                                    0
+                                                            }
+                                                        />
+                                                        {errors[
+                                                            `authors.${index}.dosen_id`
+                                                        ] && (
+                                                            <p className="text-sm text-red-500">
+                                                                {
+                                                                    errors[
+                                                                        `authors.${index}.dosen_id`
+                                                                    ]
+                                                                }
+                                                            </p>
+                                                        )}
+                                                    </Field>
+                                                </FieldGroup>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {authors.map((author, index) => (
+                                <div key={`hidden-${author.key}`}>
+                                    <input
+                                        type="hidden"
+                                        name={`authors[${index}][fakultas_id]`}
+                                        value={author.fakultasId}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name={`authors[${index}][dosen_id]`}
+                                        value={author.dosenId}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name={`authors[${index}][nama_dosen]`}
+                                        value={
+                                            author.dosenOptions.find(
+                                                (d) =>
+                                                    String(d.id) ===
+                                                    author.dosenId,
+                                            )?.nama_dosen ?? ""
+                                        }
+                                    />
+                                </div>
+                            ))}
+
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={addAuthor}
+                                className="h-10 w-full text-sm"
+                            >
+                                <Plus className="mr-1 h-4 w-4" />
+                                Tambah Penulis
+                            </Button>
+
+                            {errors.authors && (
+                                <p className="text-sm text-red-500">
+                                    {errors.authors}
+                                </p>
+                            )}
+                        </div>
+                    </CardContent>
+
+                    <CardFooter className="flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-end">
+                        <Link
+                            href={
+                                role === "dosen"
+                                    ? route("dosen.luaran_buku.index")
+                                    : role === "uppm"
+                                      ? route("uppm.luaran_buku.index")
+                                      : route("admin.luaran_buku.index")
+                            }
+                            viewTransition
+                            className="w-full sm:w-auto"
+                        >
+                            <Button
+                                className="h-11 w-full px-6 text-base sm:w-auto"
+                                variant="outline"
+                            >
+                                <ArrowLeft />
+                                Kembali
+                            </Button>
+                        </Link>
+                        <Button
+                            type="submit"
+                            disabled={processing}
+                            className="h-11 w-full px-6 text-base sm:w-auto"
+                        >
+                            {isEdit
+                                ? "Simpan Perubahan"
+                                : "Simpan Luaran Buku"}
+                        </Button>
+                    </CardFooter>
+                </Card>
+            )}
+        </Form>
+    );
+}

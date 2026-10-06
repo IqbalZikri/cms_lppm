@@ -24,7 +24,6 @@ interface Props {
 
 export default function Show({ berita }: Props) {
     const isPublished = berita.status_published === 'published';
-    console.log(berita);
 
     return (
         <>

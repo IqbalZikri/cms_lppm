@@ -1,5 +1,4 @@
 import { Head } from "@inertiajs/react";
-import FormKegiatan from "../../forms/kegiatan/form";
 import { route } from "ziggy-js";
 import { Fakultas } from "@/interface/fakultas";
 import {
@@ -9,26 +8,26 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import FormLuaranBuku from "../forms/luaran-buku/form";
 
 interface Props {
     fakultas: Fakultas[];
     role: string;
 }
 
-export default function CreateKegiatan({ fakultas, role }: Props) {
-    
+export default function CreateLuaranBuku({ fakultas, role }: Props) {
     return (
         <>
-            <Head title="Tambah Penelitian Kegiatan" />
+            <Head title="Tambah Luaran Buku" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">
-                            Tambah Data Penelitian Kegiatan
+                            Tambah Data Luaran Buku
                         </h1>
 
                         <p className="text-muted-foreground">
-                            Form tambah data penelitian kegiatan.
+                            Form tambah data luaran buku.
                         </p>
                     </div>
 
@@ -37,37 +36,37 @@ export default function CreateKegiatan({ fakultas, role }: Props) {
                             <BreadcrumbList>
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("dosen.kegiatan.index")}
+                                        href={route(
+                                            role + ".luaran_buku.index",
+                                        )}
                                     >
-                                        Penelitian Kegiatan
+                                        Luaran Buku
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("dosen.kegiatan.create")}
+                                        href={route(
+                                            role + ".luaran_buku.create",
+                                        )}
                                     >
-                                        Tambah Penelitian Kegiatan
+                                        Tambah Luaran Buku
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>
                     </div>
                 </div>
-                <FormKegiatan
-                    fakultas={fakultas}
-                    role={role}
-                    action={route("dosen.kegiatan.store")}
-                />
+                <FormLuaranBuku fakultas={fakultas} role={role} />
             </div>
         </>
     );
 }
 
-CreateKegiatan.layout = {
+CreateLuaranBuku.layout = {
     breadcrumbs: [
         {
-            title: "Tambah Penelitian Kegiatan",
+            title: "Tambah Luaran Buku",
         },
     ],
 };

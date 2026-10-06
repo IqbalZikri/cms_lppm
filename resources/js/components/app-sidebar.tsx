@@ -1,6 +1,7 @@
 import { Link } from "@inertiajs/react";
 import {
     Activity,
+    BookOpen,
     BookOpenIcon,
     Building2,
     Database,
@@ -126,6 +127,11 @@ const mainNavItems: NavItem[] = [
                 href: route("admin.luaran_jurnal.index"),
                 icon: Notebook,
             },
+            {
+                title: "Luaran Buku",
+                href: route("admin.luaran_buku.index"),
+                icon: BookOpen,
+            },
         ],
     },
 ];
@@ -149,7 +155,11 @@ export function AppSidebar() {
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild className="bg-[#bf9f62]">
+                        <SidebarMenuButton
+                            size="lg"
+                            asChild
+                            className="bg-[#bf9f62]"
+                        >
                             <Link
                                 href={route("admin.dashboard")}
                                 prefetch
