@@ -9,13 +9,14 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import FormHki from "@/pages/forms/hki/form";
+import { User } from "@/types";
 
 interface Props {
     fakultas: Fakultas[];
-    role: string;
+    user: User;
 }
 
-export default function CreateHki({ fakultas, role }: Props) {
+export default function CreateHki({ fakultas, user }: Props) {
     return (
         <>
             <Head title="Tambah Penelitian Kegiatan" />
@@ -53,7 +54,7 @@ export default function CreateHki({ fakultas, role }: Props) {
                         </Breadcrumb>
                     </div>
                 </div>
-                <FormHki fakultas={fakultas} role={role} />
+                <FormHki fakultas={fakultas} user={user} />
             </div>
         </>
     );

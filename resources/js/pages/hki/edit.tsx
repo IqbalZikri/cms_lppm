@@ -10,14 +10,15 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Hki } from "@/interface/hki";
 import FormHki from "@/pages/forms/hki/form";
+import { User } from "@/types";
 
 interface Props {
     fakultas: Fakultas[];
     data: Hki;
-    role: string;
+    user: User;
 }
 
-export default function EditHki({ fakultas, data, role }: Props) {
+export default function EditHki({ fakultas, data, user }: Props) {
     return (
         <>
             <Head title="Tambah Penelitian Kegiatan" />
@@ -38,7 +39,7 @@ export default function EditHki({ fakultas, data, role }: Props) {
                             <BreadcrumbList>
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route(role + ".hki.index")}
+                                        href={route(user.role + ".hki.index")}
                                     >
                                         Hak Kekayaan Intelektual
                                     </BreadcrumbLink>
@@ -47,7 +48,7 @@ export default function EditHki({ fakultas, data, role }: Props) {
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
                                         href={route(
-                                            role + ".hki.edit",
+                                            user.role + ".hki.edit",
                                             data.id,
                                         )}
                                     >
@@ -58,7 +59,7 @@ export default function EditHki({ fakultas, data, role }: Props) {
                         </Breadcrumb>
                     </div>
                 </div>
-                <FormHki fakultas={fakultas} hki={data} role={role} />
+                <FormHki fakultas={fakultas} hki={data} user={user} />
             </div>
         </>
     );

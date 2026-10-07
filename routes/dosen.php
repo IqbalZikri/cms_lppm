@@ -31,8 +31,8 @@ Route::middleware(['auth', 'role:dosen'])
         Route::put('pkm/{id}', [PkmController::class, 'update'])->name('pkm.update');
         Route::delete('pkm/{id}', [PkmController::class, 'destroy'])->name('pkm.destroy');
 
-        Route::get('hki', [HkiController::class, 'index'])->name('hki.index');
-        Route::get('hki/create', [HkiController::class, 'create'])->name('hki.create');
+        Route::get('hki', [HkiController::class, 'indexDosen'])->name('hki.index');
+        Route::get('hki/create', [HkiController::class, 'dosenCreate'])->name('hki.create');
         Route::post('hki/create', [HkiController::class, 'store'])->name('hki.store');
         Route::get('hki//detail/{hki}', [HkiController::class, 'show'])->name('hki.show');
         Route::get('hki/{hki}', [HkiController::class, 'edit'])->name('hki.edit');

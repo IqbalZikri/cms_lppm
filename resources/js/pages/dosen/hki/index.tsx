@@ -181,16 +181,46 @@ export default function Hki({ data, filters }: Props) {
                                     key: "link_berkas",
                                     label: "Berkas",
                                     render: (_, item) => (
-                                        <a
-                                            href={item.link_berkas}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-primary inline-flex items-center gap-1.5 text-sm hover:underline"
-                                        >
-                                            <FileText className="h-3.5 w-3.5" />
-                                            Lihat
-                                        </a>
+                                        <>
+                                            {item.link_berkas ? (
+                                                <a
+                                                    href={item.link_berkas}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-primary inline-flex items-center gap-1.5 text-sm hover:underline"
+                                                >
+                                                    <FileText className="h-3.5 w-3.5" />
+                                                    Lihat
+                                                </a>
+                                            ) : (
+                                                "-"
+                                            )}
+                                        </>
                                     ),
+                                },
+                                {
+                                    id: "status_pengajuan",
+                                    key: "status_pengajuan",
+                                    label: "Status Pengajuan",
+                                    render: (_, item) => {
+                                        const statusPengajuan =
+                                            item.status_pengajuan
+                                                .charAt(0)
+                                                .toUpperCase() +
+                                            item.status_pengajuan.slice(1);
+                                        return (
+                                            <Badge
+                                                variant={
+                                                    item.status_pengajuan ===
+                                                    "draft"
+                                                        ? "default"
+                                                        : "secondary"
+                                                }
+                                            >
+                                                {statusPengajuan}
+                                            </Badge>
+                                        );
+                                    },
                                 },
                             ]}
                             renderActions={(item) => (

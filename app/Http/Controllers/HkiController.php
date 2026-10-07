@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\StatusPengajuan;
 use App\Http\Controllers\Controller;
 use App\Models\Dosen;
 use App\Models\Fakultas;
 use App\Models\Hki;
 use App\Models\Penulis;
+use App\Models\User;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -15,12 +17,62 @@ use Log;
 
 class HkiController extends Controller
 {
+    private function messages(): array
+    {
+        return [
+            'judul.required' => 'Judul wajib diisi.',
+            'judul.max' => 'Judul maksimal :max karakter.',
+            'jenis_hki.required' => 'Pilih jenis HKI terlebih dahulu.',
+            'abstrak.required' => 'Abstrak wajib diisi.',
+            'semester.in' => 'Semester harus Ganjil atau Genap.',
+            'tahun.integer' => 'Tahun harus berupa angka.',
+            'link_berkas.required' => 'Link berkas wajib diisi.',
+            'link_berkas.url' => 'Format link berkas tidak valid.',
+            'authors.required' => 'Minimal harus ada satu penulis.',
+            'authors.min' => 'Minimal harus ada :min penulis.',
+        ];
+    }
+
+    private function attributes(): array
+    {
+        return [
+            'link_berkas' => 'link berkas',
+            'jenis_hki' => 'jenis HKI',
+        ];
+    }
+
+    private function draftRules(): array
+    {
+        return [
+            'judul' => ['required', 'string', 'max:255'], // agar draft bisa dikenali di daftar
+            'jenis_hki' => ['nullable', 'string'],
+            'abstrak' => ['nullable', 'string'],
+            'semester' => ['nullable', 'in:Ganjil,Genap'],
+            'tahun' => ['nullable', 'integer'],
+            'link_berkas' => ['nullable', 'url'],
+            'authors' => ['nullable', 'array'],
+        ];
+    }
+
+    private function submitRules(): array
+    {
+        return [
+            'judul' => ['required', 'string', 'max:255'],
+            'jenis_hki' => ['required', 'string'],
+            'abstrak' => ['required', 'string'],
+            'semester' => ['required', 'in:Ganjil,Genap'],
+            'tahun' => ['required', 'integer'],
+            'link_berkas' => ['required', 'url'],
+            'authors' => ['required', 'array', 'min:1'],
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function indexAdmin(Request $request)
     {
-        $queryHki = Hki::query()->with('penulis.fakultas', 'penulis.dosen','penulisLuar');
+        $queryHki = Hki::query()->with('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
         if ($request->filled('cari_fakultas')) {
             $queryHki->whereHas('penulis', function ($q) use ($request) {
                 $q->where('fakultas_id', $request->cari_fakultas);
@@ -54,10 +106,7 @@ class HkiController extends Controller
 
     public function indexDosen(Request $request)
     {
-        $dosen = Dosen::where('user_id', auth()->user()->id)->first();
-        $data = Hki::whereHas('penulis', function ($query) use ($dosen) {
-            $query->where('dosen_id', $dosen->id);
-        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10)->withQueryString();
+        $data = Hki::where("user_id", auth()->user()->id)->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10)->withQueryString();
         return Inertia::render('dosen/hki/index', [
             'data' => $data,
             'filters' => $request->only("search"),
@@ -81,10 +130,20 @@ class HkiController extends Controller
     public function create()
     {
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
-        $role = auth()->user()->role;
+        $user = auth()->user()->only("id", "role");
         return Inertia::render('hki/create', [
             'fakultas' => $fakultas,
-            'role' => $role,
+            'user' => $user,
+        ]);
+    }
+
+    public function dosenCreate()
+    {
+        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
+        $user = auth()->user()->only("id", "role");
+        return Inertia::render('dosen/hki/create', [
+            'fakultas' => $fakultas,
+            'user' => $user,
         ]);
     }
 
@@ -93,65 +152,33 @@ class HkiController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'jenis_hki' => ['required', Rule::in(['paten', 'haki'])],
-            'judul' => 'required',
-            'abstrak' => 'required',
-            'semester' => 'required',
-            'tahun' => 'required',
-            'link_berkas' => 'required',
-            'nomer_paten' => 'required_if:jenis_hki,paten',
-            'nomer_pengajuan_haki' => 'required_if:jenis_hki,haki',
-            'jumlah_dana' => 'required',
-            'sumber_dana' => ['required', Rule::in(['internal', 'eksternal'])],
-            'authors' => 'required|array|min:1',
-            'authors.*.tipe' => 'required|in:internal,luar',
-            'authors.*.fakultas_id' => 'required_if:authors.*.tipe,internal|nullable|exists:fakultas,id',
-            'authors.*.dosen_id' => 'required_if:authors.*.tipe,internal|nullable|exists:dosens,id',
-            'authors.*.nama_universitas' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
-            'authors.*.nama_dosen' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
-        ], [
-            'jenis_hki.required' => 'Silahkan pilih salah satu jenis HKI',
-            'jenis_hki.in' => 'Jenis HKI tidak valid',
-            'judul.required' => 'Silahkan isi judul',
-            'abstrak.required' => 'Silahkan isi abstrak',
-            'semester.required' => 'Silahkan isi semester',
-            'tahun.required' => 'Silahkan isi tahun',
-            'link_berkas.required' => 'Silahkan isi link berkas',
-            'nomer_pengajuan_haki.required_if' => 'Silahkan isi nomer pengajuan haki',
-            'nomer_paten.required_if' => 'Silahkan isi nomer paten',
-            'authors.required' => 'Silahkan tambahkan minimal satu penulis',
-            'authors.*.fakultas_id.required_if' => 'Silahkan pilih fakultas',
-            'authors.*.dosen_id.required_if' => 'Silahkan pilih dosen',
-            'authors.*.nama_universitas.required_if' => 'Silahkan isi nama universitas',
-            'authors.*.nama_dosen.required_if' => 'Silahkan isi nama dosen',
-        ]);
+        $isDraft = $request->input('action') === 'draft';
+
+        $data = $request->validate($isDraft ? $this->draftRules() : $this->submitRules(), $this->messages(), $this->attributes());
+        if (auth()->user()->role === "admin") {
+            $data['status_pengajuan'] = $isDraft ? StatusPengajuan::Draft : StatusPengajuan::Disetujui;
+        } else {
+            $data['status_pengajuan'] = $isDraft ? StatusPengajuan::Draft : StatusPengajuan::Diajukan;
+        }
 
         DB::beginTransaction();
 
         try {
 
-            $hki = Hki::create([
-                'jenis_hki' => $validated['jenis_hki'],
-                'judul' => $validated['judul'],
-                'abstrak' => $validated['abstrak'],
-                'semester' => $validated['semester'],
-                'tahun' => $validated['tahun'],
-                'link_berkas' => $validated['link_berkas'],
-                'nomer_pengajuan_haki' => $validated['nomer_pengajuan_haki'] ?? null,
-                'nomer_paten' => $validated['nomer_paten'] ?? null,
-                'sumber_dana' => $validated['sumber_dana'] ?? null,
-                'jumlah_dana' => $validated['jumlah_dana'] ?? null,
-            ]);
+            $hki = $request->user()->hki()->create($data);
 
-            foreach ($validated['authors'] as $i => $author) {
+            foreach ($request->input('authors', []) as $i => $author) {
                 if ($author['tipe'] === 'internal') {
+                    if (empty($author['fakultas_id']) || empty($author['dosen_id']))
+                        continue;
                     $hki->penulis()->create([
                         'fakultas_id' => $author['fakultas_id'],
                         'dosen_id' => $author['dosen_id'],
                         'urutan' => $i + 1,
                     ]);
                 } else {
+                    if (empty($author['nama_universitas']) || empty($author['nama_dosen']))
+                        continue;
                     $hki->penulisLuar()->create([
                         'nama_universitas' => $author['nama_universitas'],
                         'nama_dosen' => $author['nama_dosen'],
@@ -162,7 +189,13 @@ class HkiController extends Controller
 
             DB::commit();
 
-            return redirect()->route(auth()->user()->role . '.hki.index')->with('success', 'Berhasil menambahkan HKI');
+            $message = match (true) {
+                $isDraft => 'Draft berhasil disimpan',
+                auth()->user()->role === 'admin' => 'Berhasil menambahkan HKI',
+                default => 'Pengajuan HKI berhasil dikirim',
+            };
+
+            return redirect()->route(auth()->user()->role . '.hki.index')->with('success', $message);
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
@@ -189,11 +222,11 @@ class HkiController extends Controller
     {
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
         $hki->load('penulis', 'penulisLuar');
-        $role = auth()->user()->role;
+        $user = auth()->user();
         return Inertia::render('hki/edit', [
             'data' => $hki,
             'fakultas' => $fakultas,
-            'role' => $role,
+            'user' => $user,
         ]);
     }
 
@@ -202,68 +235,35 @@ class HkiController extends Controller
      */
     public function update(Request $request, Hki $hki)
     {
-        $validated = $request->validate([
-            'jenis_hki' => ['required', Rule::in(['paten', 'haki'])],
-            'judul' => 'required',
-            'abstrak' => 'required',
-            'semester' => 'required',
-            'tahun' => 'required',
-            'link_berkas' => 'required',
-            'nomer_paten' => 'required_if:jenis_hki,paten',
-            'nomer_pengajuan_haki' => 'required_if:jenis_hki,haki',
-            'jumlah_dana' => 'required',
-            'sumber_dana' => ['required', Rule::in(['internal', 'eksternal'])],
-            'authors' => 'required|array|min:1',
-            'authors.*.tipe' => 'required|in:internal,luar',
-            'authors.*.fakultas_id' => 'required_if:authors.*.tipe,internal|nullable|exists:fakultas,id',
-            'authors.*.dosen_id' => 'required_if:authors.*.tipe,internal|nullable|exists:dosens,id',
-            'authors.*.nama_universitas' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
-            'authors.*.nama_dosen' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
-        ], [
-            'jenis_hki.required' => 'Silahkan pilih salah satu jenis HKI',
-            'jenis_hki.in' => 'Jenis HKI tidak valid',
-            'judul.required' => 'Silahkan isi judul',
-            'abstrak.required' => 'Silahkan isi abstrak',
-            'semester.required' => 'Silahkan isi semester',
-            'tahun.required' => 'Silahkan isi tahun',
-            'link_berkas.required' => 'Silahkan isi link berkas',
-            'nomer_pengajuan_haki.required_if' => 'Silahkan isi nomer pengajuan haki',
-            'nomer_paten.required_if' => 'Silahkan isi nomer paten',
-            'authors.required' => 'Silahkan tambahkan minimal satu penulis',
-            'authors.*.fakultas_id.required_if' => 'Silahkan pilih fakultas',
-            'authors.*.dosen_id.required_if' => 'Silahkan pilih dosen',
-            'authors.*.nama_universitas.required_if' => 'Silahkan isi nama universitas',
-            'authors.*.nama_dosen.required_if' => 'Silahkan isi nama dosen',
-        ]);
+        $isDraft = $request->input('action') === 'draft';
 
+        $data = $request->validate($isDraft ? $this->draftRules() : $this->submitRules(), $this->messages(), $this->attributes());
+        if (auth()->user()->role === "admin") {
+            $data['status_pengajuan'] = $isDraft ? StatusPengajuan::Draft : StatusPengajuan::Disetujui;
+        } else {
+            $data['status_pengajuan'] = $isDraft ? StatusPengajuan::Draft : StatusPengajuan::Diajukan;
+        }
         DB::beginTransaction();
 
         try {
 
-            $hki->update([
-                'jenis_hki' => $validated['jenis_hki'],
-                'judul' => $validated['judul'],
-                'abstrak' => $validated['abstrak'],
-                'semester' => $validated['semester'],
-                'tahun' => $validated['tahun'],
-                'link_berkas' => $validated['link_berkas'],
-                'nomer_pengajuan_haki' => $validated['nomer_pengajuan_haki'] ?? null,
-                'nomer_paten' => $validated['nomer_paten'] ?? null,
-                'sumber_dana' => $validated['sumber_dana'] ?? null,
-                'jumlah_dana' => $validated['jumlah_dana'] ?? null,
-            ]);
+            $hki->update($data);
 
             $hki->penulis()->delete();
             $hki->penulisLuar()->delete();
 
-            foreach ($validated['authors'] as $i => $author) {
+            foreach ($request->input('authors', []) as $i => $author) {
                 if ($author['tipe'] === 'internal') {
+                    if (empty($author['fakultas_id']) || empty($author['dosen_id']))
+                        continue;
                     $hki->penulis()->create([
                         'fakultas_id' => $author['fakultas_id'],
                         'dosen_id' => $author['dosen_id'],
                         'urutan' => $i + 1,
                     ]);
                 } else {
+                    if (empty($author['nama_universitas']) || empty($author['nama_dosen']))
+                        continue;
                     $hki->penulisLuar()->create([
                         'nama_universitas' => $author['nama_universitas'],
                         'nama_dosen' => $author['nama_dosen'],
@@ -274,7 +274,13 @@ class HkiController extends Controller
 
             DB::commit();
 
-            return redirect()->route(auth()->user()->role . '.hki.index')->with('success', 'Berhasil mengedit HKI');
+            $message = match (true) {
+                $isDraft => 'Draft berhasil disimpan',
+                auth()->user()->role === 'admin' => 'Berhasil mengupdate HKI',
+                default => 'Pengajuan HKI berhasil dikirim',
+            };
+
+            return redirect()->route(auth()->user()->role . '.hki.index')->with('success', $message);
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);

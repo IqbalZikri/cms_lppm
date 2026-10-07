@@ -57,11 +57,18 @@ class User extends Authenticatable implements PasskeyUser, MustVerifyEmail
         "fakultas.nama_fakultas"
     ];
 
-    public function dosen(){
+    public function dosen()
+    {
         return $this->hasOne(Dosen::class);
     }
 
-    public function fakultas(){
+    public function fakultas()
+    {
         return $this->belongsTo(Fakultas::class);
+    }
+
+    public function hki()
+    {
+        return $this->hasMany(Hki::class);
     }
 }

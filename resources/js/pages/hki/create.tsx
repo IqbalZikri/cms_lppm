@@ -9,16 +9,19 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import FormHki from "@/pages/forms/hki/form";
+import { User } from "@/types";
 
 interface Props {
     fakultas: Fakultas[];
-    role: string;
+    user: User;
 }
 
-export default function CreateHki({ fakultas, role }: Props) {
+export default function CreateHki({ fakultas, user }: Props) {
+    console.log(user);
+    
     return (
         <>
-            <Head title="Tambah Penelitian Kegiatan" />
+            <Head title="Tambah HKI" />
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 sm:p-6">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
@@ -36,7 +39,7 @@ export default function CreateHki({ fakultas, role }: Props) {
                             <BreadcrumbList>
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route(role + ".hki.index")}
+                                        href={route(user.role + ".hki.index")}
                                     >
                                         HKI
                                     </BreadcrumbLink>
@@ -44,7 +47,7 @@ export default function CreateHki({ fakultas, role }: Props) {
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route(role + ".hki.create")}
+                                        href={route(user.role + ".hki.create")}
                                     >
                                         Tambah HKI
                                     </BreadcrumbLink>
@@ -53,7 +56,7 @@ export default function CreateHki({ fakultas, role }: Props) {
                         </Breadcrumb>
                     </div>
                 </div>
-                <FormHki fakultas={fakultas} role={role} />
+                <FormHki fakultas={fakultas} user={user} />
             </div>
         </>
     );

@@ -1,14 +1,10 @@
-import axios from "axios";
-import { useEffect } from "react";
+import { useRef } from "react";
 import {
     ArrowLeft,
     BookText,
     FileText,
     Hash,
     Link2,
-    Plus,
-    Trash2,
-    Users,
     Wallet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,34 +21,32 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Fakultas } from "@/interface/fakultas";
-import { Dosen } from "@/types/dosen";
 import { Form, Link } from "@inertiajs/react";
 import { useState } from "react";
 import { route } from "ziggy-js";
 import { Hki } from "@/interface/hki";
-import { Penulis } from "@/interface/penulis";
 import { Field, FieldGroup } from "@/components/ui/field";
 import {
     InputGroup,
     InputGroupAddon,
     InputGroupInput,
 } from "@/components/ui/input-group";
-import { Combobox } from "@/components/ui/combobox";
 import { formatRupiah } from "@/pages/forms/pkm/form";
 import FormPenulis from "@/components/form-penulis";
 import SectionHeading from "@/components/section-heading";
+import { User } from "@/types";
 
 interface Props {
     fakultas: Fakultas[];
     hki?: Hki;
-    role?: string;
+    user: User;
 }
 
 function RequiredMark() {
     return <span className="ml-0.5 text-red-500">*</span>;
 }
 
-export default function FormHki({ fakultas, hki, role }: Props) {
+export default function FormHki({ fakultas, hki, user }: Props) {
     const isEdit = !!hki;
     const [jenisHki, setJenisHki] = useState(hki?.jenis_hki ?? "");
     const [semester, setSemester] = useState(hki?.semester ?? "");
@@ -73,12 +67,13 @@ export default function FormHki({ fakultas, hki, role }: Props) {
         ? route("uppm.hki.update", hki!.id)
         : route("uppm.hki.store");
 
+    const actionRef = useRef<HTMLInputElement>(null);
     return (
         <Form
             action={
-                role === "dosen"
+                user.role === "dosen"
                     ? actionDosen
-                    : role === "uppm"
+                    : user.role === "uppm"
                       ? actionUppm
                       : actionAdmin
             }
@@ -516,15 +511,26 @@ export default function FormHki({ fakultas, hki, role }: Props) {
                             </div>
                         </div>
 
-                        <FormPenulis fakultas={fakultas} data={hki} errors={errors} />
+                        <FormPenulis
+                            fakultas={fakultas}
+                            data={hki}
+                            errors={errors}
+                        />
                     </CardContent>
 
                     <CardFooter className="flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-end">
+                        <input
+                            ref={actionRef}
+                            type="hidden"
+                            name="action"
+                            defaultValue="submit"
+                        />
+
                         <Link
                             href={
-                                role === "dosen"
+                                user.role === "dosen"
                                     ? route("dosen.hki.index")
-                                    : role === "uppm"
+                                    : user.role === "uppm"
                                       ? route("uppm.hki.index")
                                       : route("admin.hki.index")
                             }
@@ -541,10 +547,21 @@ export default function FormHki({ fakultas, hki, role }: Props) {
                         </Link>
                         <Button
                             type="submit"
+                            variant="secondary"
+                            disabled={processing}
+                            onClick={() => {
+                                if (actionRef.current)
+                                    actionRef.current.value = "draft";
+                            }}
+                        >
+                            Simpan Draft
+                        </Button>
+                        <Button
+                            type="submit"
                             disabled={processing}
                             className="h-11 w-full px-6 text-base sm:w-auto"
                         >
-                            {isEdit ? "Simpan Perubahan" : "Simpan HKI"}
+                            {isEdit ? "Simpan Perubahan" : user.role === "admin" ? "Simpan HKI" : "Ajukan"}
                         </Button>
                     </CardFooter>
                 </Card>

@@ -6,6 +6,7 @@ import {
     Building2,
     Database,
     FileBadge,
+    FilePenLine,
     FileText,
     GraduationCap,
     HandHeart,
@@ -113,11 +114,6 @@ const mainNavItems: NavItem[] = [
                 icon: HandHeart,
             },
             {
-                title: "HKI",
-                href: route("admin.hki.index"),
-                icon: FileBadge,
-            },
-            {
                 title: "Luaran Prosiding",
                 href: route("admin.luaran_prosiding.index"),
                 icon: ScrollText,
@@ -131,6 +127,17 @@ const mainNavItems: NavItem[] = [
                 title: "Luaran Buku",
                 href: route("admin.luaran_buku.index"),
                 icon: BookOpen,
+            },
+        ],
+    },
+    {
+        title: "Pengajuan",
+        icon: FilePenLine,
+        items: [
+            {
+                title: "HKI",
+                href: route("admin.hki.index"),
+                icon: FileBadge,
             },
         ],
     },

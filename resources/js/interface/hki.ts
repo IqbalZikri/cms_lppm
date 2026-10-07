@@ -13,6 +13,8 @@ export interface Hki {
     nomer_paten?: string;
     jumlah_dana: number;
     sumber_dana: string;
+    status_pengajuan: string;
     penulis: Penulis[];
     penulis_luar: PenulisLuar[];
+    user_id: number;
 }

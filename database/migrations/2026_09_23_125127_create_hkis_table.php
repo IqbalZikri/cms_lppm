@@ -12,16 +12,18 @@ return new class extends Migration {
     {
         Schema::create('hkis', function (Blueprint $table) {
             $table->id();
-            $table->enum('jenis_hki', ['paten', 'haki']);
-            $table->string('judul');
-            $table->text('abstrak');
-            $table->string('semester');
-            $table->year('tahun');
-            $table->string('link_berkas');
+            $table->enum('jenis_hki', ['paten', 'haki'])->nullable();
+            $table->string('judul')->nullable();
+            $table->text('abstrak')->nullable();
+            $table->string('semester')->nullable();
+            $table->year('tahun')->nullable();
+            $table->string('link_berkas')->nullable();
             $table->string('nomer_pengajuan_haki')->nullable();
             $table->string('nomer_paten')->nullable();
             $table->decimal('jumlah_dana', 15, 2)->nullable();
-            $table->enum('sumber_dana', ['internal', 'eksternal']);
+            $table->enum('sumber_dana', ['internal', 'eksternal'])->nullable();
+            $table->string('status_pengajuan')->nullable();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }
