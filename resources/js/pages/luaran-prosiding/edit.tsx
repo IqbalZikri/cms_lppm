@@ -8,25 +8,27 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import FormLuaranProsiding from "../../forms/luaran-prosiding/form";
+import FormLuaranProsiding from "../forms/luaran-prosiding/form";
+import { LuaranProsiding } from "@/interface/luaran-prosiding";
 
 interface Props {
     fakultas: Fakultas[];
+    data: LuaranProsiding;
 }
 
-export default function CreateKegiatan({ fakultas }: Props) {
+export default function EditLuaranProsiding({ fakultas, data }: Props) {
     return (
         <>
-            <Head title="Tambah Penelitian Kegiatan" />
+            <Head title="Edit Luaran Prosiding" />
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 sm:p-6">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">
-                            Tambah Data Luaran Prosiding
+                            Edit Data Luaran Prosiding
                         </h1>
 
                         <p className="mt-1 text-muted-foreground">
-                            Form tambah data luaran prosiding.
+                            Form edit data luaran prosiding.
                         </p>
                     </div>
 
@@ -45,25 +47,31 @@ export default function CreateKegiatan({ fakultas }: Props) {
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("admin.kegiatan.create")}
+                                        href={route(
+                                            "admin.luaran_prosiding.edit",
+                                            data.id,
+                                        )}
                                     >
-                                        Tambah Luaran Prosiding
+                                        Edit Luaran Prosiding
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>
                     </div>
                 </div>
-                <FormLuaranProsiding fakultas={fakultas} />
+                <FormLuaranProsiding
+                    fakultas={fakultas}
+                    luaranProsiding={data}
+                />
             </div>
         </>
     );
 }
 
-CreateKegiatan.layout = {
+EditLuaranProsiding.layout = {
     breadcrumbs: [
         {
-            title: "Tambah Penelitian Kegiatan",
+            title: "Edit Luaran Prosiding",
         },
     ],
 };

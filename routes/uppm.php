@@ -1,13 +1,13 @@
 <?php
 
 use App\Http\Controllers\LuaranBukuController;
+use App\Http\Controllers\LuaranProsidingController;
 use App\Http\Controllers\Uppm\DashboardController;
 use App\Http\Controllers\Uppm\DosenController;
-use App\Http\Controllers\Uppm\HkiController;
-use App\Http\Controllers\Uppm\KegiatanController;
-use App\Http\Controllers\Uppm\LuaranJurnalController;
-use App\Http\Controllers\Uppm\LuaranProsidingController;
-use App\Http\Controllers\Uppm\PkmController;
+use App\Http\Controllers\HkiController;
+use App\Http\Controllers\KegiatanController;
+use App\Http\Controllers\LuaranJurnalController;
+use App\Http\Controllers\PkmController;
 use App\Http\Controllers\Uppm\ProdiController;
 use Illuminate\Support\Facades\Route;
 

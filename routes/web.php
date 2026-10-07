@@ -2,13 +2,13 @@
 
 use App\Http\Controllers\Admin\BeritaController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\LuaranJurnalController;
+use App\Http\Controllers\LuaranJurnalController;
 use App\Http\Controllers\Admin\DosenController;
 use App\Http\Controllers\Admin\FakultasController;
-use App\Http\Controllers\Admin\HkiController;
+use App\Http\Controllers\HkiController;
 use App\Http\Controllers\Admin\KategoriController;
 use App\Http\Controllers\KegiatanController;
-use App\Http\Controllers\Admin\LuaranProsidingController;
+use App\Http\Controllers\LuaranProsidingController;
 use App\Http\Controllers\Admin\ProdiController;
 use App\Http\Controllers\Admin\SesiController;
 use App\Http\Controllers\Admin\SiteSettingsController;
@@ -95,7 +95,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::put('pkm/{id}', [PkmController::class, 'update'])->name('pkm.update');
         Route::delete('pkm/{id}', [PkmController::class, 'destroy'])->name('pkm.destroy');
 
-        Route::get('luaran_prosiding', [LuaranProsidingController::class, 'index'])->name('luaran_prosiding.index');
+        Route::get('luaran_prosiding', [LuaranProsidingController::class, 'indexAdmin'])->name('luaran_prosiding.index');
         Route::get('luaran_prosiding/create', [LuaranProsidingController::class, 'create'])->name('luaran_prosiding.create');
         Route::post('luaran_prosiding/create', [LuaranProsidingController::class, 'store'])->name('luaran_prosiding.store');
         Route::get('luaran_prosiding//detail/{luaran_prosiding}', [LuaranProsidingController::class, 'show'])->name('luaran_prosiding.show');
@@ -103,7 +103,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::put('luaran_prosiding/{luaran_prosiding}', [LuaranProsidingController::class, 'update'])->name('luaran_prosiding.update');
         Route::delete('luaran_prosiding/{luaran_prosiding}', [LuaranProsidingController::class, 'destroy'])->name('luaran_prosiding.destroy');
 
-        Route::get('hki', [HkiController::class, 'index'])->name('hki.index');
+        Route::get('hki', [HkiController::class, 'indexAdmin'])->name('hki.index');
         Route::get('hki/create', [HkiController::class, 'create'])->name('hki.create');
         Route::post('hki/create', [HkiController::class, 'store'])->name('hki.store');
         Route::get('hki//detail/{hki}', [HkiController::class, 'show'])->name('hki.show');
@@ -111,7 +111,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::put('hki/{hki}', [HkiController::class, 'update'])->name('hki.update');
         Route::delete('hki/{hki}', [HkiController::class, 'destroy'])->name('hki.destroy');
 
-        Route::get('luaran_jurnal', [LuaranJurnalController::class, 'index'])->name('luaran_jurnal.index');
+        Route::get('luaran_jurnal', [LuaranJurnalController::class, 'indexAdmin'])->name('luaran_jurnal.index');
         Route::get('luaran_jurnal/create', [LuaranJurnalController::class, 'create'])->name('luaran_jurnal.create');
         Route::post('luaran_jurnal/create', [LuaranJurnalController::class, 'store'])->name('luaran_jurnal.store');
         Route::get('luaran_jurnal//detail/{luaran_jurnal}', [LuaranJurnalController::class, 'show'])->name('luaran_jurnal.show');

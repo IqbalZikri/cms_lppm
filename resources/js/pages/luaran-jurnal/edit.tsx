@@ -8,27 +8,28 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import FormLuaranProsiding from "../../forms/luaran-prosiding/form";
-import { LuaranProsiding } from "@/interface/luaran-prosiding";
+import { Hki } from "@/interface/hki";
+import { LuaranJurnal } from "@/interface/luaran-jurnal";
+import FormLuaranJurnal from "../forms/luaran-jurnal/form";
 
 interface Props {
     fakultas: Fakultas[];
-    data: LuaranProsiding;
+    data: LuaranJurnal;
 }
 
-export default function EditLuaranProsiding({ fakultas, data }: Props) {
+export default function EditLuaranJurnal({ fakultas, data }: Props) {
     return (
         <>
-            <Head title="Edit Luaran Prosiding" />
+            <Head title="Tambah Luaran Jurnal" />
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 sm:p-6">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">
-                            Edit Data Luaran Prosiding
+                            Edit Data Luaran Jurnal
                         </h1>
 
                         <p className="mt-1 text-muted-foreground">
-                            Form edit data luaran prosiding.
+                            Form edit data luaran jurnal.
                         </p>
                     </div>
 
@@ -38,40 +39,37 @@ export default function EditLuaranProsiding({ fakultas, data }: Props) {
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
                                         href={route(
-                                            "admin.luaran_prosiding.index",
+                                            "admin.luaran_jurnal.index",
                                         )}
                                     >
-                                        Luaran Prosiding
+                                        Luaran Jurnal
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
                                         href={route(
-                                            "admin.luaran_prosiding.edit",
+                                            "admin.luaran_jurnal.edit",
                                             data.id,
                                         )}
                                     >
-                                        Edit Luaran Prosiding
+                                        Edit Luaran Jurnal
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>
                     </div>
                 </div>
-                <FormLuaranProsiding
-                    fakultas={fakultas}
-                    luaranProsiding={data}
-                />
+                <FormLuaranJurnal fakultas={fakultas} luaranJurnal={data} />
             </div>
         </>
     );
 }
 
-EditLuaranProsiding.layout = {
+EditLuaranJurnal.layout = {
     breadcrumbs: [
         {
-            title: "Edit Luaran Prosiding",
+            title: "Tambah Penelitian Kegiatan",
         },
     ],
 };

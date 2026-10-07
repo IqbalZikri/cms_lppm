@@ -1,10 +1,10 @@
 <?php
 
 use App\Http\Controllers\Dosen\DashboardController;
-use App\Http\Controllers\Dosen\HkiController;
-use App\Http\Controllers\Dosen\LuaranJurnalController;
-use App\Http\Controllers\Dosen\LuaranProsidingController;
-use App\Http\Controllers\Dosen\PkmController;
+use App\Http\Controllers\HkiController;
+use App\Http\Controllers\LuaranJurnalController;
+use App\Http\Controllers\LuaranProsidingController;
+use App\Http\Controllers\PkmController;
 use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\LuaranBukuController;
 use Illuminate\Support\Facades\Route;

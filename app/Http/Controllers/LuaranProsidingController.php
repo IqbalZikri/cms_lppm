@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Dosen;
@@ -17,9 +17,9 @@ class LuaranProsidingController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function indexAdmin(Request $request)
     {
-        $queryLuaranProsiding = LuaranProsiding::query()->with("penulis.fakultas", "penulis.dosen");
+        $queryLuaranProsiding = LuaranProsiding::query()->with("penulis.fakultas", "penulis.dosen", "penulisLuar");
         if ($request->filled('cari_fakultas')) {
             $queryLuaranProsiding->whereHas('penulis', function ($q) use ($request) {
                 $q->where('fakultas_id', $request->cari_fakultas);
@@ -48,14 +48,36 @@ class LuaranProsidingController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    public function indexDosen(Request $request)
+    {
+        $dosen = Dosen::where('user_id', auth()->user()->id)->with('penulis', 'fakultas')->first();
+        $data = LuaranProsiding::whereHas('penulis', function ($query) use ($dosen) {
+            $query->where('dosen_id', $dosen->id);
+        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10);
+        return Inertia::render('dosen/luaran-prosiding/index', [
+            'data' => $data,
+            'filters' => $request->only("search"),
+        ]);
+    }
+
+    public function indexUppm(Request $request)
+    {
+        $data = LuaranProsiding::whereHas('penulis', function ($query) {
+            $query->where('fakultas_id', auth()->user()->fakultas_id);
+        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10)->withQueryString();
+        return Inertia::render('uppm/luaran-prosiding/index', [
+            'data' => $data,
+            'filters' => $request->only("search"),
+        ]);
+    }
+
     public function create()
     {
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
-        return Inertia::render('admin/luaran-prosiding/create', [
-            'fakultas' => $fakultas
+        $role = auth()->user()->role;
+        return Inertia::render('luaran-prosiding/create', [
+            'fakultas' => $fakultas,
+            'role' => $role,
         ]);
     }
 
@@ -71,17 +93,22 @@ class LuaranProsidingController extends Controller
             'tahun' => 'required',
             'link_berkas' => 'required',
             'authors' => 'required|array|min:1',
-            'authors.*.fakultas_id' => 'required|exists:fakultas,id',
-            'authors.*.dosen_id' => 'required|exists:dosens,id',
+            'authors.*.tipe' => 'required|in:internal,luar',
+            'authors.*.fakultas_id' => 'required_if:authors.*.tipe,internal|nullable|exists:fakultas,id',
+            'authors.*.dosen_id' => 'required_if:authors.*.tipe,internal|nullable|exists:dosens,id',
+            'authors.*.nama_universitas' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
+            'authors.*.nama_dosen' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
         ], [
             'judul.required' => 'Silahkan isi judul',
             'abstrak.required' => 'Silahkan isi abstrak',
             'semester.required' => 'Silahkan isi semester',
             'tahun.required' => 'Silahkan isi tahun',
             'link_berkas.required' => 'Silahkan isi link berkas',
-            'authors.required' => 'Silahkan tambahkan minimal satu  / pelaksana',
-            'authors.*.fakultas_id.required' => 'Silahkan pilih fakultas untuk setiap  / pelaksana',
-            'authors.*.dosen_id.required' => 'Silahkan pilih dosen untuk setiap  / pelaksana',
+            'authors.required' => 'Silahkan tambahkan minimal satu penulis',
+            'authors.*.fakultas_id.required_if' => 'Silahkan pilih fakultas',
+            'authors.*.dosen_id.required_if' => 'Silahkan pilih dosen',
+            'authors.*.nama_universitas.required_if' => 'Silahkan isi nama universitas',
+            'authors.*.nama_dosen.required_if' => 'Silahkan isi nama dosen',
         ]);
 
         DB::beginTransaction();
@@ -96,16 +123,24 @@ class LuaranProsidingController extends Controller
             ]);
 
             foreach ($validated['authors'] as $i => $author) {
-                $data->penulis()->create([
-                    'fakultas_id' => $author['fakultas_id'],
-                    'dosen_id' => $author['dosen_id'],
-                    'urutan' => $i++,
-                ]);
+                if ($author['tipe'] === 'internal') {
+                    $data->penulis()->create([
+                        'fakultas_id' => $author['fakultas_id'],
+                        'dosen_id' => $author['dosen_id'],
+                        'urutan' => $i + 1,
+                    ]);
+                } else {
+                    $data->penulisLuar()->create([
+                        'nama_universitas' => $author['nama_universitas'],
+                        'nama_dosen' => $author['nama_dosen'],
+                        'urutan' => $i + 1,
+                    ]);
+                }
             }
 
             DB::commit();
 
-            return redirect()->route('admin.luaran_prosiding.index')->with('success', 'Berhasil menambahkan luaran prosiding');
+            return redirect()->route(auth()->user()->role . '.luaran_prosiding.index')->with('success', 'Berhasil menambahkan luaran prosiding');
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
@@ -118,9 +153,11 @@ class LuaranProsidingController extends Controller
      */
     public function show(LuaranProsiding $luaranProsiding)
     {
-        $luaranProsiding->load('penulis.fakultas', 'penulis.dosen');
-        return Inertia::render('admin/luaran-prosiding/show', [
-            'data' => $luaranProsiding
+        $luaranProsiding->load('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
+        $role = auth()->user()->role;
+        return Inertia::render('luaran-prosiding/show', [
+            'data' => $luaranProsiding,
+            'role' => $role,
         ]);
     }
 
@@ -129,11 +166,13 @@ class LuaranProsidingController extends Controller
      */
     public function edit(LuaranProsiding $luaranProsiding)
     {
-        $luaranProsiding->load('penulis');
+        $luaranProsiding->load('penulis', 'penulisLuar');
+        $role = auth()->user()->role;
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
-        return Inertia::render('admin/luaran-prosiding/edit', [
+        return Inertia::render('luaran-prosiding/edit', [
             'data' => $luaranProsiding,
-            'fakultas' => $fakultas
+            'fakultas' => $fakultas,
+            'role' => $role,
         ]);
     }
 
@@ -149,17 +188,22 @@ class LuaranProsidingController extends Controller
             'tahun' => 'required',
             'link_berkas' => 'required',
             'authors' => 'required|array|min:1',
-            'authors.*.fakultas_id' => 'required|exists:fakultas,id',
-            'authors.*.dosen_id' => 'required|exists:dosens,id',
+            'authors.*.tipe' => 'required|in:internal,luar',
+            'authors.*.fakultas_id' => 'required_if:authors.*.tipe,internal|nullable|exists:fakultas,id',
+            'authors.*.dosen_id' => 'required_if:authors.*.tipe,internal|nullable|exists:dosens,id',
+            'authors.*.nama_universitas' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
+            'authors.*.nama_dosen' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
         ], [
             'judul.required' => 'Silahkan isi judul',
             'abstrak.required' => 'Silahkan isi abstrak',
             'semester.required' => 'Silahkan isi semester',
             'tahun.required' => 'Silahkan isi tahun',
             'link_berkas.required' => 'Silahkan isi link berkas',
-            'authors.required' => 'Silahkan tambahkan minimal satu  / pelaksana',
-            'authors.*.fakultas_id.required' => 'Silahkan pilih fakultas untuk setiap  / pelaksana',
-            'authors.*.dosen_id.required' => 'Silahkan pilih dosen untuk setiap  / pelaksana',
+            'authors.required' => 'Silahkan tambahkan minimal satu penulis',
+            'authors.*.fakultas_id.required_if' => 'Silahkan pilih fakultas',
+            'authors.*.dosen_id.required_if' => 'Silahkan pilih dosen',
+            'authors.*.nama_universitas.required_if' => 'Silahkan isi nama universitas',
+            'authors.*.nama_dosen.required_if' => 'Silahkan isi nama dosen',
         ]);
 
         DB::beginTransaction();
@@ -174,17 +218,26 @@ class LuaranProsidingController extends Controller
             ]);
 
             $luaranProsiding->penulis()->delete();
+            $luaranProsiding->penulisLuar()->delete();
             foreach ($validated['authors'] as $i => $author) {
-                $luaranProsiding->penulis()->create([
-                    'fakultas_id' => $author['fakultas_id'],
-                    'dosen_id' => $author['dosen_id'],
-                    'urutan' => $i + 1,
-                ]);
+                if ($author['tipe'] === 'internal') {
+                    $luaranProsiding->penulis()->create([
+                        'fakultas_id' => $author['fakultas_id'],
+                        'dosen_id' => $author['dosen_id'],
+                        'urutan' => $i + 1,
+                    ]);
+                } else {
+                    $luaranProsiding->penulisLuar()->create([
+                        'nama_universitas' => $author['nama_universitas'],
+                        'nama_dosen' => $author['nama_dosen'],
+                        'urutan' => $i + 1,
+                    ]);
+                }
             }
 
             DB::commit();
 
-            return redirect()->route('admin.luaran_prosiding.index')->with('success', 'Berhasil mengedit luaran prosiding');
+            return redirect()->route(auth()->user()->role . '.luaran_prosiding.index')->with('success', 'Berhasil mengedit luaran prosiding');
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
@@ -198,6 +251,8 @@ class LuaranProsidingController extends Controller
     public function destroy(LuaranProsiding $luaranProsiding)
     {
         try {
+            $luaranProsiding->penulis()->delete();
+            $luaranProsiding->penulisLuar()->delete();
             $luaranProsiding->delete();
             return back()->with('success', 'Berhasil menghapus luaran prosiding');
         } catch (\Throwable $th) {

@@ -8,25 +8,26 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import FormLuaranJurnal from "../../forms/luaran-jurnal/form";
+import FormLuaranProsiding from "../forms/luaran-prosiding/form";
 
 interface Props {
     fakultas: Fakultas[];
+    role: string;
 }
 
-export default function CreateLuaranJurnal({ fakultas }: Props) {
+export default function CreateLuaranProsiding({ fakultas, role }: Props) {
     return (
         <>
-            <Head title="Tambah Penelitian Kegiatan" />
+            <Head title="Tambah Luaran Prosiding" />
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 sm:p-6">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">
-                            Tambah Data Luaran Jurnal
+                            Tambah Data Luaran Prosiding
                         </h1>
 
                         <p className="mt-1 text-muted-foreground">
-                            Form tambah data luaran jurnal.
+                            Form tambah data luaran prosiding.
                         </p>
                     </div>
 
@@ -36,36 +37,36 @@ export default function CreateLuaranJurnal({ fakultas }: Props) {
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
                                         href={route(
-                                            "admin.luaran_jurnal.index",
+                                            role + ".luaran_prosiding.index",
                                         )}
                                     >
-                                        Luaran Jurnal
+                                        Luaran Prosiding
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
                                         href={route(
-                                            "admin.luaran_jurnal.create",
+                                            role + ".luaran_prosiding.create",
                                         )}
                                     >
-                                        Tambah Luaran Jurnal
+                                        Tambah Luaran Prosiding
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>
                     </div>
                 </div>
-                <FormLuaranJurnal fakultas={fakultas} />
+                <FormLuaranProsiding fakultas={fakultas} role={role} />
             </div>
         </>
     );
 }
 
-CreateLuaranJurnal.layout = {
+CreateLuaranProsiding.layout = {
     breadcrumbs: [
         {
-            title: "Tambah Luaran Jurnal",
+            title: "Tambah Penelitian Kegiatan",
         },
     ],
 };

@@ -18,31 +18,52 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { ArrowLeft, FileText, Pencil } from "lucide-react";
-import { Hki } from "@/interface/hki";
+import { LuaranJurnal } from "@/interface/luaran-jurnal";
 
 interface Props {
-    data: Hki;
+    data: LuaranJurnal;
+    role: string;
 }
 
-function formatRupiah(value: string | number) {
-    const number = Number(value);
-    if (Number.isNaN(number)) return "-";
-    return new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-    }).format(number);
-}
+type PenulisRow =
+    | {
+          tipe: "internal";
+          urutan: number;
+          nama_dosen: string;
+          asal: string;
+      }
+    | {
+          tipe: "luar";
+          urutan: number;
+          nama_dosen: string;
+          asal: string;
+      };
 
-export default function Show({ data }: Props) {
-    const penulis = data.penulis ?? [];
+export default function Show({ data, role }: Props) {
+    const daftarPenulis: PenulisRow[] = [
+        ...(data.penulis ?? []).map((p) => ({
+            tipe: "internal" as const,
+            urutan: p.urutan,
+            nama_dosen: p.dosen?.nama_dosen ?? "-",
+            asal: p.fakultas?.nama_fakultas ?? "-",
+        })),
+        ...(data.penulis_luar ?? []).map((p) => ({
+            tipe: "luar" as const,
+            urutan: p.urutan,
+            nama_dosen: p.nama_dosen ?? "-",
+            asal: p.nama_universitas ?? "-",
+        })),
+    ].sort((a, b) => a.urutan - b.urutan);
 
     return (
         <>
             <Head title={`Detail - ${data.judul}`} />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
-                    <Link href={route("admin.hki.index")} viewTransition>
+                    <Link
+                        href={route(role + ".luaran_jurnal.index")}
+                        viewTransition
+                    >
                         <Button variant="outline" size="sm">
                             <ArrowLeft className="mr-1 h-4 w-4" />
                             Kembali
@@ -50,7 +71,7 @@ export default function Show({ data }: Props) {
                     </Link>
 
                     <Link
-                        href={route("admin.hki.edit", data.id)}
+                        href={route(role + ".luaran_jurnal.edit", data.id)}
                         viewTransition
                     >
                         <Button size="sm">
@@ -62,12 +83,8 @@ export default function Show({ data }: Props) {
 
                 <Card className="w-full">
                     <CardHeader>
-                        <CardTitle className="text-xl">
-                            {data.judul}
-                        </CardTitle>
-                        <CardDescription>
-                            Detail Hak Kekayaan Intelektual ( HKI )
-                        </CardDescription>
+                        <CardTitle className="text-xl">{data.judul}</CardTitle>
+                        <CardDescription>Detail Luaran Jurnal</CardDescription>
                     </CardHeader>
 
                     <CardContent className="space-y-6">
@@ -85,44 +102,6 @@ export default function Show({ data }: Props) {
                                 </p>
                                 <p className="font-medium">{data.tahun}</p>
                             </div>
-                            <div>
-                                <p className="text-muted-foreground text-sm">
-                                    Sumber Dana
-                                </p>
-                                <Badge variant="secondary" className="mt-1">
-                                    {data.sumber_dana === "internal"
-                                        ? "Internal"
-                                        : "Eksternal"}
-                                </Badge>
-                            </div>
-                            <div>
-                                <p className="text-muted-foreground text-sm">
-                                    Jumlah Dana
-                                </p>
-                                <p className="font-medium">
-                                    {formatRupiah(data.jumlah_dana)}
-                                </p>
-                            </div>
-                            {data.nomer_paten && (
-                                <div>
-                                    <p className="text-muted-foreground text-sm">
-                                        Nomor Paten
-                                    </p>
-                                    <p className="font-medium">
-                                        {data.nomer_paten}
-                                    </p>
-                                </div>
-                            )}
-                            {data.nomer_pengajuan_haki && (
-                                <div>
-                                    <p className="text-muted-foreground text-sm">
-                                        Nomor Pengajuan HAKI
-                                    </p>
-                                    <p className="font-medium">
-                                        {data.nomer_pengajuan_haki}
-                                    </p>
-                                </div>
-                            )}
                         </div>
 
                         {/* Abstrak */}
@@ -158,7 +137,7 @@ export default function Show({ data }: Props) {
                                 Penulis
                             </p>
 
-                            {penulis.length === 0 ? (
+                            {daftarPenulis.length === 0 ? (
                                 <p className="text-muted-foreground text-sm">
                                     Belum ada data penulis.
                                 </p>
@@ -170,23 +149,30 @@ export default function Show({ data }: Props) {
                                                 No.
                                             </TableHead>
                                             <TableHead>Nama Dosen</TableHead>
-                                            <TableHead>Fakultas</TableHead>
+                                            <TableHead>
+                                                Fakultas / Universitas
+                                            </TableHead>
+                                            <TableHead>Keterangan</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {penulis.map((p, index) => (
+                                        {daftarPenulis.map((p, index) => (
                                             <TableRow
-                                                key={`${p.dosen_id}-${index}`}
+                                                key={`${p.tipe}-${p.urutan}-${index}`}
                                             >
                                                 <TableCell>
                                                     {index + 1}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {p.dosen.nama_dosen ?? "-"}
+                                                    {p.nama_dosen}
                                                 </TableCell>
+                                                <TableCell>{p.asal}</TableCell>
                                                 <TableCell>
-                                                    {p.fakultas.nama_fakultas ??
-                                                        "-"}
+                                                    <span className="rounded-full border px-2 py-0.5 text-xs text-muted-foreground">
+                                                        {p.tipe === "internal"
+                                                            ? "Internal"
+                                                            : "Luar Universitas"}
+                                                    </span>
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -204,8 +190,8 @@ export default function Show({ data }: Props) {
 Show.layout = {
     breadcrumbs: [
         {
-            title: "Hak Kekayaan Intelektual",
-            href: route("admin.hki.index"),
+            title: "Luaran Jurnal",
+            href: route("admin.luaran_jurnal.index"),
         },
         {
             title: "Detail",

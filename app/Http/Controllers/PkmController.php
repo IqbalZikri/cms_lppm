@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Dosen;
 use App\Models\Fakultas;
 use App\Models\Penulis;

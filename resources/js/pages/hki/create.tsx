@@ -8,15 +8,14 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Hki } from "@/interface/hki";
 import FormHki from "@/pages/forms/hki/form";
 
 interface Props {
     fakultas: Fakultas[];
-    data: Hki;
+    role: string;
 }
 
-export default function EditHki({ fakultas, data }: Props) {
+export default function CreateHki({ fakultas, role }: Props) {
     return (
         <>
             <Head title="Tambah Penelitian Kegiatan" />
@@ -24,11 +23,11 @@ export default function EditHki({ fakultas, data }: Props) {
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">
-                            Edit Data Hak Kekayaan Intelektual
+                            Tambah Data HKI
                         </h1>
 
                         <p className="mt-1 text-muted-foreground">
-                            Form edit data Hak Kekayaan Intelektual.
+                            Form tambah data HKI.
                         </p>
                     </div>
 
@@ -37,33 +36,33 @@ export default function EditHki({ fakultas, data }: Props) {
                             <BreadcrumbList>
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("admin.hki.index")}
+                                        href={route(role + ".hki.index")}
                                     >
-                                        Hak Kekayaan Intelektual
+                                        HKI
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("admin.hki.edit", data.id)}
+                                        href={route(role + ".hki.create")}
                                     >
-                                        Edit Hak Kekayaan Intelektual
+                                        Tambah HKI
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>
                     </div>
                 </div>
-                <FormHki fakultas={fakultas} hki={data}/>
+                <FormHki fakultas={fakultas} role={role} />
             </div>
         </>
     );
 }
 
-EditHki.layout = {
+CreateHki.layout = {
     breadcrumbs: [
         {
-            title: "Tambah Penelitian Kegiatan",
+            title: "Tambah Hak Kekayaan Intelektual",
         },
     ],
 };

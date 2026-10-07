@@ -1,4 +1,5 @@
 import { Penulis } from "./penulis";
+import { PenulisLuar } from "./penulis-luar";
 
 export interface Hki {
     id: number;
@@ -13,4 +14,5 @@ export interface Hki {
     jumlah_dana: number;
     sumber_dana: string;
     penulis: Penulis[];
+    penulis_luar: PenulisLuar[];
 }

@@ -53,7 +53,6 @@ interface Props {
     fakultas: Fakultas[];
     kegiatan?: Kegiatan;
     role?: string;
-    action?: string;
 }
 
 function RequiredMark() {
@@ -64,7 +63,6 @@ export default function FormKegiatan({
     fakultas,
     kegiatan,
     role,
-    action,
 }: Props) {
     const isEdit = !!kegiatan;
     const [semester, setSemester] = useState(kegiatan?.semester ?? "");
@@ -400,8 +398,11 @@ export default function FormKegiatan({
                             </div>
                         </div>
 
-                        <FormPenulis fakultas={fakultas} data={kegiatan} errors={errors}/>
-                       
+                        <FormPenulis
+                            fakultas={fakultas}
+                            data={kegiatan}
+                            errors={errors}
+                        />
                     </CardContent>
 
                     <CardFooter className="flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-end">

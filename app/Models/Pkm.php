@@ -15,8 +15,8 @@ class Pkm extends Model
         'judul',
         'penulis.fakultas.nama_fakultas',
         'penulis.dosen.nama_dosen',
-        'penulis.nama_universitas',
-        'penulis.nama_dosen',
+        'penulisLuar.nama_universitas',
+        'penulisLuar.nama_dosen',
     ];
     protected $fillable = [
         'jenis_pkm',
