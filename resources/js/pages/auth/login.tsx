@@ -1,4 +1,4 @@
-import { Form, Head, usePage } from "@inertiajs/react";
+import { Form, Head, Link, usePage } from "@inertiajs/react";
 import InputError from "@/components/input-error";
 import PasswordInput from "@/components/password-input";
 import TextLink from "@/components/text-link";
@@ -13,6 +13,7 @@ import { route } from "ziggy-js";
 import { Toaster } from "@/components/ui/sonner";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { MoveLeft } from "lucide-react";
 
 type Props = {
     status?: string;
@@ -86,15 +87,6 @@ export default function Login({ status, canResetPassword }: Props) {
                                 <InputError message={errors.password} />
                             </div>
 
-                            {/* <div className="flex items-center space-x-3">
-                                <Checkbox
-                                    id="remember"
-                                    name="remember"
-                                    tabIndex={3}
-                                />
-                                <Label htmlFor="remember">Remember me</Label>
-                            </div> */}
-
                             <Button
                                 type="submit"
                                 className="mt-4 w-full bg-[#bf9f62] transition duration-300 ease-in-out"
@@ -105,6 +97,12 @@ export default function Login({ status, canResetPassword }: Props) {
                                 {processing && <Spinner />}
                                 Log in
                             </Button>
+                            <Link href={route("beranda")} viewTransition>
+                                <Button className="w-full bg-[#0a5237] transition duration-300 ease-in-out">
+                                    <MoveLeft />
+                                    Kembali
+                                </Button>
+                            </Link>
                         </div>
 
                         <div className="text-muted-foreground text-center text-sm">
