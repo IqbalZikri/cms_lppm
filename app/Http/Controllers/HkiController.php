@@ -30,6 +30,8 @@ class HkiController extends Controller
             'link_berkas.url' => 'Format link berkas tidak valid.',
             'authors.required' => 'Minimal harus ada satu penulis.',
             'authors.min' => 'Minimal harus ada :min penulis.',
+            'nomer_paten.required_if' => 'Nomor paten wajib diisi jika jenis HKI berupa paten.',
+            'nomer_pengajuan_haki.required_if' => 'Nomor pengajuan HAKI wajib diisi jika jenis HKI berupa HAKI.',
         ];
     }
 
@@ -64,6 +66,8 @@ class HkiController extends Controller
             'tahun' => ['required', 'integer'],
             'link_berkas' => ['required', 'url'],
             'authors' => ['required', 'array', 'min:1'],
+            'nomer_paten' => ['required_if:jenis_hki,paten', 'string'],
+            'nomer_pengajuan_haki' => ['required_if:jenis_hki,haki', 'string'],
         ];
     }
 
@@ -73,11 +77,19 @@ class HkiController extends Controller
     public function indexAdmin(Request $request)
     {
         $queryHki = Hki::query()->with('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
+
+        $queryHki->where(function ($q) {
+            $q->where('status_pengajuan', '!=', 'draft')
+                ->orWhereNull('status_pengajuan')
+                ->orWhere('user_id', auth()->id());
+        });
+
         if ($request->filled('cari_fakultas')) {
             $queryHki->whereHas('penulis', function ($q) use ($request) {
                 $q->where('fakultas_id', $request->cari_fakultas);
             });
         }
+
         $data = $queryHki->clone()->search($request->query("search"))->latest()->paginate(10)->withQueryString();
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
         $totalPaten = Hki::where('jenis_hki', 'paten')->count();
@@ -117,7 +129,7 @@ class HkiController extends Controller
     {
         $data = Hki::whereHas('penulis', function ($query) {
             $query->where('fakultas_id', auth()->user()->fakultas_id);
-        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10)->withQueryString();
+        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen', 'penulisLuar')->latest()->paginate(10)->withQueryString();
         return Inertia::render('uppm/hki/index', [
             'data' => $data,
             'filters' => $request->only("search")
@@ -131,7 +143,7 @@ class HkiController extends Controller
     {
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
         $user = auth()->user()->only("id", "role");
-        return Inertia::render('hki/create', [
+        return Inertia::render('admin/hki/create', [
             'fakultas' => $fakultas,
             'user' => $user,
         ]);
@@ -142,6 +154,16 @@ class HkiController extends Controller
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
         $user = auth()->user()->only("id", "role");
         return Inertia::render('dosen/hki/create', [
+            'fakultas' => $fakultas,
+            'user' => $user,
+        ]);
+    }
+
+    public function createRoleUppm()
+    {
+        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
+        $user = auth()->user()->only("id", "role");
+        return Inertia::render('uppm/hki/create', [
             'fakultas' => $fakultas,
             'user' => $user,
         ]);
@@ -209,7 +231,7 @@ class HkiController extends Controller
     public function show(Hki $hki)
     {
         $hki->load('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
-        return Inertia::render('hki/show', [
+        return Inertia::render('admin/hki/show', [
             'data' => $hki,
             "role" => auth()->user()->role
         ]);
@@ -224,6 +246,15 @@ class HkiController extends Controller
         ]);
     }
 
+    public function showRoleUppm(Hki $hki)
+    {
+        $hki->load('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
+        return Inertia::render('uppm/hki/show', [
+            'data' => $hki,
+            "role" => auth()->user()->role
+        ]);
+    }
+
     public function updateStatusPengajuan(Request $request, $id)
     {
         $data = Hki::findOrFail($id);
@@ -233,7 +264,7 @@ class HkiController extends Controller
                 "status_pengajuan" => $request->status_pengajuan
             ]);
 
-            return back()->with("success", "Pengajuan HKI berhasil di " . $request->status_pengajuan);
+            return back()->with("success", "Pengajuan HKI berhasil " . $request->status_pengajuan);
         } catch (\Throwable $th) {
             Log::info($th->getMessage());
             return back()->with("error", "Terjadi Kesalahan");
@@ -247,7 +278,7 @@ class HkiController extends Controller
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
         $hki->load('penulis', 'penulisLuar');
         $user = auth()->user();
-        return Inertia::render('hki/edit', [
+        return Inertia::render('admin/hki/edit', [
             'data' => $hki,
             'fakultas' => $fakultas,
             'user' => $user,
@@ -260,6 +291,18 @@ class HkiController extends Controller
         $hki->load('penulis', 'penulisLuar');
         $user = auth()->user();
         return Inertia::render('dosen/hki/edit', [
+            'data' => $hki,
+            'fakultas' => $fakultas,
+            'user' => $user,
+        ]);
+    }
+
+    public function editRoleUppm(Hki $hki)
+    {
+        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
+        $hki->load('penulis', 'penulisLuar');
+        $user = auth()->user();
+        return Inertia::render('uppm/hki/edit', [
             'data' => $hki,
             'fakultas' => $fakultas,
             'user' => $user,

@@ -112,6 +112,17 @@ export default function Hki({ data, filters }: Props) {
                             data={data}
                             columns={[
                                 {
+                                    id: "jenis_hki",
+                                    key: "jenis_hki",
+                                    label: "Jenis HKI",
+                                    render: (_, item) => (
+                                        <Badge>
+                                            {item.jenis_hki.toUpperCase() ??
+                                                "- "}
+                                        </Badge>
+                                    ),
+                                },
+                                {
                                     id: "judul",
                                     key: "judul",
                                     label: "Judul",
@@ -135,7 +146,7 @@ export default function Hki({ data, filters }: Props) {
                                                     key={i}
                                                     className="flex flex-wrap items-center gap-1.5"
                                                 >
-                                                    <Badge className="whitespace-nowrap">
+                                                    <Badge className="whitespace-nowrap text-[13px]">
                                                         {
                                                             penulis.fakultas
                                                                 .nama_fakultas
@@ -157,7 +168,7 @@ export default function Hki({ data, filters }: Props) {
                                                     key={i}
                                                     className="flex flex-wrap items-center gap-1.5"
                                                 >
-                                                    <Badge className="whitespace-nowrap">
+                                                    <Badge className="whitespace-nowrap text-[13px]">
                                                         {
                                                             penulis.dosen
                                                                 .nama_dosen
@@ -165,6 +176,45 @@ export default function Hki({ data, filters }: Props) {
                                                     </Badge>
                                                 </div>
                                             ))}
+                                        </div>
+                                    ),
+                                },
+                                {
+                                    id: "penulis_luar",
+                                    key: "penulis_luar",
+                                    label: "Penulis Luar Universitas",
+                                    render: (_, item) => (
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {item.penulis_luar.length !== 0 ? (
+                                                <>
+                                                    {item.penulis_luar.map(
+                                                        (penulis, i) => (
+                                                            <div
+                                                                key={i}
+                                                                className="flex flex-wrap items-center gap-1.5"
+                                                            >
+                                                                <Badge
+                                                                    className="whitespace-nowrap"
+                                                                    variant={
+                                                                        "outline"
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        penulis.nama_universitas
+                                                                    }
+                                                                </Badge>
+                                                                <Badge className="whitespace-nowrap">
+                                                                    {
+                                                                        penulis.nama_dosen
+                                                                    }
+                                                                </Badge>
+                                                            </div>
+                                                        ),
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <>-</>
+                                            )}
                                         </div>
                                     ),
                                 },
@@ -183,37 +233,87 @@ export default function Hki({ data, filters }: Props) {
                                     key: "link_berkas",
                                     label: "Berkas",
                                     render: (_, item) => (
-                                        <a
-                                            href={item.link_berkas}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-primary inline-flex items-center gap-1.5 text-sm hover:underline"
-                                        >
-                                            <FileText className="h-3.5 w-3.5" />
-                                            Lihat
-                                        </a>
+                                        <>
+                                            {item.link_berkas ? (
+                                                <a
+                                                    href={item.link_berkas}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-primary inline-flex items-center gap-1.5 text-sm hover:underline"
+                                                >
+                                                    <FileText className="h-3.5 w-3.5" />
+                                                    Lihat
+                                                </a>
+                                            ) : (
+                                                "-"
+                                            )}
+                                        </>
                                     ),
+                                },
+                                {
+                                    id: "status_pengajuan",
+                                    key: "status_pengajuan",
+                                    label: "Status Pengajuan",
+                                    render: (_, item) => {
+                                        const statusPengajuan =
+                                            item.status_pengajuan
+                                                .charAt(0)
+                                                .toUpperCase() +
+                                            item.status_pengajuan.slice(1);
+                                        return (
+                                            <Badge
+                                                variant={
+                                                    item.status_pengajuan ===
+                                                        "draft" ||
+                                                    item.status_pengajuan ===
+                                                        "diajukan"
+                                                        ? "secondary"
+                                                        : item.status_pengajuan ===
+                                                            "disetujui"
+                                                          ? "success"
+                                                          : "destructive"
+                                                }
+                                            >
+                                                {statusPengajuan}
+                                            </Badge>
+                                        );
+                                    },
                                 },
                             ]}
                             renderActions={(item) => (
                                 <div className="flex items-center gap-3">
-                                    <Link
-                                        href={route("uppm.hki.show", item.id)}
-                                        viewTransition
-                                    >
-                                        <Button
-                                            variant="outline"
-                                            title="Lihat detail"
+                                    {item.status_pengajuan === "draft" ? (
+                                        ""
+                                    ) : (
+                                        <Link
+                                            href={route(
+                                                "uppm.hki.show",
+                                                item.id,
+                                            )}
+                                            viewTransition
                                         >
-                                            Show
-                                        </Button>
-                                    </Link>
-                                    <Link
-                                        href={route("uppm.hki.edit", item.id)}
-                                        viewTransition
-                                    >
-                                        <Button title="Edit">Edit</Button>
-                                    </Link>
+                                            <Button
+                                                variant="outline"
+                                                title="Lihat detail"
+                                            >
+                                                Show
+                                            </Button>
+                                        </Link>
+                                    )}
+                                    {item.status_pengajuan === "diajukan" ||
+                                    item.status_pengajuan === "disetujui" ? (
+                                        ""
+                                    ) : (
+                                        <Link
+                                            href={route(
+                                                "uppm.hki.edit",
+                                                item.id,
+                                            )}
+                                            viewTransition
+                                        >
+                                            <Button title="Edit">Edit</Button>
+                                        </Link>
+                                    )}
                                     <DialogDelete
                                         label={item.judul}
                                         actionUrl={route(

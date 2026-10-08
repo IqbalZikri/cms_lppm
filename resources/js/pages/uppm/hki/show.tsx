@@ -34,8 +34,39 @@ function formatRupiah(value: string | number) {
     }).format(number);
 }
 
+type PenulisRow =
+    | {
+          tipe: "internal";
+          urutan: number;
+          nama_dosen: string;
+          asal: string;
+      }
+    | {
+          tipe: "luar";
+          urutan: number;
+          nama_dosen: string;
+          asal: string;
+      };
+
 export default function Show({ data }: Props) {
-    const penulis = data.penulis ?? [];
+    const daftarPenulis: PenulisRow[] = [
+        ...(data.penulis ?? []).map((p) => ({
+            tipe: "internal" as const,
+            urutan: p.urutan,
+            nama_dosen: p.dosen?.nama_dosen ?? "-",
+            asal: p.fakultas?.nama_fakultas ?? "-",
+        })),
+        ...(data.penulis_luar ?? []).map((p) => ({
+            tipe: "luar" as const,
+            urutan: p.urutan,
+            nama_dosen: p.nama_dosen ?? "-",
+            asal: p.nama_universitas ?? "-",
+        })),
+    ].sort((a, b) => a.urutan - b.urutan);
+
+    const statusPengajuan =
+        data.status_pengajuan.charAt(0).toUpperCase() +
+        data.status_pengajuan.slice(1);
 
     return (
         <>
@@ -49,22 +80,23 @@ export default function Show({ data }: Props) {
                         </Button>
                     </Link>
 
-                    <Link
-                        href={route("uppm.hki.edit", data.id)}
-                        viewTransition
-                    >
-                        <Button size="sm">
-                            <Pencil className="mr-1 h-4 w-4" />
-                            Edit
-                        </Button>
-                    </Link>
+                    {(data.status_pengajuan === "draft" ||
+                        data.status_pengajuan === "ditolak") && (
+                        <Link
+                            href={route("uppm.hki.edit", data.id)}
+                            viewTransition
+                        >
+                            <Button size="sm">
+                                <Pencil className="mr-1 h-4 w-4" />
+                                Edit
+                            </Button>
+                        </Link>
+                    )}
                 </div>
 
                 <Card className="w-full">
                     <CardHeader>
-                        <CardTitle className="text-xl">
-                            {data.judul}
-                        </CardTitle>
+                        <CardTitle className="text-xl">{data.judul}</CardTitle>
                         <CardDescription>
                             Detail Hak Kekayaan Intelektual ( HKI )
                         </CardDescription>
@@ -135,30 +167,47 @@ export default function Show({ data }: Props) {
                             </p>
                         </div>
 
-                        {/* Link berkas */}
-                        <div>
-                            <p className="text-muted-foreground mb-1 text-sm">
-                                Link Berkas
-                            </p>
-                            <Link
-                                href={data.link_berkas}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-sm text-blue-600 underline"
-                                viewTransition
-                            >
-                                <FileText className="h-4 w-4" />
-                                Lihat Berkas
-                            </Link>
-                        </div>
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <p className="text-muted-foreground mb-1 text-sm">
+                                    Link Berkas
+                                </p>
+                                <Link
+                                    href={data.link_berkas}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 text-sm text-blue-600 underline"
+                                    viewTransition
+                                >
+                                    <FileText className="h-4 w-4" />
+                                    Lihat Berkas
+                                </Link>
+                            </div>
 
-                        {/* Daftar penulis */}
+                            <div>
+                                <p className="text-muted-foreground mb-1 text-sm">
+                                    Status Pengajuan
+                                </p>
+                                <Badge
+                                    variant={
+                                        data.status_pengajuan === "ditolak"
+                                            ? "destructive"
+                                            : data.status_pengajuan ===
+                                                "disetujui"
+                                              ? "success"
+                                              : "secondary"
+                                    }
+                                >
+                                    {statusPengajuan}
+                                </Badge>
+                            </div>
+                        </div>
                         <div>
                             <p className="text-muted-foreground mb-2 text-sm">
                                 Penulis
                             </p>
 
-                            {penulis.length === 0 ? (
+                            {daftarPenulis.length === 0 ? (
                                 <p className="text-muted-foreground text-sm">
                                     Belum ada data penulis.
                                 </p>
@@ -170,23 +219,30 @@ export default function Show({ data }: Props) {
                                                 No.
                                             </TableHead>
                                             <TableHead>Nama Dosen</TableHead>
-                                            <TableHead>Fakultas</TableHead>
+                                            <TableHead>
+                                                Fakultas / Universitas
+                                            </TableHead>
+                                            <TableHead>Keterangan</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {penulis.map((p, index) => (
+                                        {daftarPenulis.map((p, index) => (
                                             <TableRow
-                                                key={`${p.dosen_id}-${index}`}
+                                                key={`${p.tipe}-${p.urutan}-${index}`}
                                             >
                                                 <TableCell>
                                                     {index + 1}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {p.dosen.nama_dosen ?? "-"}
+                                                    {p.nama_dosen}
                                                 </TableCell>
+                                                <TableCell>{p.asal}</TableCell>
                                                 <TableCell>
-                                                    {p.fakultas.nama_fakultas ??
-                                                        "-"}
+                                                    <span className="rounded-full border px-2 py-0.5 text-muted-foreground">
+                                                        {p.tipe === "internal"
+                                                            ? "Internal"
+                                                            : "Luar Universitas"}
+                                                    </span>
                                                 </TableCell>
                                             </TableRow>
                                         ))}

@@ -116,7 +116,8 @@ export default function Hki({ data, filters }: Props) {
                                     label: "Jenis HKI",
                                     render: (_, item) => (
                                         <Badge>
-                                            {item.jenis_hki.toUpperCase() ?? "- "}
+                                            {item.jenis_hki?.toUpperCase() ??
+                                                "-"}
                                         </Badge>
                                     ),
                                 },
@@ -262,9 +263,14 @@ export default function Hki({ data, filters }: Props) {
                                             <Badge
                                                 variant={
                                                     item.status_pengajuan ===
-                                                    "draft"
+                                                        "draft" ||
+                                                    item.status_pengajuan ==
+                                                        "diajukan"
                                                         ? "default"
-                                                        : "secondary"
+                                                        : item.status_pengajuan ===
+                                                            "disetujui"
+                                                          ? "success"
+                                                          : "destructive"
                                                 }
                                             >
                                                 {statusPengajuan}
@@ -275,18 +281,26 @@ export default function Hki({ data, filters }: Props) {
                             ]}
                             renderActions={(item) => (
                                 <div className="flex items-center gap-3">
-                                    <Link
-                                        href={route("dosen.hki.show", item.id)}
-                                        viewTransition
-                                    >
-                                        <Button
-                                            variant="outline"
-                                            title="Lihat detail"
+                                    {item.status_pengajuan === "draft" ? (
+                                        ""
+                                    ) : (
+                                        <Link
+                                            href={route(
+                                                "dosen.hki.show",
+                                                item.id,
+                                            )}
+                                            viewTransition
                                         >
-                                            Show
-                                        </Button>
-                                    </Link>
-                                    {item.status_pengajuan === "diajukan" ? (
+                                            <Button
+                                                variant="outline"
+                                                title="Lihat detail"
+                                            >
+                                                Show
+                                            </Button>
+                                        </Link>
+                                    )}
+                                    {item.status_pengajuan === "diajukan" ||
+                                    item.status_pengajuan === "disetujui" ? (
                                         ""
                                     ) : (
                                         <Link

@@ -10,14 +10,17 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Hki } from "@/interface/hki";
 import FormHki from "@/pages/forms/hki/form";
+import { User } from "@/types";
 
 interface Props {
     fakultas: Fakultas[];
     data: Hki;
-    role: string;
+    user: User;
 }
 
-export default function EditHki({ fakultas, data, role }: Props) {
+export default function EditHki({ fakultas, data, user }: Props) {
+    console.log(data);
+    
     return (
         <>
             <Head title="Tambah Penelitian Kegiatan" />
@@ -55,7 +58,7 @@ export default function EditHki({ fakultas, data, role }: Props) {
                         </Breadcrumb>
                     </div>
                 </div>
-                <FormHki fakultas={fakultas} hki={data} role={role}/>
+                <FormHki fakultas={fakultas} hki={data} user={user}/>
             </div>
         </>
     );

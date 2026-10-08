@@ -34,7 +34,7 @@ Route::middleware(['auth', 'role:dosen'])
         Route::get('hki', [HkiController::class, 'indexDosen'])->name('hki.index');
         Route::get('hki/create', [HkiController::class, 'dosenCreate'])->name('hki.create');
         Route::post('hki/create', [HkiController::class, 'store'])->name('hki.store');
-        Route::get('hki//detail/{hki}', [HkiController::class, 'showRoleDosen'])->name('hki.show');
+        Route::get('hki/detail/{hki}', [HkiController::class, 'showRoleDosen'])->name('hki.show');
         Route::get('hki/{hki}', [HkiController::class, 'editRoleDosen'])->name('hki.edit');
         Route::put('hki/{hki}', [HkiController::class, 'update'])->name('hki.update');
         Route::delete('hki/{hki}', [HkiController::class, 'destroy'])->name('hki.destroy');

@@ -345,18 +345,26 @@ export default function Hki({
                             ]}
                             renderActions={(item) => (
                                 <div className="flex items-center gap-3">
-                                    <Link
-                                        href={route("admin.hki.show", item.id)}
-                                        viewTransition
-                                    >
-                                        <Button
-                                            variant="outline"
-                                            title="Lihat detail"
+                                    {item.status_pengajuan === "draft" ? (
+                                        ""
+                                    ) : (
+                                        <Link
+                                            href={route(
+                                                "admin.hki.show",
+                                                item.id,
+                                            )}
+                                            viewTransition
                                         >
-                                            Show
-                                        </Button>
-                                    </Link>
-                                    {item.status_pengajuan === "diajukan" ? (
+                                            <Button
+                                                variant="outline"
+                                                title="Lihat detail"
+                                            >
+                                                Show
+                                            </Button>
+                                        </Link>
+                                    )}
+                                    {item.status_pengajuan === "diajukan" ||
+                                    item.status_pengajuan === "disetujui" ? (
                                         ""
                                     ) : (
                                         <Link

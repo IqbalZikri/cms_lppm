@@ -4,6 +4,7 @@ import {
     BookOpen,
     Building,
     FileBadge,
+    FilePenLine,
     FileText,
     GraduationCap,
     HandHeart,
@@ -58,11 +59,6 @@ const mainNavItems: NavItem[] = [
                 icon: HandHeart,
             },
             {
-                title: "HKI",
-                href: route("uppm.hki.index"),
-                icon: FileBadge,
-            },
-            {
                 title: "Luaran Prosiding",
                 href: route("uppm.luaran_prosiding.index"),
                 icon: ScrollText,
@@ -71,6 +67,17 @@ const mainNavItems: NavItem[] = [
                 title: "Luaran Jurnal",
                 href: route("uppm.luaran_jurnal.index"),
                 icon: Notebook,
+            },
+        ],
+    },
+    {
+        title: "Pengajuan",
+        icon: FilePenLine,
+        items: [
+            {
+                title: "HKI",
+                href: route("uppm.hki.index"),
+                icon: FileBadge,
             },
         ],
     },

@@ -66,7 +66,9 @@ export default function Show({ data, role }: Props) {
         })),
     ].sort((a, b) => a.urutan - b.urutan);
 
-    const statusPengajuan = data.status_pengajuan.charAt(0).toUpperCase() + data.status_pengajuan.slice(1);
+    const statusPengajuan =
+        data.status_pengajuan.charAt(0).toUpperCase() +
+        data.status_pengajuan.slice(1);
 
     return (
         <>
@@ -80,7 +82,8 @@ export default function Show({ data, role }: Props) {
                         </Button>
                     </Link>
 
-                    {data.status_pengajuan === "diajukan" ? (
+                    {data.status_pengajuan === "diajukan" ||
+                    data.status_pengajuan === "disetujui" ? (
                         ""
                     ) : (
                         <Link
@@ -254,8 +257,8 @@ export default function Show({ data, role }: Props) {
                             )}
                         </div>
                     </CardContent>
-                    {data.status_pengajuan === "diajukan" && (
-                        <CardFooter className="grid justify-items-end">
+                    <CardFooter className="grid justify-items-end">
+                        {data.status_pengajuan === "diajukan" && (
                             <Form
                                 className="flex gap-3"
                                 action={route(
@@ -279,8 +282,26 @@ export default function Show({ data, role }: Props) {
                                     Setujui
                                 </Button>
                             </Form>
-                        </CardFooter>
-                    )}
+                        )}
+                        {data.status_pengajuan === "disetujui" && (
+                            <Form
+                                className="flex gap-3"
+                                action={route(
+                                    "admin.hki.updateStatusPengajuan",
+                                    data.id,
+                                )}
+                                method="PUT"
+                            >
+                                <Button
+                                    name="status_pengajuan"
+                                    value={"ditolak"}
+                                    variant={"destructive"}
+                                >
+                                    Tolak
+                                </Button>
+                            </Form>
+                        )}
+                    </CardFooter>
                 </Card>
             </div>
         </>
