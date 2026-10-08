@@ -52,6 +52,7 @@ export default function Hki({ data, filters }: Props) {
 
         return () => clearTimeout(timeout);
     }, [search]);
+
     return (
         <>
             <Head title="Hak Kekayaan Intelektual" />
@@ -110,6 +111,16 @@ export default function Hki({ data, filters }: Props) {
                             data={data}
                             columns={[
                                 {
+                                    id: "jenis_hki",
+                                    key: "jenis_hki",
+                                    label: "Jenis HKI",
+                                    render: (_, item) => (
+                                        <Badge>
+                                            {item.jenis_hki.toUpperCase() ?? "- "}
+                                        </Badge>
+                                    ),
+                                },
+                                {
                                     id: "judul",
                                     key: "judul",
                                     label: "Judul",
@@ -163,6 +174,45 @@ export default function Hki({ data, filters }: Props) {
                                                     </Badge>
                                                 </div>
                                             ))}
+                                        </div>
+                                    ),
+                                },
+                                {
+                                    id: "penulis_luar",
+                                    key: "penulis_luar",
+                                    label: "Penulis Luar Universitas",
+                                    render: (_, item) => (
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {item.penulis_luar.length !== 0 ? (
+                                                <>
+                                                    {item.penulis_luar.map(
+                                                        (penulis, i) => (
+                                                            <div
+                                                                key={i}
+                                                                className="flex flex-wrap items-center gap-1.5"
+                                                            >
+                                                                <Badge
+                                                                    className="whitespace-nowrap text-[13px]"
+                                                                    variant={
+                                                                        "outline"
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        penulis.nama_universitas
+                                                                    }
+                                                                </Badge>
+                                                                <Badge className="whitespace-nowrap text-[13px]">
+                                                                    {
+                                                                        penulis.nama_dosen
+                                                                    }
+                                                                </Badge>
+                                                            </div>
+                                                        ),
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <>-</>
+                                            )}
                                         </div>
                                     ),
                                 },
@@ -236,12 +286,20 @@ export default function Hki({ data, filters }: Props) {
                                             Show
                                         </Button>
                                     </Link>
-                                    <Link
-                                        href={route("dosen.hki.edit", item.id)}
-                                        viewTransition
-                                    >
-                                        <Button title="Edit">Edit</Button>
-                                    </Link>
+                                    {item.status_pengajuan === "diajukan" ? (
+                                        ""
+                                    ) : (
+                                        <Link
+                                            href={route(
+                                                "dosen.hki.edit",
+                                                item.id,
+                                            )}
+                                            viewTransition
+                                        >
+                                            <Button title="Edit">Edit</Button>
+                                        </Link>
+                                    )}
+
                                     <DialogDelete
                                         label={item.judul}
                                         actionUrl={route(

@@ -49,22 +49,23 @@ export default function Show({ data }: Props) {
                         </Button>
                     </Link>
 
-                    <Link
-                        href={route("dosen.hki.edit", data.id)}
-                        viewTransition
-                    >
-                        <Button size="sm">
-                            <Pencil className="mr-1 h-4 w-4" />
-                            Edit
-                        </Button>
-                    </Link>
+                    {data.status_pengajuan === "draft" ||
+                        (data.status_pengajuan === "ditolak" && (
+                            <Link
+                                href={route("dosen.hki.edit", data.id)}
+                                viewTransition
+                            >
+                                <Button size="sm">
+                                    <Pencil className="mr-1 h-4 w-4" />
+                                    Edit
+                                </Button>
+                            </Link>
+                        ))}
                 </div>
 
                 <Card className="w-full">
                     <CardHeader>
-                        <CardTitle className="text-xl">
-                            {data.judul}
-                        </CardTitle>
+                        <CardTitle className="text-xl">{data.judul}</CardTitle>
                         <CardDescription>
                             Detail Hak Kekayaan Intelektual ( HKI )
                         </CardDescription>
@@ -125,7 +126,6 @@ export default function Show({ data }: Props) {
                             )}
                         </div>
 
-                        {/* Abstrak */}
                         <div>
                             <p className="text-muted-foreground mb-1 text-sm">
                                 Abstrak
@@ -135,21 +135,31 @@ export default function Show({ data }: Props) {
                             </p>
                         </div>
 
-                        {/* Link berkas */}
-                        <div>
-                            <p className="text-muted-foreground mb-1 text-sm">
-                                Link Berkas
-                            </p>
-                            <Link
-                                href={data.link_berkas}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-sm text-blue-600 underline"
-                                viewTransition
-                            >
-                                <FileText className="h-4 w-4" />
-                                Lihat Berkas
-                            </Link>
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <p className="text-muted-foreground mb-1 text-sm">
+                                    Link Berkas
+                                </p>
+                                <Link
+                                    href={data.link_berkas}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 text-sm text-blue-600 underline"
+                                    viewTransition
+                                >
+                                    <FileText className="h-4 w-4" />
+                                    Lihat Berkas
+                                </Link>
+                            </div>
+
+                            <div>
+                                <p className="text-muted-foreground mb-1 text-sm">
+                                    Status Pengajuan
+                                </p>
+                                <Badge>
+                                    {data.status_pengajuan}
+                                </Badge>
+                            </div>
                         </div>
 
                         {/* Daftar penulis */}

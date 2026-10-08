@@ -1,9 +1,10 @@
-import { Head, Link } from "@inertiajs/react";
+import { Form, Head, Link } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import {
     Card,
     CardContent,
     CardDescription,
+    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
@@ -65,6 +66,8 @@ export default function Show({ data, role }: Props) {
         })),
     ].sort((a, b) => a.urutan - b.urutan);
 
+    const statusPengajuan = data.status_pengajuan.charAt(0).toUpperCase() + data.status_pengajuan.slice(1);
+
     return (
         <>
             <Head title={`Detail - ${data.judul}`} />
@@ -77,15 +80,19 @@ export default function Show({ data, role }: Props) {
                         </Button>
                     </Link>
 
-                    <Link
-                        href={route(role + ".hki.edit", data.id)}
-                        viewTransition
-                    >
-                        <Button size="sm">
-                            <Pencil className="mr-1 h-4 w-4" />
-                            Edit
-                        </Button>
-                    </Link>
+                    {data.status_pengajuan === "diajukan" ? (
+                        ""
+                    ) : (
+                        <Link
+                            href={route(role + ".hki.edit", data.id)}
+                            viewTransition
+                        >
+                            <Button size="sm">
+                                <Pencil className="mr-1 h-4 w-4" />
+                                Edit
+                            </Button>
+                        </Link>
+                    )}
                 </div>
 
                 <Card className="w-full">
@@ -161,21 +168,40 @@ export default function Show({ data, role }: Props) {
                             </p>
                         </div>
 
-                        {/* Link berkas */}
-                        <div>
-                            <p className="text-muted-foreground mb-1 text-sm">
-                                Link Berkas
-                            </p>
-                            <Link
-                                href={data.link_berkas}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-sm text-blue-600 underline"
-                                viewTransition
-                            >
-                                <FileText className="h-4 w-4" />
-                                Lihat Berkas
-                            </Link>
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <p className="text-muted-foreground mb-1 text-sm">
+                                    Link Berkas
+                                </p>
+                                <Link
+                                    href={data.link_berkas}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 text-sm text-blue-600 underline"
+                                    viewTransition
+                                >
+                                    <FileText className="h-4 w-4" />
+                                    Lihat Berkas
+                                </Link>
+                            </div>
+
+                            <div>
+                                <p className="text-muted-foreground mb-1 text-sm">
+                                    Status Pengajuan
+                                </p>
+                                <Badge
+                                    variant={
+                                        data.status_pengajuan === "ditolak"
+                                            ? "destructive"
+                                            : data.status_pengajuan ===
+                                                "disetujui"
+                                              ? "success"
+                                              : "secondary"
+                                    }
+                                >
+                                    {statusPengajuan}
+                                </Badge>
+                            </div>
                         </div>
 
                         {/* Daftar penulis */}
@@ -228,6 +254,33 @@ export default function Show({ data, role }: Props) {
                             )}
                         </div>
                     </CardContent>
+                    {data.status_pengajuan === "diajukan" && (
+                        <CardFooter className="grid justify-items-end">
+                            <Form
+                                className="flex gap-3"
+                                action={route(
+                                    "admin.hki.updateStatusPengajuan",
+                                    data.id,
+                                )}
+                                method="PUT"
+                            >
+                                <Button
+                                    name="status_pengajuan"
+                                    value={"ditolak"}
+                                    variant={"destructive"}
+                                >
+                                    Tolak
+                                </Button>
+                                <Button
+                                    name="status_pengajuan"
+                                    value={"disetujui"}
+                                    variant={"success"}
+                                >
+                                    Setujui
+                                </Button>
+                            </Form>
+                        </CardFooter>
+                    )}
                 </Card>
             </div>
         </>

@@ -107,6 +107,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('hki/create', [HkiController::class, 'create'])->name('hki.create');
         Route::post('hki/create', [HkiController::class, 'store'])->name('hki.store');
         Route::get('hki//detail/{hki}', [HkiController::class, 'show'])->name('hki.show');
+        Route::put('hki//update-status/{id}', [HkiController::class, 'updateStatusPengajuan'])->name('hki.updateStatusPengajuan');
         Route::get('hki/{hki}', [HkiController::class, 'edit'])->name('hki.edit');
         Route::put('hki/{hki}', [HkiController::class, 'update'])->name('hki.update');
         Route::delete('hki/{hki}', [HkiController::class, 'destroy'])->name('hki.destroy');

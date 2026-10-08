@@ -106,7 +106,7 @@ class HkiController extends Controller
 
     public function indexDosen(Request $request)
     {
-        $data = Hki::where("user_id", auth()->user()->id)->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10)->withQueryString();
+        $data = Hki::where("user_id", auth()->user()->id)->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen', 'penulisLuar')->latest()->paginate(10)->withQueryString();
         return Inertia::render('dosen/hki/index', [
             'data' => $data,
             'filters' => $request->only("search"),
@@ -215,6 +215,30 @@ class HkiController extends Controller
         ]);
     }
 
+    public function showRoleDosen(Hki $hki)
+    {
+        $hki->load('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
+        return Inertia::render('dosen/hki/show', [
+            'data' => $hki,
+            "role" => auth()->user()->role
+        ]);
+    }
+
+    public function updateStatusPengajuan(Request $request, $id)
+    {
+        $data = Hki::findOrFail($id);
+
+        try {
+            $data->update([
+                "status_pengajuan" => $request->status_pengajuan
+            ]);
+
+            return back()->with("success", "Pengajuan HKI berhasil di " . $request->status_pengajuan);
+        } catch (\Throwable $th) {
+            Log::info($th->getMessage());
+            return back()->with("error", "Terjadi Kesalahan");
+        }
+    }
     /**
      * Show the form for editing the specified resource.
      */
@@ -224,6 +248,18 @@ class HkiController extends Controller
         $hki->load('penulis', 'penulisLuar');
         $user = auth()->user();
         return Inertia::render('hki/edit', [
+            'data' => $hki,
+            'fakultas' => $fakultas,
+            'user' => $user,
+        ]);
+    }
+
+    public function editRoleDosen(Hki $hki)
+    {
+        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
+        $hki->load('penulis', 'penulisLuar');
+        $user = auth()->user();
+        return Inertia::render('dosen/hki/edit', [
             'data' => $hki,
             'fakultas' => $fakultas,
             'user' => $user,

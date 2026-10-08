@@ -561,7 +561,11 @@ export default function FormHki({ fakultas, hki, user }: Props) {
                             disabled={processing}
                             className="h-11 w-full px-6 text-base sm:w-auto"
                         >
-                            {isEdit ? "Simpan Perubahan" : user.role === "admin" ? "Simpan HKI" : "Ajukan"}
+                            {isEdit && user.role === "admin"
+                                ? "Simpan"
+                                : user.role === "admin"
+                                  ? "Simpan HKI"
+                                  : "Ajukan"}
                         </Button>
                     </CardFooter>
                 </Card>

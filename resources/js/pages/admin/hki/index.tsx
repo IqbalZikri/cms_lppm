@@ -328,7 +328,13 @@ export default function Hki({
                                                     item.status_pengajuan ===
                                                     "draft"
                                                         ? "default"
-                                                        : "secondary"
+                                                        : item.status_pengajuan ===
+                                                            "diajukan"
+                                                          ? "secondary"
+                                                          : item.status_pengajuan ===
+                                                              "disetujui"
+                                                            ? "success"
+                                                            : "destructive"
                                                 }
                                             >
                                                 {statusPengajuan}
@@ -350,12 +356,19 @@ export default function Hki({
                                             Show
                                         </Button>
                                     </Link>
-                                    <Link
-                                        href={route("admin.hki.edit", item.id)}
-                                        viewTransition
-                                    >
-                                        <Button title="Edit">Edit</Button>
-                                    </Link>
+                                    {item.status_pengajuan === "diajukan" ? (
+                                        ""
+                                    ) : (
+                                        <Link
+                                            href={route(
+                                                "admin.hki.edit",
+                                                item.id,
+                                            )}
+                                            viewTransition
+                                        >
+                                            <Button title="Edit">Edit</Button>
+                                        </Link>
+                                    )}
                                     <DialogDelete
                                         label={item.judul}
                                         actionUrl={route(
