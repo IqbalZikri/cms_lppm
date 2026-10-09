@@ -1,21 +1,21 @@
 import { Link, usePage } from "@inertiajs/react";
-import { ChevronDown, Mail, Menu, Search, X } from "lucide-react";
+import { ChevronDown, Mail, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Button } from "../ui/button";
+import { route } from "ziggy-js";
 
 const mainLinks = [
     { label: "Beranda", href: "/" },
     { label: "Berita", href: "/berita" },
     { label: "Penelitian", href: "/penelitian" },
     { label: "Publikasi", href: "/publikasi" },
+    { label: "PKM", href: "/pkm" },
     { label: "Kontak", href: "/kontak" },
 ] as const;
 
 const profileLinks = [
     { label: "Visi & Misi", href: "/profil/visi-misi" },
-    { label: "Struktur Kepengurusan", href: "/profil/struktur" },
-    { label: "Sejarah", href: "/profil/sejarah" },
 ] as const;
 
 export default function SiteHeader() {
@@ -27,7 +27,9 @@ export default function SiteHeader() {
     const path = url.split("?")[0];
 
     const isActive = (href: string) =>
-        href === "/" ? path === "/" : path === href || path.startsWith(`${href}/`);
+        href === "/"
+            ? path === "/"
+            : path === href || path.startsWith(`${href}/`);
 
     const isProfileActive = path.startsWith("/profil");
 
@@ -80,7 +82,10 @@ export default function SiteHeader() {
                     <Link
                         href={beranda.href}
                         className={`nav-link ${isActive(beranda.href) ? "nav-link-active" : ""}`}
-                        aria-current={isActive(beranda.href) ? "page" : undefined}
+                        aria-current={
+                            isActive(beranda.href) ? "page" : undefined
+                        }
+                        viewTransition
                     >
                         {beranda.label}
                     </Link>
@@ -100,8 +105,11 @@ export default function SiteHeader() {
                                     key={item.href}
                                     href={item.href}
                                     className={`block rounded-sm px-4 py-3 text-sm font-medium hover:bg-muted hover:text-primary ${
-                                        isActive(item.href) ? "bg-muted text-primary" : ""
+                                        isActive(item.href)
+                                            ? "bg-muted text-primary"
+                                            : ""
                                     }`}
+                                    viewTransition
                                 >
                                     {item.label}
                                 </Link>
@@ -114,15 +122,18 @@ export default function SiteHeader() {
                             key={item.href}
                             href={item.href}
                             className={`nav-link ${isActive(item.href) ? "nav-link-active" : ""}`}
-                            aria-current={isActive(item.href) ? "page" : undefined}
+                            aria-current={
+                                isActive(item.href) ? "page" : undefined
+                            }
+                            viewTransition
                         >
                             {item.label}
                         </Link>
                     ))}
 
-                    <Button size="icon" variant="ghost" aria-label="Cari">
-                        <Search />
-                    </Button>
+                    <Link href={route("login")} viewTransition>
+                        <Button variant={"default"}>Login</Button>
+                    </Link>
                 </nav>
 
                 <Button
@@ -151,6 +162,7 @@ export default function SiteHeader() {
                                 href={beranda.href}
                                 onClick={closeMenu}
                                 className={`mobile-link ${isActive(beranda.href) ? "mobile-link-active" : ""}`}
+                                viewTransition
                             >
                                 {beranda.label}
                             </Link>
@@ -188,6 +200,7 @@ export default function SiteHeader() {
                                     href={item.href}
                                     onClick={closeMenu}
                                     className={`mobile-link ${isActive(item.href) ? "mobile-link-active" : ""}`}
+                                    viewTransition
                                 >
                                     {item.label}
                                 </Link>

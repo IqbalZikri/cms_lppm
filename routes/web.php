@@ -22,6 +22,13 @@ use Inertia\Inertia;
 Route::inertia('/welcome', 'welcome')->name('home');
 
 Route::get("/", [PublicController::class, "beranda"])->name("beranda");
+Route::get("/profil/visi-misi", [PublicController::class, "profil"])->name("profil");
+Route::get("/berita", [PublicController::class, "berita"])->name("berita");
+Route::get("/berita", [PublicController::class, "berita"])->name("berita");
+Route::get("/penelitian", [PublicController::class, "penelitian"])->name("penelitian");
+Route::get('/publikasi', [PublicController::class, 'publikasi'])->name('publikasi');
+Route::get('/pkm', [PublicController::class, 'pkm'])->name('pkm');
+Route::get('/kontak', [PublicController::class, 'kontak'])->name('kontak');
 // Route::inertia("/profil", "public/profil")->name("profil");
 // Route::inertia("/berita", "public/berita")->name("berita");
 // Route::inertia("/penelitian", "public/penelitian")->name("penelitian");

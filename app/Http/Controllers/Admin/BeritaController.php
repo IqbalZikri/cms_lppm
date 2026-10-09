@@ -55,6 +55,7 @@ class BeritaController extends Controller
             'ringkasan_berita.required' => 'Ringkasan berita wajib diisi',
             'isi_berita.required' => 'Isi berita wajib diisi',
             'gambar.mimes' => 'Format yang didukung png, jpg, jpeg',
+            'gambar.max' => 'Gambar maksimal berukuran 2 MB',
         ]);
 
         try {
@@ -70,6 +71,7 @@ class BeritaController extends Controller
                 'views' => 0,
                 'gambar' => $gambar ?? null,
                 'status_published' => $request->status_published,
+                'published_at' => $request->published_at ?? now(),
                 'slug' => $request->slug,
                 'user_id' => auth()->user()->id,
             ]);
@@ -170,6 +172,7 @@ class BeritaController extends Controller
                 'views' => 0,
                 'gambar' => $gambarBaru ?? null,
                 'status_published' => $request->status_published,
+                'published_at' => $request->published_at ?? now(),
                 'slug' => $request->slug,
                 'user_id' => auth()->user()->id,
             ]);

@@ -58,7 +58,7 @@
     --color-sidebar-ring: var(--sidebar-ring);
 
     /* Halaman public */
-    --color-forest: var(--forest);
+    --color-forest: #0b1f0e;
     --color-gold: var(--gold);
     --color-amber: var(--amber);
     --color-ink: var(--ink);

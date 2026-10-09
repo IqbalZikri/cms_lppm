@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -17,7 +16,7 @@ return new class extends Migration
             $table->string('judul_berita');
             $table->string('ringkasan_berita');
             $table->text('isi_berita');
-            $table->string('views')->nullable();
+            $table->integer('views')->default(0)->nullable();
             $table->string('gambar')->nullable();
             $table->string('status_published');
             $table->string('slug');

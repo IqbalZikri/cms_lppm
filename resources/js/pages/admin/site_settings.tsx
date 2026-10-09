@@ -1,6 +1,13 @@
 import Header from "@/components/header";
+import RichTextEditor from "@/components/rich-text-editor";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,9 +21,17 @@ interface Props {
 }
 
 type TextKey =
-    | "nama_website" | "deskripsi_website" | "facebook_url" | "instagram_url"
-    | "twitter_url" | "telepon" | "email" | "alamat" | "whatsapp_number"
-    | "vision" | "mission";
+    | "nama_website"
+    | "deskripsi_website"
+    | "facebook_url"
+    | "instagram_url"
+    | "twitter_url"
+    | "telepon"
+    | "email"
+    | "alamat"
+    | "whatsapp_number"
+    | "vision"
+    | "mission";
 
 export default function SiteSettingsPage({ site_setting: s }: Props) {
     const [preview, setPreview] = useState<string | null>(s.logo_url ?? null);
@@ -51,6 +66,8 @@ export default function SiteSettingsPage({ site_setting: s }: Props) {
     const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] ?? null;
         setData("logo_url", file);
+
+        if (preview?.startsWith("blob:")) URL.revokeObjectURL(preview);
         setPreview(file ? URL.createObjectURL(file) : (s.logo_url ?? null));
     };
 
@@ -68,41 +85,74 @@ export default function SiteSettingsPage({ site_setting: s }: Props) {
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <Header
                     page="Pengaturan Website"
-                    breadcrumb={[{ label: "Pengaturan Website", href: "site_setting.index" }]}
+                    breadcrumb={[
+                        {
+                            label: "Pengaturan Website",
+                            href: "site_setting.index",
+                        },
+                    ]}
                 />
 
                 <form onSubmit={submit} className="space-y-4">
                     <Tabs defaultValue="informasi">
                         <TabsList>
-                            <TabsTrigger value="informasi">Informasi Website</TabsTrigger>
-                            <TabsTrigger value="sosmed">Link Sosial Media</TabsTrigger>
-                            <TabsTrigger value="kontak">Kontak & Alamat</TabsTrigger>
-                            <TabsTrigger value="visi_misi">Visi & Misi</TabsTrigger>
+                            <TabsTrigger value="informasi">
+                                Informasi Website
+                            </TabsTrigger>
+                            <TabsTrigger value="sosmed">
+                                Link Sosial Media
+                            </TabsTrigger>
+                            <TabsTrigger value="kontak">
+                                Kontak & Alamat
+                            </TabsTrigger>
+                            <TabsTrigger value="visi_misi">
+                                Visi & Misi
+                            </TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="informasi">
                             <Card>
                                 <CardHeader>
                                     <CardTitle>Informasi Website</CardTitle>
-                                    <CardDescription>Nama, deskripsi, dan logo website</CardDescription>
+                                    <CardDescription>
+                                        Nama, deskripsi, dan logo website
+                                    </CardDescription>
                                 </CardHeader>
                                 <CardContent>
                                     <FieldGroup>
                                         <Field>
-                                            <FieldLabel htmlFor="nama_website">Nama Website</FieldLabel>
-                                            <Input {...bind("nama_website")} placeholder="Nama Website" />
+                                            <FieldLabel htmlFor="nama_website">
+                                                Nama Website
+                                            </FieldLabel>
+                                            <Input
+                                                {...bind("nama_website")}
+                                                placeholder="Nama Website"
+                                            />
                                             {errors.nama_website && (
-                                                <p className="text-sm text-destructive">{errors.nama_website}</p>
+                                                <p className="text-sm text-destructive">
+                                                    {errors.nama_website}
+                                                </p>
                                             )}
                                         </Field>
                                         <Field>
-                                            <FieldLabel htmlFor="deskripsi_website">Deskripsi Website</FieldLabel>
-                                            <Textarea {...bind("deskripsi_website")} placeholder="Deskripsi Website" />
+                                            <FieldLabel htmlFor="deskripsi_website">
+                                                Deskripsi Website
+                                            </FieldLabel>
+                                            <Textarea
+                                                {...bind("deskripsi_website")}
+                                                placeholder="Deskripsi Website"
+                                            />
                                         </Field>
                                         <Field>
-                                            <FieldLabel htmlFor="logo_url">Logo Website</FieldLabel>
+                                            <FieldLabel htmlFor="logo_url">
+                                                Logo Website
+                                            </FieldLabel>
                                             {preview && (
-                                                <img src={preview} alt="Logo" className="h-16 w-16 object-contain" />
+                                                <img
+                                                    src={preview}
+                                                    alt="Logo"
+                                                    className="h-16 w-16 object-contain"
+                                                />
                                             )}
                                             <Input
                                                 id="logo_url"
@@ -111,7 +161,9 @@ export default function SiteSettingsPage({ site_setting: s }: Props) {
                                                 onChange={handleLogoChange}
                                             />
                                             {errors.logo_url && (
-                                                <p className="text-sm text-destructive">{errors.logo_url}</p>
+                                                <p className="text-sm text-destructive">
+                                                    {errors.logo_url}
+                                                </p>
                                             )}
                                         </Field>
                                     </FieldGroup>
@@ -126,14 +178,29 @@ export default function SiteSettingsPage({ site_setting: s }: Props) {
                                 </CardHeader>
                                 <CardContent>
                                     <FieldGroup>
-                                        {(["facebook_url", "instagram_url", "twitter_url"] as const).map((key) => (
+                                        {(
+                                            [
+                                                "facebook_url",
+                                                "instagram_url",
+                                                "twitter_url",
+                                            ] as const
+                                        ).map((key) => (
                                             <Field key={key}>
                                                 <FieldLabel htmlFor={key}>
-                                                    {key.replace("_url", "").replace(/^./, (c) => c.toUpperCase())}
+                                                    {key
+                                                        .replace("_url", "")
+                                                        .replace(/^./, (c) =>
+                                                            c.toUpperCase(),
+                                                        )}
                                                 </FieldLabel>
-                                                <Input {...bind(key)} placeholder="https://..." />
+                                                <Input
+                                                    {...bind(key)}
+                                                    placeholder="https://..."
+                                                />
                                                 {errors[key] && (
-                                                    <p className="text-sm text-destructive">{errors[key]}</p>
+                                                    <p className="text-sm text-destructive">
+                                                        {errors[key]}
+                                                    </p>
                                                 )}
                                             </Field>
                                         ))}
@@ -150,20 +217,43 @@ export default function SiteSettingsPage({ site_setting: s }: Props) {
                                 <CardContent>
                                     <FieldGroup>
                                         <Field>
-                                            <FieldLabel htmlFor="telepon">Nomor Telepon</FieldLabel>
-                                            <Input {...bind("telepon")} type="tel" placeholder="021-xxxxxx" />
+                                            <FieldLabel htmlFor="telepon">
+                                                Nomor Telepon
+                                            </FieldLabel>
+                                            <Input
+                                                {...bind("telepon")}
+                                                type="tel"
+                                                placeholder="021-xxxxxx"
+                                            />
                                         </Field>
                                         <Field>
-                                            <FieldLabel htmlFor="whatsapp_number">WhatsApp</FieldLabel>
-                                            <Input {...bind("whatsapp_number")} type="tel" placeholder="628xxxxxxxxxx" />
+                                            <FieldLabel htmlFor="whatsapp_number">
+                                                WhatsApp
+                                            </FieldLabel>
+                                            <Input
+                                                {...bind("whatsapp_number")}
+                                                type="tel"
+                                                placeholder="628xxxxxxxxxx"
+                                            />
                                         </Field>
                                         <Field>
-                                            <FieldLabel htmlFor="email">Email</FieldLabel>
-                                            <Input {...bind("email")} type="email" placeholder="email@example.com" />
+                                            <FieldLabel htmlFor="email">
+                                                Email
+                                            </FieldLabel>
+                                            <Input
+                                                {...bind("email")}
+                                                type="email"
+                                                placeholder="email@example.com"
+                                            />
                                         </Field>
                                         <Field>
-                                            <FieldLabel htmlFor="alamat">Alamat</FieldLabel>
-                                            <Textarea {...bind("alamat")} placeholder="Alamat" />
+                                            <FieldLabel htmlFor="alamat">
+                                                Alamat
+                                            </FieldLabel>
+                                            <Textarea
+                                                {...bind("alamat")}
+                                                placeholder="Alamat"
+                                            />
                                         </Field>
                                     </FieldGroup>
                                 </CardContent>
@@ -178,12 +268,35 @@ export default function SiteSettingsPage({ site_setting: s }: Props) {
                                 <CardContent>
                                     <FieldGroup>
                                         <Field>
-                                            <FieldLabel htmlFor="vision">Visi</FieldLabel>
-                                            <Textarea {...bind("vision")} rows={4} />
+                                            <FieldLabel htmlFor="vision">
+                                                Visi
+                                            </FieldLabel>
+                                            <Textarea
+                                                {...bind("vision")}
+                                                rows={4}
+                                            />
+                                            {errors.vision && (
+                                                <p className="text-sm text-destructive">
+                                                    {errors.vision}
+                                                </p>
+                                            )}
                                         </Field>
                                         <Field>
-                                            <FieldLabel htmlFor="mission">Misi (satu poin per baris)</FieldLabel>
-                                            <Textarea {...bind("mission")} rows={8} />
+                                            <FieldLabel>
+                                                Misi (gunakan daftar bernomor
+                                                atau poin)
+                                            </FieldLabel>
+                                            <RichTextEditor
+                                                value={data.mission}
+                                                onChange={(html: string) =>
+                                                    setData("mission", html)
+                                                }
+                                            />
+                                            {errors.mission && (
+                                                <p className="text-sm text-destructive">
+                                                    {errors.mission}
+                                                </p>
+                                            )}
                                         </Field>
                                     </FieldGroup>
                                 </CardContent>
@@ -201,5 +314,7 @@ export default function SiteSettingsPage({ site_setting: s }: Props) {
 }
 
 SiteSettingsPage.layout = {
-    breadcrumbs: [{ title: "Site Settings", href: route("site_setting.index") }],
+    breadcrumbs: [
+        { title: "Site Settings", href: route("site_setting.index") },
+    ],
 };

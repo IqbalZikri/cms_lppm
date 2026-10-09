@@ -6,7 +6,6 @@ import AuthLayout from "@/layouts/auth-layout";
 import SettingsLayout from "@/layouts/settings/layout";
 import DosenAppLayout from "./layouts/dosen/dosen-layout";
 import UppmAppLayout from "./layouts/uppm/uppm-layout";
-import PublicAppLayout from "./layouts/public/public-layout";
 
 const appName = "Lembaga Penjamin dan Pengabdian Masyarakat";
 

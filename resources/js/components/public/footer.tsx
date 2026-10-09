@@ -84,10 +84,6 @@ export function SiteFooter() {
             <div className="border-t border-primary-foreground/10">
                 <div className="page-shell flex flex-col gap-2 py-5 text-xs text-primary-foreground/45 md:flex-row md:justify-between">
                     <span>© 2026 LPPM Universitas Cendekia Abditama.</span>
-                    <span>
-                        Data pada situs ini merupakan contoh tampilan dan perlu
-                        diverifikasi.
-                    </span>
                 </div>
             </div>
         </footer>
