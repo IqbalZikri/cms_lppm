@@ -1,19 +1,15 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Newsreader:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 @import "tw-animate-css";
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
 @custom-variant dark (&:is(.dark *));
 
-@theme {
-    --font-sans:
-        "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
-        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-        "Noto Color Emoji";
-
+/* Token semantik: inline supaya bisa dioverride per wrapper (.theme-uca, .public-theme) */
+@theme inline {
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);
@@ -61,6 +57,22 @@
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
 
+    /* Halaman public */
+    --color-forest: var(--forest);
+    --color-gold: var(--gold);
+    --color-amber: var(--amber);
+    --color-ink: var(--ink);
+    --color-surface: var(--surface);
+}
+
+/* Font dan warna statis */
+@theme {
+    --font-sans:
+        "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+        "Noto Color Emoji";
+    --font-display: "Fraunces", Georgia, serif;
+
     /* Halaman Dosen */
     --color-uca-green-50: #eef6f1;
     --color-uca-green-100: #d4e8dc;
@@ -86,7 +98,6 @@
     --color-uca-cream: #faf8f3;
     --color-uca-ink: #16241c;
 
-    --font-display: "Fraunces", Georgia, serif;
     --color-uca-green: #0b4a2c;
     --color-uca-deep: #062f1c;
     --color-uca-gold: #c9a55c;
@@ -127,6 +138,13 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.87 0 0);
+
+    /* Token halaman public (nilai tetap, tidak bentrok dengan starter kit) */
+    --forest: oklch(0.29 0.085 151);
+    --gold: oklch(0.72 0.12 82);
+    --amber: oklch(0.68 0.17 52);
+    --ink: oklch(0.19 0.035 154);
+    --surface: oklch(0.965 0.012 98);
 }
 
 .dark {
@@ -243,7 +261,7 @@
     --sidebar-border: #14663a;
 }
 
-.theme-beranda {
+/* .theme-beranda {
     --background: #f7f4ec;
     font-family: "Plus Jakarta Sans", system-ui, sans-serif;
     color: #1c2a22;
@@ -252,21 +270,154 @@
 .theme-beranda :focus-visible {
     outline: 3px solid #c9a55c;
     outline-offset: 2px;
-}
+} */
 /* ukuran dasar 17px hanya saat halaman publik tampil */
-html:has(.theme-beranda) {
+/* html:has(.theme-beranda) {
     font-size: 17px;
     scrollbar-width: none;
 }
 html:has(.theme-beranda)::-webkit-scrollbar {
     display: none;
-}
+} */
 @media (prefers-reduced-motion: reduce) {
     .theme-beranda * {
         animation: none !important;
         transition: none !important;
         scroll-behavior: auto !important;
     }
+}
+
+/* ============================================================
+ * Tema halaman publik LPPM (pakai class "public-theme" di layout)
+ * ============================================================ */
+.public-theme {
+    --font-sans: "DM Sans", sans-serif;
+    --font-display: "Newsreader", serif;
+
+    --radius: 0.45rem;
+    --background: oklch(0.985 0.006 95);
+    --foreground: oklch(0.22 0.025 155);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.22 0.025 155);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.22 0.025 155);
+    --primary: oklch(0.36 0.1 151);
+    --primary-foreground: oklch(0.985 0.006 95);
+    --secondary: oklch(0.9 0.04 88);
+    --secondary-foreground: oklch(0.3 0.07 151);
+    --muted: oklch(0.95 0.012 100);
+    --muted-foreground: oklch(0.5 0.025 153);
+    --accent: oklch(0.92 0.055 88);
+    --accent-foreground: oklch(0.29 0.07 151);
+    --destructive: oklch(0.577 0.245 27.325);
+    --destructive-foreground: oklch(0.984 0.003 247.858);
+    --border: oklch(0.88 0.018 102);
+    --input: oklch(0.88 0.018 102);
+    --ring: oklch(0.56 0.12 151);
+
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    min-width: 320px;
+    overflow-x: clip; /* jangan pakai hidden, itu merusak header sticky */
+}
+
+.public-theme h1,
+.public-theme h2,
+.public-theme h3 {
+    letter-spacing: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .public-theme *,
+    .public-theme *::before,
+    .public-theme *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Utility halaman publik */
+@utility page-shell {
+    width: min(100% - 2rem, 76rem);
+    margin-inline: auto;
+}
+@utility eyebrow {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+@utility nav-link {
+    position: relative;
+    padding: 0.75rem 0.8rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--muted-foreground);
+    transition: color 0.2s ease;
+}
+@utility nav-link-active {
+    color: var(--primary);
+}
+@utility mobile-link {
+    display: block;
+    border-radius: 0.25rem;
+    padding: 0.75rem;
+    font-weight: 600;
+    color: var(--foreground);
+}
+@utility mobile-link-active {
+    color: var(--primary);
+    background-color: var(--muted);
+}
+@utility bg-heritage-pattern {
+    background-image: linear-gradient(
+        45deg,
+        transparent 48%,
+        color-mix(in oklab, var(--gold) 24%, transparent) 49%,
+        color-mix(in oklab, var(--gold) 24%, transparent) 51%,
+        transparent 52%
+    );
+    background-size: 28px 28px;
+}
+@utility section-pad {
+    padding-block: clamp(4rem, 8vw, 7rem);
+}
+@utility lift-card {
+    transition:
+        transform 0.35s ease,
+        box-shadow 0.35s ease;
+    &:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 22px 45px
+            color-mix(in oklab, var(--forest) 12%, transparent);
+    }
+}
+
+@keyframes slow-zoom {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(1.08);
+    }
+}
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+.hero-photo {
+    animation: slow-zoom 14s ease-in-out infinite alternate;
+}
+.float-soft {
+    animation: float 4s ease-in-out infinite;
 }
 
 @layer base {

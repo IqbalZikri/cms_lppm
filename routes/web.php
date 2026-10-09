@@ -15,17 +15,18 @@ use App\Http\Controllers\Admin\SiteSettingsController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\LuaranBukuController;
 use App\Http\Controllers\PkmController;
+use App\Http\Controllers\PublicController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::inertia('/welcome', 'welcome')->name('home');
 
-Route::inertia("/", "public/beranda")->name("beranda");
-Route::inertia("/profil", "public/profil")->name("profil");
-Route::inertia("/berita", "public/berita")->name("berita");
-Route::inertia("/penelitian", "public/penelitian")->name("penelitian");
-Route::inertia("/publikasi", "public/publikasi")->name("publikasi");
-Route::inertia("/kontak", "public/kontak")->name("kontak");
+Route::get("/", [PublicController::class, "beranda"])->name("beranda");
+// Route::inertia("/profil", "public/profil")->name("profil");
+// Route::inertia("/berita", "public/berita")->name("berita");
+// Route::inertia("/penelitian", "public/penelitian")->name("penelitian");
+// Route::inertia("/publikasi", "public/publikasi")->name("publikasi");
+// Route::inertia("/kontak", "public/kontak")->name("kontak");
 
 Route::get('register', [SesiController::class, 'register'])->name('sesi.register');
 Route::post('register', [SesiController::class, 'registerAccount'])->name('sesi.registerAccount');

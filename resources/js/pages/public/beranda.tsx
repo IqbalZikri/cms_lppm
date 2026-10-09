@@ -1,350 +1,212 @@
 import { Link } from "@inertiajs/react";
-import { motion } from "framer-motion";
-import {
-    ArrowRight,
-    Award,
-    BookOpen,
-    CalendarDays,
-    Clock,
-    FileText,
-    FlaskConical,
-    Globe,
-    HeartHandshake,
-    Link2,
-    Mail,
-    MapPin,
-    Users,
-} from "lucide-react";
 import { useState } from "react";
-import {
-    Bar,
-    BarChart,
-    CartesianGrid,
-    Legend,
-    Line,
-    LineChart,
-    ResponsiveContainer,
-    Tooltip,
-    XAxis,
-    YAxis,
-} from "recharts";
-import { IMG, agenda, news, semesterChart, stats, tgl } from "@/lib/data";
-import { btn, CountUp, Reveal, Section } from "@/components/public/ui";
+import { BookOpen, Clock, FlaskConical, Handshake, HeartHandshake, MapPin } from "lucide-react";
 import PublicAppLayout from "@/layouts/public/public-layout";
 
-const icons = [FlaskConical, HeartHandshake, Award, BookOpen, FileText];
-
-const kontak = {
-    alamat: "Kampus Islamic Village, Universitas Cendekia Abditama (isi alamat lengkap dan kode pos)",
-    email: "lppm@uca.ac.id",
-    web: "lppm.uca.ac.id",
-    jam: "Senin sampai Jumat, 08.00 sampai 16.00 WIB",
-    mapsQuery: "Universitas Cendekia Abditama", // ganti dengan alamat lengkap agar titik peta akurat
+type Berita = { kategori: string; tanggal: string; judul: string; gambar: string; slug: string };
+type Agenda = { tanggal: string; bulan: string; judul: string; waktu: string; lokasi: string };
+type Capaian = { periode: string[]; penelitian: number[]; publikasi: number[] };
+type Props = {
+    statistik: { angka: string; label: string }[];
+    capaian: Capaian;
+    berita: Berita[];
+    agenda: Agenda[];
 };
 
-const layanan = [
-    {
-        icon: FlaskConical,
-        title: "Penelitian",
-        text: "Hibah internal dan eksternal, pendampingan proposal, serta pemantauan kemajuan penelitian.",
-        href: "/penelitian",
-    },
-    {
-        icon: HeartHandshake,
-        title: "Pengabdian Masyarakat",
-        text: "Program PKM dan desa binaan yang berangkat dari kebutuhan warga.",
-        href: "/berita",
-    },
-    {
-        icon: Award,
-        title: "Pengelolaan HKI",
-        text: "Bantuan pendaftaran hak cipta, paten, dan kekayaan intelektual dosen.",
-        href: "/publikasi",
-    },
-    {
-        icon: BookOpen,
-        title: "Publikasi Ilmiah",
-        text: "Dukungan penerbitan di jurnal Scopus, SINTA, dan prosiding.",
-        href: "/publikasi",
-    },
-    {
-        icon: Users,
-        title: "Pelatihan dan Klinik Proposal",
-        text: "Workshop penulisan, klinik proposal, dan bimbingan menghadapi review.",
-        href: "/layanan",
-    },
-    {
-        icon: Link2,
-        title: "Kerja Sama dan Kemitraan",
-        text: "Jejaring riset dengan perguruan tinggi, pemerintah, dan industri.",
-        href: "/kontak",
-    },
+const ekosistem = [
+    { icon: FlaskConical, judul: "Penelitian", teks: "Pendanaan, pendampingan proposal, dan tata kelola penelitian dosen.", href: "/penelitian" },
+    { icon: BookOpen, judul: "Publikasi", teks: "Klinik naskah, repositori, serta dukungan jurnal dan kekayaan intelektual.", href: "/publikasi" },
+    { icon: HeartHandshake, judul: "Pengabdian", teks: "Program berbasis kebutuhan untuk memberdayakan komunitas secara berkelanjutan.", href: "/berita" },
+    { icon: Handshake, judul: "Kolaborasi", teks: "Ruang temu peneliti, dunia usaha, pemerintah, dan masyarakat.", href: "/kontak" },
 ];
 
-export default function Beranda() {
-    const [mode, setMode] = useState<"bar" | "line">("bar");
-    const [first, ...rest] = news;
+function GrafikCapaian({ data }: { data: Capaian }) {
+    const [seri, setSeri] = useState<"penelitian" | "publikasi">("penelitian");
+    const nilai = data[seri];
+    const maks = Math.max(...nilai);
+
     return (
-        <PublicAppLayout title="Beranda">
-            <section className="relative isolate flex min-h-[calc(100svh-4.5rem)] flex-col overflow-hidden bg-uca-deep">
-  {/* foto digeser ke kanan: hanya menempati 70% lebar di layar besar */}
-  <motion.img
-    src={IMG.gerbang}
-    alt="Gerbang Universitas Cendekia Abditama"
-    initial={{ scale: 1.08 }} animate={{ scale: 1 }} transition={{ duration: 2.4, ease: 'easeOut' }}
-    className="absolute inset-y-0 right-0 -z-20 h-full w-full object-cover object-[52%_50%] lg:w-[70%]"
-  />
-  {/* pudar dari hijau tua di kiri (tempat teks) ke foto di kanan */}
-  <div className="absolute inset-0 -z-10 bg-uca-deep/70 lg:bg-transparent lg:bg-gradient-to-r lg:from-uca-deep lg:from-[32%] lg:via-uca-deep/55 lg:via-[48%] lg:to-transparent" />
-
-  <div className="mx-auto flex w-full max-w-6xl flex-1 items-center px-5 py-10">
-    <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-xl">
-      <p className="mb-3 inline-block rounded-full bg-uca-gold px-4 py-1 text-sm font-bold text-uca-deep">Universitas Cendekia Abditama</p>
-      <h1 className="font-display text-4xl font-bold leading-tight text-white md:text-5xl xl:text-6xl">Riset yang berguna, pengabdian yang terasa.</h1>
-      <p className="mt-5 text-lg text-white/85">Lembaga Penelitian dan Pengabdian Masyarakat mendampingi dosen meneliti, menerbitkan karya, dan hadir bagi masyarakat.</p>
-      <div className="mt-8 flex flex-wrap gap-3">
-        <Link href="/penelitian" className={btn + ' !bg-uca-gold !text-uca-deep hover:!bg-white'}>Lihat penelitian <ArrowRight size={18} /></Link>
-        <Link href="/layanan" className="inline-flex items-center rounded-xl border-2 border-white/70 px-5 py-3 font-semibold text-white hover:bg-white/10">Cara mengajukan</Link>
-      </div>
-    </motion.div>
-  </div>
-
-  {/* statistik di dasar hero, tidak lagi menumpuk keluar */}
-  <div className="mx-auto w-full max-w-6xl px-5 pb-6">
-    <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-uca-gold/40 shadow-2xl md:grid-cols-5">
-      {stats.map((s, i) => { const I = icons[i]; return (
-        <div key={s.label} className="bg-white p-4">
-          <I className="mb-1 text-uca-red" size={22} />
-          <div className="font-display text-3xl font-bold text-uca-green"><CountUp to={s.value} /></div>
-          <div className="text-sm font-semibold text-slate-600">{s.label}</div>
-        </div>); })}
-    </div>
-  </div>
-</section>
-
-            <Section
-                title="Perkembangan tiap semester"
-                hint="Jumlah penelitian dan publikasi dosen UCA, dikelompokkan per semester."
-            >
-                <Reveal>
-                    <div className="rounded-2xl bg-white p-5 shadow">
-                        <div className="mb-4 flex gap-2" role="tablist">
-                            {(
-                                [
-                                    ["bar", "Batang"],
-                                    ["line", "Garis"],
-                                ] as const
-                            ).map(([k, l]) => (
-                                <button
-                                    key={k}
-                                    role="tab"
-                                    aria-selected={mode === k}
-                                    onClick={() => setMode(k)}
-                                    className={`rounded-lg px-4 py-2 font-semibold ${mode === k ? "bg-uca-green text-white" : "bg-uca-cream text-uca-green"}`}
-                                >
-                                    {l}
-                                </button>
-                            ))}
-                        </div>
-                        <div className="h-80">
-                            <ResponsiveContainer>
-                                {mode === "bar" ? (
-                                    <BarChart data={semesterChart}>
-                                        <CartesianGrid
-                                            strokeDasharray="3 3"
-                                            vertical={false}
-                                        />
-                                        <XAxis
-                                            dataKey="semester"
-                                            tick={{ fontSize: 13 }}
-                                        />
-                                        <YAxis />
-                                        <Tooltip />
-                                        <Legend />
-                                        <Bar
-                                            dataKey="penelitian"
-                                            name="Penelitian"
-                                            fill="#0B4A2C"
-                                            radius={[6, 6, 0, 0]}
-                                        />
-                                        <Bar
-                                            dataKey="publikasi"
-                                            name="Publikasi"
-                                            fill="#C9A55C"
-                                            radius={[6, 6, 0, 0]}
-                                        />
-                                    </BarChart>
-                                ) : (
-                                    <LineChart data={semesterChart}>
-                                        <CartesianGrid
-                                            strokeDasharray="3 3"
-                                            vertical={false}
-                                        />
-                                        <XAxis
-                                            dataKey="semester"
-                                            tick={{ fontSize: 13 }}
-                                        />
-                                        <YAxis />
-                                        <Tooltip />
-                                        <Legend />
-                                        <Line
-                                            dataKey="penelitian"
-                                            name="Penelitian"
-                                            stroke="#0B4A2C"
-                                            strokeWidth={3}
-                                        />
-                                        <Line
-                                            dataKey="publikasi"
-                                            name="Publikasi"
-                                            stroke="#D32F43"
-                                            strokeWidth={3}
-                                        />
-                                    </LineChart>
-                                )}
-                            </ResponsiveContainer>
-                        </div>
-                    </div>
-                </Reveal>
-            </Section>
-
-            <div className="bg-white">
-                <Section
-                    title="Layanan LPPM"
-                    hint="Apa saja yang bisa dibantu LPPM untuk dosen dan mitra."
-                >
-                    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                        {layanan.map((l) => (
-                            <Link
-                                key={l.title}
-                                href={l.href}
-                                className="group rounded-2xl bg-uca-cream p-6 shadow transition hover:-translate-y-1 hover:shadow-xl"
-                            >
-                                <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-uca-green text-uca-gold transition group-hover:bg-uca-red group-hover:text-white">
-                                    <l.icon size={28} />
-                                </span>
-                                <h3 className="font-display text-xl font-bold text-uca-green">
-                                    {l.title}
-                                </h3>
-                                <p className="mt-2 text-slate-600">{l.text}</p>
-                            </Link>
-                        ))}
-                    </div>
-                </Section>
-            </div>
-
-            <Section
-                title="Berita terbaru"
-                action={
-                    <Link href="/berita" className="font-semibold text-uca-red">
-                        Semua berita
-                    </Link>
-                }
-            >
-                <div className="grid gap-6 lg:grid-cols-5">
-                    <Link
-                        href={`/berita/${first.slug}`}
-                        className="group relative overflow-hidden rounded-2xl lg:col-span-3"
+        <div className="rounded-lg border bg-card p-6">
+            <div className="flex gap-2" role="tablist" aria-label="Pilih data grafik">
+                {(["penelitian", "publikasi"] as const).map((s) => (
+                    <button
+                        key={s}
+                        role="tab"
+                        aria-selected={seri === s}
+                        onClick={() => setSeri(s)}
+                        className={`rounded-sm px-4 py-2 text-sm font-semibold capitalize transition-colors ${
+                            seri === s ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-foreground"
+                        }`}
                     >
-                        <img
-                            src={first.image}
-                            alt=""
-                            className="h-full min-h-72 w-full object-cover transition duration-500 group-hover:scale-105"
+                        {s}
+                    </button>
+                ))}
+            </div>
+            <div className="mt-8 flex items-end gap-3">
+                {nilai.map((n, i) => (
+                    <div key={data.periode[i]} className="flex flex-1 flex-col items-center justify-end gap-2">
+                        <span className="text-xs font-semibold">{n}</span>
+                        <div
+                            className="w-full rounded-t-sm bg-primary transition-[height] duration-500"
+                            style={{ height: `${(n / maks) * 180}px` }}
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-uca-deep via-uca-deep/50 to-transparent" />
-                        <div className="absolute bottom-0 p-6 text-white">
-                            <span className="rounded bg-uca-red px-2 py-1 text-xs font-bold">
-                                {first.category}
-                            </span>
-                            <h3 className="font-display mt-2 text-2xl font-bold">
-                                {first.title}
-                            </h3>
-                            <p className="mt-1 text-white/80">
-                                {tgl(first.date)}
-                            </p>
-                        </div>
-                    </Link>
-                    <div className="space-y-4 lg:col-span-2">
-                        {rest.slice(0, 3).map((n) => (
-                            <Link
-                                key={n.slug}
-                                href={`/berita/${n.slug}`}
-                                className="flex gap-4 rounded-2xl bg-white p-3 shadow transition hover:-translate-y-0.5"
-                            >
-                                <img
-                                    src={n.image}
-                                    alt=""
-                                    className="h-24 w-28 shrink-0 rounded-xl object-cover"
-                                />
-                                <div>
-                                    <span className="text-sm font-bold text-uca-red">
-                                        {n.category}
-                                    </span>
-                                    <h3 className="font-semibold leading-snug text-uca-green">
-                                        {n.title}
-                                    </h3>
-                                    <p className="text-sm text-slate-500">
-                                        {tgl(n.date)}
-                                    </p>
-                                </div>
-                            </Link>
+                        <span className="text-center text-[11px] leading-tight text-muted-foreground">{data.periode[i]}</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+export default function Beranda({ statistik, capaian, berita, agenda }: Props) {
+    const [utama, ...lainnya] = berita;
+
+    return (
+        <PublicAppLayout title="Riset, Inovasi & Pengabdian">
+            <section className="relative isolate overflow-hidden bg-forest text-primary-foreground">
+                <img
+                    src="/images/gedung-uca.jpg"
+                    alt="Gedung Universitas Cendekia Abditama"
+                    className="hero-photo absolute inset-0 -z-20 size-full object-cover"
+                />
+                <div className="absolute inset-0 -z-10 bg-linear-to-r from-forest/95 via-forest/75 to-forest/30" />
+                <div className="page-shell pt-20 pb-12 md:pt-32">
+                    <p className="eyebrow text-gold">LPPM Universitas Cendekia Abditama</p>
+                    <h1 className="mt-5 max-w-3xl font-display text-5xl leading-[1.05] md:text-7xl">
+                        Meneliti hari ini.
+                        <br />
+                        Mengabdi untuk esok.
+                    </h1>
+                    <p className="mt-6 max-w-xl text-lg leading-8 text-primary-foreground/80">
+                        Kami menumbuhkan riset yang relevan, inovasi yang dapat diterapkan, dan pengabdian yang memperkuat masyarakat.
+                    </p>
+                    <div className="mt-8 flex flex-wrap gap-3">
+                        <Link href="/penelitian" className="rounded-sm bg-gold px-6 py-3 text-sm font-bold text-ink transition-opacity hover:opacity-90">
+                            Jelajahi Penelitian
+                        </Link>
+                        <Link href="/profil/visi-misi" className="rounded-sm border border-primary-foreground/40 px-6 py-3 text-sm font-bold transition-colors hover:bg-primary-foreground/10">
+                            Kenali LPPM
+                        </Link>
+                    </div>
+                    <dl className="mt-16 grid grid-cols-2 gap-6 border-t border-primary-foreground/20 pt-8 md:grid-cols-4">
+                        {statistik.map((s) => (
+                            <div key={s.label}>
+                                <dd className="font-display text-4xl text-gold md:text-5xl">{s.angka}</dd>
+                                <dt className="mt-1 text-sm text-primary-foreground/70">{s.label}</dt>
+                            </div>
+                        ))}
+                    </dl>
+                </div>
+            </section>
+
+            <section className="section-pad bg-heritage-pattern">
+                <div className="page-shell grid items-center gap-10 lg:grid-cols-2">
+                    <div>
+                        <p className="eyebrow text-primary">Capaian Institusi</p>
+                        <h2 className="mt-3 font-display text-3xl text-forest md:text-4xl">Pertumbuhan gagasan yang terukur</h2>
+                        <p className="mt-4 max-w-lg leading-7 text-muted-foreground">
+                            Kinerja penelitian dan publikasi meningkat konsisten setiap semester, didukung kolaborasi lintas program studi dan mitra.
+                        </p>
+                    </div>
+                    <GrafikCapaian data={capaian} />
+                </div>
+            </section>
+
+            <section className="section-pad bg-surface">
+                <div className="page-shell">
+                    <p className="eyebrow text-primary">Ekosistem LPPM</p>
+                    <h2 className="mt-3 font-display text-3xl text-forest md:text-4xl">Dari ide menuju dampak nyata</h2>
+                    <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                        {ekosistem.map(({ icon: Icon, judul, teks, href }) => (
+                            <article key={judul} className="lift-card flex flex-col rounded-lg border bg-card p-6">
+                                <Icon className="size-8 text-primary" />
+                                <h3 className="mt-5 font-display text-xl text-forest">{judul}</h3>
+                                <p className="mt-2 flex-1 text-sm leading-6 text-muted-foreground">{teks}</p>
+                                <Link href={href} className="mt-5 text-sm font-bold text-primary hover:text-amber">
+                                    Selengkapnya
+                                </Link>
+                            </article>
                         ))}
                     </div>
                 </div>
-            </Section>
+            </section>
 
-            <section className="bg-uca-cream">
-                <div className="mx-auto max-w-6xl px-5 py-14">
-                    <h2 className="font-display text-3xl font-bold text-uca-green">
-                        Temukan kami
-                    </h2>
-                    <p className="mb-7 text-slate-600">
-                        Datang langsung ke sekretariat LPPM atau hubungi lewat
-                        kontak di bawah.
-                    </p>
-                    <div className="grid gap-6 lg:grid-cols-5">
-                        <div className="space-y-4 lg:col-span-2">
-                            {[
-                                [MapPin, "Alamat", kontak.alamat],
-                                [Mail, "Email", kontak.email],
-                                [Globe, "Website", kontak.web],
-                                [Clock, "Jam operasional", kontak.jam],
-                            ].map(([I, t, v]: any) => (
-                                <div
-                                    key={t}
-                                    className="flex gap-4 rounded-2xl border-l-8 border-uca-red bg-white p-5 shadow"
-                                >
-                                    <I className="mt-0.5 shrink-0 text-uca-red" />
-                                    <div>
-                                        <b className="text-uca-green">{t}</b>
-                                        <p className="text-slate-700">{v}</p>
+            <section className="section-pad">
+                <div className="page-shell">
+                    <div className="flex items-end justify-between gap-4">
+                        <div>
+                            <p className="eyebrow text-primary">Kabar Terkini</p>
+                            <h2 className="mt-3 font-display text-3xl text-forest md:text-4xl">Berita & cerita dampak</h2>
+                        </div>
+                        <Link href="/berita" className="text-sm font-bold text-primary hover:text-amber">
+                            Semua berita
+                        </Link>
+                    </div>
+
+                    <div className="mt-10 grid gap-10 lg:grid-cols-[1.6fr_1fr]">
+                        <div className="grid gap-6 md:grid-cols-2">
+                            {utama && (
+                                <Link href="/berita" className="lift-card group overflow-hidden rounded-lg border bg-card md:col-span-2">
+                                    <img src={utama.gambar} alt="" className="h-64 w-full object-cover" />
+                                    <div className="p-6">
+                                        <p className="text-xs font-semibold text-muted-foreground">
+                                            <span className="text-primary">{utama.kategori}</span> &nbsp;{utama.tanggal}
+                                        </p>
+                                        <h3 className="mt-2 font-display text-2xl text-forest group-hover:text-primary">{utama.judul}</h3>
                                     </div>
-                                </div>
+                                </Link>
+                            )}
+                            {lainnya.map((b) => (
+                                <Link key={b.slug} href="/berita" className="lift-card group overflow-hidden rounded-lg border bg-card">
+                                    <img src={b.gambar} alt="" className="h-40 w-full object-cover" />
+                                    <div className="p-5">
+                                        <p className="text-xs font-semibold text-muted-foreground">
+                                            <span className="text-primary">{b.kategori}</span> &nbsp;{b.tanggal}
+                                        </p>
+                                        <h3 className="mt-2 font-display text-lg leading-snug text-forest group-hover:text-primary">{b.judul}</h3>
+                                    </div>
+                                </Link>
                             ))}
                         </div>
-                        <div className="overflow-hidden rounded-2xl bg-white shadow-lg lg:col-span-3">
-                            <iframe
-                                title="Lokasi di Google Maps"
-                                src={`https://www.google.com/maps?q=${encodeURIComponent(kontak.mapsQuery)}&output=embed`}
-                                className="h-80 w-full border-0 lg:h-[26rem]"
-                                loading="lazy"
-                                referrerPolicy="no-referrer-when-downgrade"
-                                allowFullScreen
-                            />
-                            <div className="flex flex-wrap items-center justify-between gap-3 p-4">
-                                <span className="font-semibold text-uca-green">
-                                    Universitas Cendekia Abditama
-                                </span>
-                                <a
-                                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(kontak.mapsQuery)}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="rounded-xl bg-uca-green px-4 py-2 font-semibold text-white hover:bg-uca-deep"
-                                >
-                                    Buka di Google Maps
-                                </a>
-                            </div>
-                        </div>
+
+                        <aside>
+                            <h3 className="font-display text-2xl text-forest">Agenda terdekat</h3>
+                            <ul className="mt-5 divide-y border-y">
+                                {agenda.map((a) => (
+                                    <li key={a.judul} className="flex gap-4 py-5">
+                                        <div className="flex size-16 shrink-0 flex-col items-center justify-center rounded-sm bg-forest text-primary-foreground">
+                                            <strong className="font-display text-2xl leading-none">{a.tanggal}</strong>
+                                            <span className="mt-1 text-[10px] font-bold tracking-widest text-gold">{a.bulan}</span>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-display text-lg leading-snug text-forest">{a.judul}</h4>
+                                            <p className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                                                <span className="flex items-center gap-1"><Clock className="size-3.5" />{a.waktu}</span>
+                                                <span className="flex items-center gap-1"><MapPin className="size-3.5" />{a.lokasi}</span>
+                                            </p>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                            <Link href="/berita" className="mt-5 inline-block text-sm font-bold text-primary hover:text-amber">
+                                Lihat seluruh agenda
+                            </Link>
+                        </aside>
                     </div>
+                </div>
+            </section>
+
+            <section className="relative isolate overflow-hidden bg-forest text-primary-foreground">
+                <img src="/images/gerbang-uca.jpg" alt="Gerbang Universitas Cendekia Abditama" className="absolute inset-0 -z-20 size-full object-cover" />
+                <div className="absolute inset-0 -z-10 bg-forest/85" />
+                <div className="page-shell section-pad">
+                    <p className="eyebrow text-gold">Mari Berkolaborasi</p>
+                    <h2 className="mt-4 max-w-2xl font-display text-3xl leading-tight md:text-5xl">
+                        Gagasan baik tumbuh lebih kuat saat dikerjakan bersama.
+                    </h2>
+                    <Link href="/kontak" className="mt-8 inline-block rounded-sm bg-gold px-6 py-3 text-sm font-bold text-ink transition-opacity hover:opacity-90">
+                        Hubungi kami
+                    </Link>
                 </div>
             </section>
         </PublicAppLayout>
