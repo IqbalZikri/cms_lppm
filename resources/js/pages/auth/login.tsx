@@ -98,7 +98,7 @@ export default function Login({ status, canResetPassword }: Props) {
                                 Log in
                             </Button>
                             <Link href={route("beranda")} viewTransition>
-                                <Button className="w-full bg-[#0a5237] transition duration-300 ease-in-out">
+                                <Button className="w-full bg-[#0a5237] transition duration-300 ease-in-out dark:text-white ">
                                     <MoveLeft />
                                     Kembali
                                 </Button>
@@ -106,7 +106,7 @@ export default function Login({ status, canResetPassword }: Props) {
                         </div>
 
                         <div className="text-muted-foreground text-center text-sm">
-                            Don't have an account?{" "}
+                            Tidak punya akun?{" "}
                             <TextLink
                                 href={route("sesi.register")}
                                 tabIndex={5}

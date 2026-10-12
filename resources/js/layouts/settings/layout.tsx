@@ -14,24 +14,12 @@ import { Cog } from "lucide-react";
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: "Profile",
-        href: edit(),
-        icon: null,
-    },
-    {
-        title: "Security",
-        href: editSecurity(),
-        icon: null,
-    },
-    {
         title: "Appearance",
-        href: editAppearance(),
-        icon: null,
+        href: route("appearance.edit"),
     },
     {
         title: "Site Settings",
         href: route("site_setting.index"),
-        icon: null,
     },
 ];
 

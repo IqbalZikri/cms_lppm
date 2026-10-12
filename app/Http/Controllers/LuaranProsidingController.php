@@ -60,7 +60,7 @@ class LuaranProsidingController extends Controller
         ]);
     }
 
-    public function indexUppm(Request $request)
+    public function indexRoleUppm(Request $request)
     {
         $data = LuaranProsiding::whereHas('penulis', function ($query) {
             $query->where('fakultas_id', auth()->user()->fakultas_id);
@@ -76,6 +76,26 @@ class LuaranProsidingController extends Controller
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
         $role = auth()->user()->role;
         return Inertia::render('luaran-prosiding/create', [
+            'fakultas' => $fakultas,
+            'role' => $role,
+        ]);
+    }
+
+    public function createRoleDosen()
+    {
+        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
+        $role = auth()->user()->role;
+        return Inertia::render('dosen/luaran-prosiding/create', [
+            'fakultas' => $fakultas,
+            'role' => $role,
+        ]);
+    }
+
+    public function createRoleUppm()
+    {
+        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
+        $role = auth()->user()->role;
+        return Inertia::render('uppm/luaran-prosiding/create', [
             'fakultas' => $fakultas,
             'role' => $role,
         ]);
@@ -120,6 +140,7 @@ class LuaranProsidingController extends Controller
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],
                 'link_berkas' => $validated['link_berkas'],
+                'user_id' => auth()->user()->id,
             ]);
 
             foreach ($validated['authors'] as $i => $author) {
@@ -161,6 +182,26 @@ class LuaranProsidingController extends Controller
         ]);
     }
 
+    public function showRoleDosen(LuaranProsiding $luaranProsiding)
+    {
+        $luaranProsiding->load('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
+        $role = auth()->user()->role;
+        return Inertia::render('dosen/luaran-prosiding/show', [
+            'data' => $luaranProsiding,
+            'role' => $role,
+        ]);
+    }
+
+    public function showRoleUppm(LuaranProsiding $luaranProsiding)
+    {
+        $luaranProsiding->load('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
+        $role = auth()->user()->role;
+        return Inertia::render('uppm/luaran-prosiding/show', [
+            'data' => $luaranProsiding,
+            'role' => $role,
+        ]);
+    }
+
     /**
      * Show the form for editing the specified resource.
      */
@@ -170,6 +211,30 @@ class LuaranProsidingController extends Controller
         $role = auth()->user()->role;
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
         return Inertia::render('luaran-prosiding/edit', [
+            'data' => $luaranProsiding,
+            'fakultas' => $fakultas,
+            'role' => $role,
+        ]);
+    }
+
+    public function editRoleDosen(LuaranProsiding $luaranProsiding)
+    {
+        $luaranProsiding->load('penulis', 'penulisLuar');
+        $role = auth()->user()->role;
+        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
+        return Inertia::render('dosen/luaran-prosiding/edit', [
+            'data' => $luaranProsiding,
+            'fakultas' => $fakultas,
+            'role' => $role,
+        ]);
+    }
+
+    public function editRoleUppm(LuaranProsiding $luaranProsiding)
+    {
+        $luaranProsiding->load('penulis', 'penulisLuar');
+        $role = auth()->user()->role;
+        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
+        return Inertia::render('uppm/luaran-prosiding/edit', [
             'data' => $luaranProsiding,
             'fakultas' => $fakultas,
             'role' => $role,

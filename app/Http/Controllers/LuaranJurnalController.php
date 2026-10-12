@@ -124,6 +124,7 @@ class LuaranJurnalController extends Controller
                 'semester' => $validated['semester'],
                 'tahun' => $validated['tahun'],
                 'link_berkas' => $validated['link_berkas'],
+                'user_id' => auth()->user()->id,
             ]);
 
             foreach ($validated['authors'] as $i => $author) {

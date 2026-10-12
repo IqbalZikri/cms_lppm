@@ -17,8 +17,6 @@ interface Props {
 }
 
 export default function CreateHki({ fakultas, user }: Props) {
-    console.log(user);
-    
     return (
         <>
             <Head title="Tambah HKI" />

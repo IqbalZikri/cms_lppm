@@ -1,5 +1,6 @@
 import { Link } from "@inertiajs/react";
 import { Calendar, Eye } from "lucide-react";
+import BeritaCover from "../berita-cover";
 
 export type BeritaItem = {
     id: number;
@@ -26,7 +27,7 @@ export default function KartuBerita({ b }: { b: BeritaItem }) {
                     className="h-48 w-full object-cover"
                 />
             ) : (
-                <div className="h-48 w-full bg-muted" />
+                <BeritaCover className="h-48 rounded-none md:h-48" />
             )}
             <div className="flex flex-1 flex-col p-5">
                 {b.kategori && (

@@ -20,7 +20,7 @@ class KegiatanController extends Controller
      */
     public function indexAdmin(Request $request)
     {
-        $queryKegiatan = Kegiatan::query()->with('penulis.fakultas', 'penulis.dosen','penulisLuar');
+        $queryKegiatan = Kegiatan::query()->with('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
 
         if ($request->filled('cari_fakultas')) {
             $queryKegiatan->whereHas('penulis', function ($q) use ($request) {
@@ -63,11 +63,19 @@ class KegiatanController extends Controller
         ]);
     }
 
-    public function indexUppm(Request $request)
+    public function indexRoleUppm(Request $request)
     {
-        $data = Kegiatan::whereHas('penulis', function ($query) {
-            $query->where('fakultas_id', auth()->user()->fakultas_id);
-        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10)->withQueryString();
+        $user = auth()->user();
+
+        $data = Kegiatan::where(function ($q) use ($user) {
+            $q->where('user_id', $user->id)
+                ->orWhereHas('penulis', fn($p) => $p->where('fakultas_id', $user->fakultas_id));
+        })
+            ->search($request->query('search'))
+            ->with('penulis.fakultas', 'penulis.dosen', 'penulisLuar')
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('uppm/kegiatan/index', [
             'kegiatan' => $data,
@@ -80,6 +88,26 @@ class KegiatanController extends Controller
         $fakultas = Fakultas::get();
         $role = auth()->user()->role;
         return Inertia::render('kegiatan/create', [
+            'fakultas' => $fakultas,
+            'role' => $role,
+        ]);
+    }
+
+    public function createRoleDosen()
+    {
+        $fakultas = Fakultas::get();
+        $role = auth()->user()->role;
+        return Inertia::render('dosen/kegiatan/create', [
+            'fakultas' => $fakultas,
+            'role' => $role,
+        ]);
+    }
+
+    public function createRoleUppm()
+    {
+        $fakultas = Fakultas::get();
+        $role = auth()->user()->role;
+        return Inertia::render('uppm/kegiatan/create', [
             'fakultas' => $fakultas,
             'role' => $role,
         ]);
@@ -131,6 +159,7 @@ class KegiatanController extends Controller
                 'link_berkas' => $validated['link_berkas'],
                 'sumber_dana' => $validated['sumber_dana'],
                 'jumlah_dana' => $validated['jumlah_dana'],
+                'user_id' => auth()->user()->id,
             ]);
 
             foreach ($validated['authors'] as $i => $author) {
@@ -174,6 +203,30 @@ class KegiatanController extends Controller
         ]);
     }
 
+    public function showRoleDosen(string $id)
+    {
+        $data = Kegiatan::findOrFail($id);
+        $data->load('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
+        $fakultas = Fakultas::get();
+        return Inertia::render('dosen/kegiatan/show', [
+            'data' => $data,
+            'fakultas' => $fakultas,
+            'role' => auth()->user()->role,
+        ]);
+    }
+
+    public function showRoleUppm(string $id)
+    {
+        $data = Kegiatan::findOrFail($id);
+        $data->load('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
+        $fakultas = Fakultas::get();
+        return Inertia::render('uppm/kegiatan/show', [
+            'data' => $data,
+            'fakultas' => $fakultas,
+            'role' => auth()->user()->role,
+        ]);
+    }
+
     /**
      * Show the form for editing the specified resource.
      */
@@ -184,6 +237,34 @@ class KegiatanController extends Controller
         $fakultas = Fakultas::get();
         $dosen = Dosen::get();
         return Inertia::render('kegiatan/edit', [
+            'kegiatan' => $kegiatan,
+            'fakultas' => $fakultas,
+            'dosen' => $dosen,
+            'role' => auth()->user()->role
+        ]);
+    }
+
+    public function editRoleUppm(string $id)
+    {
+        $kegiatan = Kegiatan::findOrFail($id);
+        $kegiatan->load('penulis', 'penulisLuar');
+        $fakultas = Fakultas::get();
+        $dosen = Dosen::get();
+        return Inertia::render('uppm/kegiatan/edit', [
+            'kegiatan' => $kegiatan,
+            'fakultas' => $fakultas,
+            'dosen' => $dosen,
+            'role' => auth()->user()->role
+        ]);
+    }
+
+    public function editRoleDosen(string $id)
+    {
+        $kegiatan = Kegiatan::findOrFail($id);
+        $kegiatan->load('penulis', 'penulisLuar');
+        $fakultas = Fakultas::get();
+        $dosen = Dosen::get();
+        return Inertia::render('dosen/kegiatan/edit', [
             'kegiatan' => $kegiatan,
             'fakultas' => $fakultas,
             'dosen' => $dosen,

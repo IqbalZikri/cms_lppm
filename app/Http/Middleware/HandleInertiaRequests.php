@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\SiteSettings;
+use Cache;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -41,11 +43,27 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'flash' => [
-                'success' => fn () => $request->session()->get('success'),
-                'error' => fn () => $request->session()->get('error'),
+                'success' => fn() => $request->session()->get('success'),
+                'error' => fn() => $request->session()->get('error'),
             ],
+            'site' => fn() => Cache::remember('site.settings', 3600, function () {
+                // hasil: ['telepon' => '021-123456', 'email' => '...', ...]
+                $s = SiteSettings::pluck('setting_value', 'setting_key');
+
+                return [
+                    'nama' => $s['nama_website'] ?? null,
+                    'logo' => $s['logo_url'] ?? null,
+                    'alamat' => $s['alamat'] ?? null,
+                    'email' => $s['email'] ?? null,
+                    'telepon' => $s['telepon'] ?? null,
+                    'whatsapp' => $s['whatsapp_number'] ?? null,
+                    'facebook' => $s['facebook_url'] ?? null,
+                    'instagram' => $s['instagram_url'] ?? null,
+                    'twitter' => $s['twitter_url'] ?? null,
+                ];
+            }),
         ];
     }
 }

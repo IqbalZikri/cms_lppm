@@ -24,8 +24,6 @@ const labelHalaman = (l: string) =>
 export default function BeritaIndex({ berita, kategori, filters }: Props) {
     const [q, setQ] = useState(filters.q ?? "");
 
-    console.log(berita);
-
     const kosongTotal =
         berita.data.length === 0 && !filters.q && !filters.kategori;
 

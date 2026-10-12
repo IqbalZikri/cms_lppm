@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->string('link_berkas');
             $table->enum('sumber_dana', ['internal', 'eksternal']);
             $table->decimal('jumlah_dana', 15, 2);
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

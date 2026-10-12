@@ -1,8 +1,8 @@
 import { Link, usePage } from "@inertiajs/react";
-import { home } from "@/routes";
 import type { AuthLayoutProps } from "@/types";
 import DSC06368 from "@/../../public/images/DSC06368.jpg";
 import { Card, CardContent } from "@/components/ui/card";
+import { route } from "ziggy-js";
 
 export default function AuthSimpleLayout({
     children,
@@ -46,7 +46,7 @@ export default function AuthSimpleLayout({
 
     return (
         <div
-            className="relative flex min-h-svh flex-col items-center justify-center gap-6 bg-cover bg-center p-6 md:p-10"
+            className="public-theme relative flex min-h-svh flex-col items-center justify-center gap-6 bg-cover bg-center p-6 md:p-10"
             style={{ backgroundImage: `url(${DSC06368})` }}
         >
             <div className="absolute inset-0 bg-gradient-to-b from-sky-900/40 via-black/30 to-emerald-950/60" />
@@ -59,7 +59,7 @@ export default function AuthSimpleLayout({
                 <Card className="gap-0 overflow-hidden rounded-2xl border-0 bg-[#FBF6E9]/95 py-0 text-stone-800 shadow-2xl ring-1 ring-[#E8DCC0] backdrop-blur-md">
                     {/* Header band: hijau tua + garis emas (warna dari logo) */}
                     <div className="border-b-4 border-[#C0A062] bg-gradient-to-br from-[#052E1C] to-[#0B5A3C] px-6 py-6 md:px-8">
-                        <Link href={home()} className="block">
+                        <Link href={route("beranda")} className="block">
                             <div className="relative mx-auto aspect-[1600/582] w-full max-w-[360px]">
                                 {/* Lingkaran putih di belakang ikon (area ikon = tinggi logo) */}
                                 <div className="absolute left-0 top-0 aspect-square h-full rounded-full bg-white shadow-lg" />

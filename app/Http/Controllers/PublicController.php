@@ -22,7 +22,7 @@ class PublicController extends Controller
 {
     public function beranda()
     {
-        $berita = Berita::latest()->take(5)->get();
+        $berita = Berita::with("kategori")->latest()->take(5)->get();
         $penelitian = $this->merge([
             $this->countPerPeriod(Kegiatan::class),
             $this->countPerPeriod(Hki::class),

@@ -19,8 +19,6 @@ interface Props {
 }
 
 export default function EditHki({ fakultas, data, user }: Props) {
-    console.log(data);
-    
     return (
         <>
             <Head title="Tambah Penelitian Kegiatan" />
@@ -58,7 +56,7 @@ export default function EditHki({ fakultas, data, user }: Props) {
                         </Breadcrumb>
                     </div>
                 </div>
-                <FormHki fakultas={fakultas} hki={data} user={user}/>
+                <FormHki fakultas={fakultas} hki={data} user={user} />
             </div>
         </>
     );

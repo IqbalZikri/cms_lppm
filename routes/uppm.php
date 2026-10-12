@@ -20,20 +20,21 @@ Route::middleware(['auth', 'role:uppm'])
         Route::get('prodi', [ProdiController::class, 'index'])->name('prodi.index');
 
         Route::get('dosen', [DosenController::class, 'index'])->name('dosen.index');
+        Route::get('dosen/{id}', [DosenController::class, 'show'])->name('dosen.show');
 
-        Route::get('kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.index');
-        Route::get('kegiatan/create', [KegiatanController::class, 'create'])->name('kegiatan.create');
+        Route::get('kegiatan', [KegiatanController::class, 'indexRoleUppm'])->name('kegiatan.index');
+        Route::get('kegiatan/create', [KegiatanController::class, 'createRoleUppm'])->name('kegiatan.create');
         Route::post('kegiatan/create', [KegiatanController::class, 'store'])->name('kegiatan.store');
-        Route::get('kegiatan//detail/{id}', [KegiatanController::class, 'show'])->name('kegiatan.show');
-        Route::get('kegiatan/{id}', [KegiatanController::class, 'edit'])->name('kegiatan.edit');
+        Route::get('kegiatan//detail/{id}', [KegiatanController::class, 'showRoleUppm'])->name('kegiatan.show');
+        Route::get('kegiatan/{id}', [KegiatanController::class, 'editRoleUppm'])->name('kegiatan.edit');
         Route::put('kegiatan/{id}', [KegiatanController::class, 'update'])->name('kegiatan.update');
         Route::delete('kegiatan/{id}', [KegiatanController::class, 'destroy'])->name('kegiatan.destroy');
 
-        Route::get('pkm', [PkmController::class, 'index'])->name('pkm.index');
-        Route::get('pkm/create', [PkmController::class, 'create'])->name('pkm.create');
+        Route::get('pkm', [PkmController::class, 'indexRoleUppm'])->name('pkm.index');
+        Route::get('pkm/create', [PkmController::class, 'createRoleUppm'])->name('pkm.create');
         Route::post('pkm/create', [PkmController::class, 'store'])->name('pkm.store');
-        Route::get('pkm//detail/{id}', [PkmController::class, 'show'])->name('pkm.show');
-        Route::get('pkm/{id}', [PkmController::class, 'edit'])->name('pkm.edit');
+        Route::get('pkm//detail/{id}', [PkmController::class, 'showRoleUppm'])->name('pkm.show');
+        Route::get('pkm/{id}', [PkmController::class, 'editRoleUppm'])->name('pkm.edit');
         Route::put('pkm/{id}', [PkmController::class, 'update'])->name('pkm.update');
         Route::delete('pkm/{id}', [PkmController::class, 'destroy'])->name('pkm.destroy');
 
@@ -45,27 +46,27 @@ Route::middleware(['auth', 'role:uppm'])
         Route::put('hki/{hki}', [HkiController::class, 'update'])->name('hki.update');
         Route::delete('hki/{hki}', [HkiController::class, 'destroy'])->name('hki.destroy');
 
-        Route::get('luaran_prosiding', [LuaranProsidingController::class, 'index'])->name('luaran_prosiding.index');
-        Route::get('luaran_prosiding/create', [LuaranProsidingController::class, 'create'])->name('luaran_prosiding.create');
+        Route::get('luaran_prosiding', [LuaranProsidingController::class, 'indexRoleUppm'])->name('luaran_prosiding.index');
+        Route::get('luaran_prosiding/create', [LuaranProsidingController::class, 'createRoleUppm'])->name('luaran_prosiding.create');
         Route::post('luaran_prosiding/create', [LuaranProsidingController::class, 'store'])->name('luaran_prosiding.store');
-        Route::get('luaran_prosiding//detail/{luaran_prosiding}', [LuaranProsidingController::class, 'show'])->name('luaran_prosiding.show');
-        Route::get('luaran_prosiding/{luaran_prosiding}', [LuaranProsidingController::class, 'edit'])->name('luaran_prosiding.edit');
+        Route::get('luaran_prosiding//detail/{luaran_prosiding}', [LuaranProsidingController::class, 'showRoleUppm'])->name('luaran_prosiding.show');
+        Route::get('luaran_prosiding/{luaran_prosiding}', [LuaranProsidingController::class, 'editRoleUppm'])->name('luaran_prosiding.edit');
         Route::put('luaran_prosiding/{luaran_prosiding}', [LuaranProsidingController::class, 'update'])->name('luaran_prosiding.update');
         Route::delete('luaran_prosiding/{luaran_prosiding}', [LuaranProsidingController::class, 'destroy'])->name('luaran_prosiding.destroy');
 
-        Route::get('luaran_jurnal', [LuaranJurnalController::class, 'index'])->name('luaran_jurnal.index');
-        Route::get('luaran_jurnal/create', [LuaranJurnalController::class, 'create'])->name('luaran_jurnal.create');
+        Route::get('luaran_jurnal', [LuaranJurnalController::class, 'indexRoleUppm'])->name('luaran_jurnal.index');
+        Route::get('luaran_jurnal/create', [LuaranJurnalController::class, 'createRoleUppm'])->name('luaran_jurnal.create');
         Route::post('luaran_jurnal/create', [LuaranJurnalController::class, 'store'])->name('luaran_jurnal.store');
-        Route::get('luaran_jurnal//detail/{luaran_jurnal}', [LuaranJurnalController::class, 'show'])->name('luaran_jurnal.show');
-        Route::get('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'edit'])->name('luaran_jurnal.edit');
+        Route::get('luaran_jurnal//detail/{luaran_jurnal}', [LuaranJurnalController::class, 'showRoleUppm'])->name('luaran_jurnal.show');
+        Route::get('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'editRoleUppm'])->name('luaran_jurnal.edit');
         Route::put('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'update'])->name('luaran_jurnal.update');
         Route::delete('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'destroy'])->name('luaran_jurnal.destroy');
 
         Route::get('luaran_buku', [LuaranBukuController::class, 'indexUppm'])->name('luaran_buku.index');
-        Route::get('luaran_buku/create', [LuaranBukuController::class, 'create'])->name('luaran_buku.create');
+        Route::get('luaran_buku/create', [LuaranBukuController::class, 'createRoleUppm'])->name('luaran_buku.create');
         Route::post('luaran_buku/create', [LuaranBukuController::class, 'store'])->name('luaran_buku.store');
-        Route::get('luaran_buku//detail/{luaran_buku}', [LuaranBukuController::class, 'show'])->name('luaran_buku.show');
-        Route::get('luaran_buku/{luaran_buku}', [LuaranBukuController::class, 'edit'])->name('luaran_buku.edit');
+        Route::get('luaran_buku//detail/{luaran_buku}', [LuaranBukuController::class, 'showRoleUppm'])->name('luaran_buku.show');
+        Route::get('luaran_buku/{luaran_buku}', [LuaranBukuController::class, 'editRoleUppm'])->name('luaran_buku.edit');
         Route::put('luaran_buku/{luaran_buku}', [LuaranBukuController::class, 'update'])->name('luaran_buku.update');
         Route::delete('luaran_buku/{luaran_buku}', [LuaranBukuController::class, 'destroy'])->name('luaran_buku.destroy');
     });

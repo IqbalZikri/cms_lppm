@@ -54,7 +54,7 @@ class Berita extends Model
     public function scopeTayang(Builder $query): Builder
     {
         return $query
-            ->where('status_published', 'published') // sesuaikan dengan nilai asli di database
+            ->where('status_published', 'published')
             ->where(function ($q) {
                 $q->whereNull('published_at')->orWhere('published_at', '<=', now());
             });

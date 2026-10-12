@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Dosen;
 use App\Models\Fakultas;
 use App\Models\Prodi;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Storage;
 
 class DosenController extends Controller
 {
@@ -28,6 +30,22 @@ class DosenController extends Controller
             'totalPerempuan' => $totalPerempuan,
             'data' => $dataTabelDosen,
             'filters' => $request->only("search")
+        ]);
+    }
+
+    public function show(string $id)
+    {
+        $dosen = Dosen::with('fakultas', 'prodi', 'user')->findOrFail($id);
+        $user = User::findOrFail($dosen->user_id);
+
+        return Inertia::render('uppm/dosen/show', [
+            'dosen' => [
+                ...$dosen->toArray(),
+                'foto' => $dosen->foto
+                    ? Storage::url($dosen->foto)
+                    : null,
+            ],
+            'user' => $user,
         ]);
     }
 }

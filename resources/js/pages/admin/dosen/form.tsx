@@ -133,7 +133,7 @@ export default function DosenForm({ fakultas, dosen, user }: Props) {
 
         setProdiLoading(true);
 
-        fetch(route("admin.prodi.getProdi", data.fakultas_id))
+        fetch(route("prodi.getProdi", data.fakultas_id))
             .then((response) => response.json())
             .then((data: Prodi[]) => setProdi(data))
             .catch((error) => {

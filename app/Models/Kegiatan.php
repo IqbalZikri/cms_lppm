@@ -28,6 +28,7 @@ class Kegiatan extends Model
         'link_berkas',
         'sumber_dana',
         'jumlah_dana',
+        'user_id',
     ];
 
     public function penulis(): MorphMany
@@ -38,5 +39,10 @@ class Kegiatan extends Model
     public function penulisLuar(): MorphMany
     {
         return $this->morphMany(PenulisLuar::class, 'penulisable_luar')->orderBy('urutan');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

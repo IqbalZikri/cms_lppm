@@ -59,7 +59,7 @@ class PkmController extends Controller
         ]);
     }
 
-    public function indexUppm(Request $request)
+    public function indexRoleUppm(Request $request)
     {
         $data = Pkm::whereHas('penulis', function ($query) {
             $query->where('fakultas_id', auth()->user()->fakultas_id);
@@ -76,6 +76,26 @@ class PkmController extends Controller
         $fakultas = Fakultas::get();
         $role = auth()->user()->role;
         return Inertia::render('pkm/create', [
+            'fakultas' => $fakultas,
+            'role' => $role,
+        ]);
+    }
+
+    public function createRoleDosen()
+    {
+        $fakultas = Fakultas::get();
+        $role = auth()->user()->role;
+        return Inertia::render('dosen/pkm/create', [
+            'fakultas' => $fakultas,
+            'role' => $role,
+        ]);
+    }
+
+    public function createRoleUppm()
+    {
+        $fakultas = Fakultas::get();
+        $role = auth()->user()->role;
+        return Inertia::render('uppm/pkm/create', [
             'fakultas' => $fakultas,
             'role' => $role,
         ]);
@@ -131,6 +151,7 @@ class PkmController extends Controller
                 'link_berkas' => $validated['link_berkas'],
                 'sumber_dana' => $validated['sumber_dana'],
                 'jumlah_dana' => $validated['jumlah_dana'],
+                'user_id' => auth()->user()->id,
             ]);
 
             foreach ($validated['authors'] as $i => $author) {
@@ -169,12 +190,56 @@ class PkmController extends Controller
         ]);
     }
 
+    public function showRoleDosen($id)
+    {
+        $data = Pkm::findOrFail($id);
+        $data->load('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
+        return Inertia::render('dosen/pkm/show', [
+            'data' => $data,
+            'role' => auth()->user()->role,
+        ]);
+    }
+
+    public function showRoleUppm($id)
+    {
+        $data = Pkm::findOrFail($id);
+        $data->load('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
+        return Inertia::render('uppm/pkm/show', [
+            'data' => $data,
+            'role' => auth()->user()->role,
+        ]);
+    }
+
     public function edit($id)
     {
         $data = Pkm::findOrFail($id);
         $data->load('penulis', 'penulisLuar');
         $fakultas = Fakultas::get();
         return Inertia::render('pkm/edit', [
+            'data' => $data,
+            'fakultas' => $fakultas,
+            'role' => auth()->user()->role,
+        ]);
+    }
+
+    public function editRoleDosen($id)
+    {
+        $data = Pkm::findOrFail($id);
+        $data->load('penulis', 'penulisLuar');
+        $fakultas = Fakultas::get();
+        return Inertia::render('dosen/pkm/edit', [
+            'data' => $data,
+            'fakultas' => $fakultas,
+            'role' => auth()->user()->role,
+        ]);
+    }
+
+    public function editRoleUppm($id)
+    {
+        $data = Pkm::findOrFail($id);
+        $data->load('penulis', 'penulisLuar');
+        $fakultas = Fakultas::get();
+        return Inertia::render('uppm/pkm/edit', [
             'data' => $data,
             'fakultas' => $fakultas,
             'role' => auth()->user()->role,

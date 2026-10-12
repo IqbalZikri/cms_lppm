@@ -8,10 +8,14 @@ import {
     Handshake,
     HeartHandshake,
     MapPin,
+    Newspaper,
+    Sparkles,
 } from "lucide-react";
 import PublicAppLayout from "@/layouts/public/public-layout";
 import TrenChart, { ChartPoint } from "@/components/tren-chart";
 import { Berita } from "@/interface/berita";
+import BeritaPlaceholder from "@/components/berita-placeholder";
+import { formatTanggal } from "@/lib/format-tanggal";
 
 type Props = {
     chart: ChartPoint[];
@@ -192,43 +196,111 @@ export default function Beranda({ chart, stats, berita }: Props) {
                         </Link>
                     </div>
 
-                    <div className="mt-10 grid gap-10 lg:grid-cols-[1.6fr_1fr]">
-                        <div className="grid gap-6 md:grid-cols-2">
-                            {berita.length >= 1 ? (
-                                <Link
-                                    href="/berita"
-                                    className="lift-card group overflow-hidden rounded-lg border bg-card md:col-span-2"
-                                >
-                                    {berita.gambar && (
-                                        <img
-                                            src={berita.gambar}
-                                            alt=""
-                                            className="h-64 w-full object-cover"
-                                        />
-                                    )}
-                                    <div className="p-6">
-                                        <p className="text-xs font-semibold text-muted-foreground">
-                                            <span className="text-primary">
-                                                {berita.kategori}
-                                            </span>{" "}
-                                            &nbsp;{berita.tanggal}
-                                        </p>
-                                        <h3 className="mt-2 font-display text-2xl text-forest group-hover:text-primary">
-                                            {berita.judul}
-                                        </h3>
-                                    </div>
-                                </Link>
-                            ) : (
-                                <span>Belum ada berita</span>
-                            )}
+                    {berita && berita.length > 0 && (
+                        <div className="grid gap-6 md:grid-cols-3">
+                            {berita.map((item, index) => {
+                                const isLatest = index === 0;
+
+                                /* ===== BERITA TERBARU (lengkap + ringkasan) ===== */
+                                if (isLatest) {
+                                    return (
+                                        <Link
+                                            key={item.id}
+                                            href={`/berita/${item.slug}`}
+                                            className="lift-card group grid overflow-hidden rounded-xl border bg-card md:col-span-3 md:grid-cols-2"
+                                        >
+                                            <div className="relative overflow-hidden">
+                                                {item.gambar ? (
+                                                    <img
+                                                        src={item.gambar}
+                                                        alt={item.judul_berita}
+                                                        className="h-72 w-full object-cover transition-transform duration-500 group-hover:scale-105 md:h-full"
+                                                    />
+                                                ) : (
+                                                    <BeritaPlaceholder
+                                                        featured
+                                                    />
+                                                )}
+
+                                                <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground shadow-md">
+                                                    <Sparkles className="h-3.5 w-3.5" />
+                                                    Terbaru
+                                                </span>
+                                            </div>
+
+                                            <div className="flex flex-col justify-center p-6 md:p-10">
+                                                <p className="text-xs font-semibold text-muted-foreground">
+                                                    <span className="text-primary">
+                                                        {
+                                                            item.kategori
+                                                                ?.nama_kategori
+                                                        }
+                                                    </span>{" "}
+                                                    &nbsp;
+                                                    {formatTanggal(
+                                                        item.published_at,
+                                                    )}
+                                                </p>
+                                                <h3 className="mt-3 font-display text-3xl leading-tight text-forest group-hover:text-primary">
+                                                    {item.judul_berita}
+                                                </h3>
+                                                <p className="mt-4 line-clamp-4 text-muted-foreground">
+                                                    {item.ringkasan_berita}
+                                                </p>
+                                                <span className="mt-6 inline-flex items-center text-sm font-semibold text-primary">
+                                                    Baca selengkapnya
+                                                    <span className="ml-1 transition-transform group-hover:translate-x-1">
+                                                        →
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </Link>
+                                    );
+                                }
+
+                                /* ===== BERITA LAIN (ringkas) ===== */
+                                return (
+                                    <Link
+                                        key={item.id}
+                                        href={`/berita/${item.slug}`}
+                                        className="lift-card group overflow-hidden rounded-lg border bg-card"
+                                    >
+                                        <div className="overflow-hidden">
+                                            {item.gambar ? (
+                                                <img
+                                                    src={item.gambar}
+                                                    alt={item.judul_berita}
+                                                    className="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                />
+                                            ) : (
+                                                <BeritaPlaceholder />
+                                            )}
+                                        </div>
+                                        <div className="p-5">
+                                            <p className="text-xs font-semibold text-muted-foreground">
+                                                <span className="text-primary">
+                                                    {
+                                                        item.kategori
+                                                            ?.nama_kategori
+                                                    }
+                                                </span>{" "}
+                                                &nbsp;{item.published_at}
+                                            </p>
+                                            <h3 className="mt-2 line-clamp-2 font-display text-xl text-forest group-hover:text-primary">
+                                                {item.judul_berita}
+                                            </h3>
+                                        </div>
+                                    </Link>
+                                );
+                            })}
                         </div>
-                    </div>
+                    )}
                 </div>
             </section>
 
             <section className="relative isolate overflow-hidden bg-forest text-primary-foreground">
                 <img
-                    src="/images/gerbang-uca.jpg"
+                    src="/images/gerbang.jpg"
                     alt="Gerbang Universitas Cendekia Abditama"
                     className="absolute inset-0 -z-20 size-full object-cover"
                 />

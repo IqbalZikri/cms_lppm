@@ -33,18 +33,19 @@ class DatabaseSeeder extends Seeder
         //     'role' => 'dosen'
         // ]);
 
-        // User::factory()->count(10)->create();
+        User::factory()->count(10)->create();
 
 
         $this->call([
             // FakultasSeeder::class,
             // ProdiSeeder::class,
-            // DosenSeeder::class,
-            KegiatanSeeder::class,
-            PkmSeeder::class,
-            HkiSeeder::class,
-            LuaranJurnalSeeder::class,
-            LuaranProsidingSeeder::class
+            DosenSeeder::class,
+            // KegiatanSeeder::class,
+            // PkmSeeder::class,
+            // HkiSeeder::class,
+            // LuaranJurnalSeeder::class,
+            // LuaranProsidingSeeder::class,
+            // LuaranBukuSeeder::class
         ]);
 
     }

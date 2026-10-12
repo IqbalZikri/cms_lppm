@@ -104,8 +104,6 @@ function RequiredMark() {
 export default function FormLuaranBuku({ fakultas, luaranBuku, role }: Props) {
     const isEdit = !!luaranBuku;
 
-    console.log(luaranBuku);
-    
     const actionAdmin = isEdit
         ? route("admin.luaran_buku.update", luaranBuku!.id)
         : route("admin.luaran_buku.store");

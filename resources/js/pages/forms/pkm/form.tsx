@@ -63,8 +63,6 @@ function RequiredMark() {
 }
 
 export default function FormPkm({ fakultas, pkm, role }: Props) {
-    console.log(pkm);
-    
     const isEdit = !!pkm;
     const [jenisPkm, setJenisPkm] = useState(pkm?.jenis_pkm ?? "");
     const [semester, setSemester] = useState(pkm?.semester ?? "");
@@ -439,7 +437,11 @@ export default function FormPkm({ fakultas, pkm, role }: Props) {
                             </div>
                         </div>
 
-                        <FormPenulis fakultas={fakultas} data={pkm} errors={errors} />
+                        <FormPenulis
+                            fakultas={fakultas}
+                            data={pkm}
+                            errors={errors}
+                        />
                     </CardContent>
 
                     <CardFooter className="flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-end">

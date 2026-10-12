@@ -19,7 +19,7 @@ import { Fakultas } from "@/interface/fakultas";
 import { Kegiatan as KegiatanInterface } from "@/interface/kegiatan";
 import { PaginatedData } from "@/interface/pagination";
 import { Head, Link, router } from "@inertiajs/react";
-import { Activity, Plus } from "lucide-react";
+import { Activity, FileText, Plus } from "lucide-react";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { route } from "ziggy-js";
 
@@ -41,8 +41,6 @@ export default function Kegiatan({
     totalKegiatanPerFakultas,
     totalKegiatan,
 }: Props) {
-    console.log(data);
-
     const statistikFakultas = totalKegiatanPerFakultas.map((item: any) => ({
         label: item.label,
         count: item.count,
@@ -256,6 +254,32 @@ export default function Kegiatan({
                                                 <>-</>
                                             )}
                                         </div>
+                                    ),
+                                },
+                                {
+                                    id: "periode",
+                                    key: "semester",
+                                    label: "Periode",
+                                    render: (_, item) => (
+                                        <span className="whitespace-nowrap text-sm">
+                                            {item.semester} {item.tahun}
+                                        </span>
+                                    ),
+                                },
+                                {
+                                    id: "berkas",
+                                    key: "link_berkas",
+                                    label: "Berkas",
+                                    render: (_, item) => (
+                                        <a
+                                            href={item.link_berkas}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-primary inline-flex items-center gap-1.5 text-sm hover:underline"
+                                        >
+                                            <FileText className="h-3.5 w-3.5" />
+                                            Lihat
+                                        </a>
                                     ),
                                 },
                             ]}

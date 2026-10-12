@@ -1,7 +1,9 @@
+import { motion } from "motion/react";
 import { Link } from "@inertiajs/react";
 import { ArrowLeft, Calendar, Eye } from "lucide-react";
 import PublicAppLayout from "@/layouts/public/public-layout";
 import KartuBerita, { BeritaItem } from "@/components/public/kartu-berita";
+import BeritaCover from "@/components/berita-cover";
 
 interface Props {
     berita: BeritaItem & { isi: string };
@@ -11,7 +13,24 @@ interface Props {
 export default function BeritaShow({ berita, terkait = [] }: Props) {
     return (
         <PublicAppLayout title={berita.judul}>
-            <section className="bg-forest text-primary-foreground">
+            <section className="relative isolate overflow-hidden bg-forest text-primary-foreground">
+                <motion.img
+                    src="/images/DSC06353.jpg"
+                    alt="Gedung Universitas Cendekia Abditama"
+                    className="absolute inset-0 -z-20 size-full object-cover object-center"
+                    initial={{ scale: 1.12 }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: 2.4, ease: "easeOut" }}
+                />
+
+                {/* Overlay: hampir hitam di kiri, makin bening ke kanan */}
+                <div
+                    className="absolute inset-0 -z-10"
+                    style={{
+                        background:
+                            "linear-gradient(90deg, rgb(5 23 12 / 0.96) 0%, rgb(5 23 12 / 0.93) 22%, rgb(5 23 12 / 0.85) 39%, rgb(5 23 12 / 0.68) 59%, rgb(5 23 12 / 0.52) 78%, rgb(5 23 12 / 0.28) 100%)",
+                    }}
+                />
                 <div className="page-shell max-w-4xl py-14 md:py-20">
                     <Link
                         href="/berita"
@@ -42,11 +61,16 @@ export default function BeritaShow({ berita, terkait = [] }: Props) {
 
             <article className="section-pad">
                 <div className="page-shell max-w-4xl">
-                    {berita.gambar && (
+                    {berita.gambar ? (
                         <img
                             src={berita.gambar}
                             alt={berita.judul}
                             className="mb-10 max-h-[28rem] w-full rounded-lg object-cover"
+                        />
+                    ) : (
+                        <BeritaCover
+                            kategori={berita.kategori}
+                            className="mb-10"
                         />
                     )}
                     {berita.ringkasan && (

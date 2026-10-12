@@ -1,6 +1,7 @@
 import { Link } from "@inertiajs/react";
 import {
     Activity,
+    BookMarked,
     BookOpen,
     Building,
     FileBadge,
@@ -58,6 +59,12 @@ const mainNavItems: NavItem[] = [
                 href: route("uppm.pkm.index"),
                 icon: HandHeart,
             },
+        ],
+    },
+    {
+        title: "Publikasi",
+        icon: BookMarked,
+        items: [
             {
                 title: "Luaran Prosiding",
                 href: route("uppm.luaran_prosiding.index"),
@@ -67,6 +74,11 @@ const mainNavItems: NavItem[] = [
                 title: "Luaran Jurnal",
                 href: route("uppm.luaran_jurnal.index"),
                 icon: Notebook,
+            },
+            {
+                title: "Luaran Buku",
+                href: route("admin.luaran_buku.index"),
+                icon: BookOpen,
             },
         ],
     },

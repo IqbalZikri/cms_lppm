@@ -1,4 +1,4 @@
-import { ChartAreaInteractive } from "@/components/chart-area-interactive";
+import { ChartDashboard, ChartPoint } from "@/components/chart-dashboard";
 import StatisticsCard from "@/components/statistic-card";
 import {
     Card,
@@ -19,10 +19,10 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Hki } from "@/interface/hki";
 import { Kegiatan } from "@/interface/kegiatan";
+import { LuaranBuku } from "@/interface/luaran-buku";
 import { LuaranJurnal } from "@/interface/luaran-jurnal";
 import { LuaranProsiding } from "@/interface/luaran-prosiding";
 import { Pkm } from "@/interface/pkm";
-import { Auth } from "@/types";
 import { Dosen } from "@/types/dosen";
 import { Head, Link } from "@inertiajs/react";
 
@@ -33,11 +33,14 @@ interface Props {
     totalHki: number;
     totalLuaranJurnal: number;
     totalLuaranProsiding: number;
+    totalLuaranBuku: number;
     kegiatanTerbaru: Kegiatan[];
     pkmTerbaru: Pkm[];
     hkiTerbaru: Hki[];
     luaranJurnalTerbaru: LuaranJurnal[];
     luaranProsidingTerbaru: LuaranProsiding[];
+    luaranBukuTerbaru: LuaranBuku[];
+    chartData: ChartPoint[];
 }
 
 export default function Dashboard({
@@ -47,13 +50,17 @@ export default function Dashboard({
     totalHki,
     totalLuaranJurnal,
     totalLuaranProsiding,
+    totalLuaranBuku,
     kegiatanTerbaru,
     pkmTerbaru,
     hkiTerbaru,
     luaranJurnalTerbaru,
     luaranProsidingTerbaru,
+    luaranBukuTerbaru,
+    chartData,
 }: Props) {
-
+    console.log(dosenLogin);
+    
     return (
         <>
             <Head title="Dashboard Dosen" />
@@ -62,7 +69,7 @@ export default function Dashboard({
                     Selamat Datang {dosenLogin.nama_dosen}
                 </h1>
                 <StatisticsCard
-                    className="lg:grid-cols-3"
+                    className="lg:grid-cols-4"
                     dataCard={[
                         {
                             label: "Penelitian",
@@ -88,10 +95,14 @@ export default function Dashboard({
                             label: "Luaran Prosiding",
                             count: totalLuaranProsiding,
                         },
+                        {
+                            label: "Luaran Buku",
+                            count: totalLuaranBuku,
+                        },
                     ]}
                 />
 
-                <ChartAreaInteractive />
+                <ChartDashboard chartData={chartData} />
 
                 <Card>
                     <CardHeader>
@@ -111,6 +122,9 @@ export default function Dashboard({
                                 </TabsTrigger>
                                 <TabsTrigger value="luaranProsiding">
                                     Luaran Prosiding
+                                </TabsTrigger>
+                                <TabsTrigger value="luaranBuku">
+                                    Luaran Buku
                                 </TabsTrigger>
                             </TabsList>
                             <TabsContent value="kegiatan">
@@ -380,6 +394,65 @@ export default function Dashboard({
                                         ) : (
                                             <>
                                                 {luaranProsidingTerbaru.map(
+                                                    (item, index) => (
+                                                        <TableRow key={item.id}>
+                                                            <TableCell className="font-medium">
+                                                                {index + 1}
+                                                            </TableCell>
+
+                                                            <TableCell>
+                                                                {item.judul}
+                                                            </TableCell>
+
+                                                            <TableCell>
+                                                                <Link
+                                                                    href={
+                                                                        item.link_berkas
+                                                                    }
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="text-blue-600 underline"
+                                                                >
+                                                                    Lihat Berkas
+                                                                </Link>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ),
+                                                )}
+                                            </>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </TabsContent>
+                            <TabsContent value="luaranBuku">
+                                <Table>
+                                    <TableCaption>
+                                        Data Luaran Buku Terbaru.
+                                    </TableCaption>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="w-[100px]">
+                                                No.
+                                            </TableHead>
+                                            <TableHead>Judul</TableHead>
+                                            <TableHead>Link Berkas</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {luaranBukuTerbaru.length === 0 ? (
+                                            <>
+                                                <TableRow>
+                                                    <TableCell
+                                                        className="font-medium text-center"
+                                                        colSpan={5}
+                                                    >
+                                                        Data belum ada.
+                                                    </TableCell>
+                                                </TableRow>
+                                            </>
+                                        ) : (
+                                            <>
+                                                {luaranBukuTerbaru.map(
                                                     (item, index) => (
                                                         <TableRow key={item.id}>
                                                             <TableCell className="font-medium">

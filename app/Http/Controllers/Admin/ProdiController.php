@@ -36,12 +36,11 @@ class ProdiController extends Controller
     {
         $request->validate([
             'fakultas_id' => 'required',
-            'kode_prodi' => 'required|unique:prodis,kode_prodi',
+            'kode_prodi' => 'required',
             'nama_prodi' => 'required',
         ], [
             'fakultas_id.required' => 'Pilih salah satu fakultas',
             'kode_prodi.required' => 'Kode prodi wajib diisi',
-            'kode_prodi.unique' => 'Kode prodi sudah digunakan',
             'nama_prodi.required' => 'Nama prodi wajib diisi',
         ]);
 
@@ -64,12 +63,11 @@ class ProdiController extends Controller
     {
         $request->validate([
             'fakultas_id' => 'required',
-            'kode_prodi' => 'required|unique:prodis,kode_prodi,' . $id,
+            'kode_prodi' => 'required',
             'nama_prodi' => 'required',
         ], [
             'fakultas_id.required' => 'Pilih salah satu fakultas',
             'kode_prodi.required' => 'Kode prodi wajib diisi',
-            'kode_prodi.unique' => 'Kode prodi sudah digunakan',
             'nama_prodi.required' => 'Nama prodi wajib diisi',
         ]);
 

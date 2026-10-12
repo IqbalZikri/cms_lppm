@@ -1,9 +1,11 @@
 import { Link } from "@inertiajs/react";
 import {
     Activity,
+    BookMarked,
     BookOpen,
     BookOpenIcon,
     Building2,
+    CogIcon,
     Database,
     FileBadge,
     FilePenLine,
@@ -14,6 +16,7 @@ import {
     Newspaper,
     NewspaperIcon,
     Notebook,
+    Palette,
     Plus,
     ScrollText,
     Tags,
@@ -113,6 +116,12 @@ const mainNavItems: NavItem[] = [
                 href: route("admin.pkm.index"),
                 icon: HandHeart,
             },
+        ],
+    },
+    {
+        title: "Publikasi",
+        icon: BookMarked,
+        items: [
             {
                 title: "Luaran Prosiding",
                 href: route("admin.luaran_prosiding.index"),
@@ -144,16 +153,11 @@ const mainNavItems: NavItem[] = [
 ];
 
 const footerNavItems: NavItem[] = [
-    // {
-    //     title: "Repository",
-    //     href: "https://github.com/laravel/react-starter-kit",
-    //     icon: FolderGit2,
-    // },
-    // {
-    //     title: "Documentation",
-    //     href: "https://laravel.com/docs/starter-kits#react",
-    //     icon: BookOpen,
-    // },
+    {
+        title: "Site Settings",
+        href: route("site_setting.index"),
+        icon: CogIcon,
+    },
 ];
 
 export function AppSidebar() {

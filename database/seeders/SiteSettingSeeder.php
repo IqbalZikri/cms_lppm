@@ -15,7 +15,6 @@ class SiteSettingSeeder extends Seeder
     {
         $settings = [
             ['setting_key' => 'nama_website', "setting_value" => "Lembaga Penjamin & Pengabdian Masyarakat - Universitas Cendekia Abditama"],
-            ['setting_key' => 'deskripsi_website', "setting_value" => "Website Lembaga Penjamin & Pengabdian Masyarakat Universitas Cendekia Abditama"],
             ["setting_key" => "logo_url", "setting_value" => "/logo-uca-website.png"],
             ['setting_key' => 'facebook_url', 'setting_value' => null],
             ['setting_key' => 'instagram_url', 'setting_value' => null],

@@ -16,7 +16,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::query()->whereIn('role', ['admin', 'uppm'])->search($request->query("search"))->oldest('id')->paginate(10)->withQueryString();
+        $users = User::query()->whereIn('role', ['admin', 'uppm'])->search($request->query("search"))->with("fakultas")->oldest('id')->paginate(10)->withQueryString();
         $totalUser = $users->total();
         $totalUppm = User::where('role', 'uppm')->count();
         $totalAdmin = User::where('role', 'admin')->count();

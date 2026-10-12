@@ -27,7 +27,8 @@ class LuaranJurnal extends Model
         'abstrak',
         'semester',
         'tahun',
-        'link_berkas'
+        'link_berkas',
+        'user_id',
     ];
 
     public function penulis(): MorphMany
@@ -38,5 +39,10 @@ class LuaranJurnal extends Model
     public function penulisLuar(): MorphMany
     {
         return $this->morphMany(PenulisLuar::class, 'penulisable_luar')->orderBy('urutan');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

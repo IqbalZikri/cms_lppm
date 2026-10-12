@@ -47,6 +47,7 @@
     --color-chart-3: var(--chart-3);
     --color-chart-4: var(--chart-4);
     --color-chart-5: var(--chart-5);
+    --color-chart-6: var(--chart-6);
 
     --color-sidebar: var(--sidebar);
     --color-sidebar-foreground: var(--sidebar-foreground);
@@ -129,6 +130,7 @@
     --chart-3: oklch(0.398 0.07 227.392);
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
+    --chart-6: oklch(0.55 0.12 300);
     --radius: 0.625rem;
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);
@@ -219,6 +221,7 @@
     --chart-3: #e8792b;
     --chart-4: #6fb08c;
     --chart-5: #8a6f34;
+    --chart-6: #7c83c9;
 
     --sidebar: #093c21;
     --sidebar-foreground: #e8f1eb;
@@ -261,7 +264,7 @@
     --sidebar-border: #14663a;
 }
 
- /* .public-theme {
+/* .public-theme {
     --background: #f7f4ec;
     font-family: "Plus Jakarta Sans", system-ui, sans-serif;
     color: #1c2a22;
@@ -272,13 +275,13 @@
     outline-offset: 2px;
 }  */
 /* ukuran dasar 17px hanya saat halaman publik tampil */
- html:has(.public-theme) {
+html:has(.public-theme) {
     font-size: 17px;
     scrollbar-width: none;
 }
 html:has(.public-theme)::-webkit-scrollbar {
     display: none;
-} 
+}
 @media (prefers-reduced-motion: reduce) {
     .theme-beranda * {
         animation: none !important;

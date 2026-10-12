@@ -22,7 +22,6 @@ interface Props {
 
 type TextKey =
     | "nama_website"
-    | "deskripsi_website"
     | "facebook_url"
     | "instagram_url"
     | "twitter_url"
@@ -133,15 +132,6 @@ export default function SiteSettingsPage({ site_setting: s }: Props) {
                                                     {errors.nama_website}
                                                 </p>
                                             )}
-                                        </Field>
-                                        <Field>
-                                            <FieldLabel htmlFor="deskripsi_website">
-                                                Deskripsi Website
-                                            </FieldLabel>
-                                            <Textarea
-                                                {...bind("deskripsi_website")}
-                                                placeholder="Deskripsi Website"
-                                            />
                                         </Field>
                                         <Field>
                                             <FieldLabel htmlFor="logo_url">
@@ -282,10 +272,7 @@ export default function SiteSettingsPage({ site_setting: s }: Props) {
                                             )}
                                         </Field>
                                         <Field>
-                                            <FieldLabel>
-                                                Misi (gunakan daftar bernomor
-                                                atau poin)
-                                            </FieldLabel>
+                                            <FieldLabel>Misi</FieldLabel>
                                             <RichTextEditor
                                                 value={data.mission}
                                                 onChange={(html: string) =>

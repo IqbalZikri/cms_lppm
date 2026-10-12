@@ -200,6 +200,19 @@ export default function UserPage({
                                     key: "role",
                                     label: "Hak Akses / Role",
                                 },
+                                {
+                                    key: "fakultas",
+                                    label: "UPPM / LPPM",
+                                    render: (_, item) => {
+                                        return item.fakultas ? (
+                                            <Badge>
+                                                {item.fakultas.nama_fakultas}
+                                            </Badge>
+                                        ) : (
+                                            "LPPM"
+                                        );
+                                    },
+                                },
                             ]}
                             renderActions={(item) => (
                                 <div className="flex items-center gap-2">

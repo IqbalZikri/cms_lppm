@@ -317,11 +317,14 @@ export default function Hki({
                                     key: "status_pengajuan",
                                     label: "Status Pengajuan",
                                     render: (_, item) => {
-                                        const statusPengajuan =
-                                            item.status_pengajuan
-                                                .charAt(0)
-                                                .toUpperCase() +
-                                            item.status_pengajuan.slice(1);
+                                        let statusPengajuan;
+                                        if (item.status_pengajuan) {
+                                            statusPengajuan =
+                                                item.status_pengajuan
+                                                    .charAt(0)
+                                                    .toUpperCase() +
+                                                item.status_pengajuan.slice(1);
+                                        }
                                         return (
                                             <Badge
                                                 variant={
@@ -337,7 +340,7 @@ export default function Hki({
                                                             : "destructive"
                                                 }
                                             >
-                                                {statusPengajuan}
+                                                {statusPengajuan ?? "-"}
                                             </Badge>
                                         );
                                     },

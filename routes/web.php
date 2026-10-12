@@ -17,14 +17,11 @@ use App\Http\Controllers\LuaranBukuController;
 use App\Http\Controllers\PkmController;
 use App\Http\Controllers\PublicController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::inertia('/welcome', 'welcome')->name('home');
 
 Route::get("/", [PublicController::class, "beranda"])->name("beranda");
 Route::get("/profil/visi-misi", [PublicController::class, "profil"])->name("profil");
 Route::get("/berita", [PublicController::class, "berita"])->name("berita");
-Route::get("/berita", [PublicController::class, "berita"])->name("berita");
+Route::get("/berita/{slug}", [PublicController::class, "beritaDetail"])->name("beritaDetail");
 Route::get("/penelitian", [PublicController::class, "penelitian"])->name("penelitian");
 Route::get('/publikasi', [PublicController::class, 'publikasi'])->name('publikasi');
 Route::get('/pkm', [PublicController::class, 'pkm'])->name('pkm');

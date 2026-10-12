@@ -19,7 +19,7 @@ import { PaginatedData } from "@/interface/pagination";
 import { Pkm as PkmInterface } from "@/interface/pkm";
 import { Fakultas } from "@/types/fakultas";
 import { Head, Link, router } from "@inertiajs/react";
-import { HandHeart, Plus } from "lucide-react";
+import { FileText, HandHeart, Plus } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import { route } from "ziggy-js";
 
@@ -235,6 +235,32 @@ export default function Pkm({
                                                 <>-</>
                                             )}
                                         </div>
+                                    ),
+                                },
+                                {
+                                    id: "periode",
+                                    key: "semester",
+                                    label: "Periode",
+                                    render: (_, item) => (
+                                        <span className="whitespace-nowrap text-sm">
+                                            {item.semester} {item.tahun}
+                                        </span>
+                                    ),
+                                },
+                                {
+                                    id: "berkas",
+                                    key: "link_berkas",
+                                    label: "Berkas",
+                                    render: (_, item) => (
+                                        <a
+                                            href={item.link_berkas}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-primary inline-flex items-center gap-1.5 text-sm hover:underline"
+                                        >
+                                            <FileText className="h-3.5 w-3.5" />
+                                            Lihat
+                                        </a>
                                     ),
                                 },
                             ]}

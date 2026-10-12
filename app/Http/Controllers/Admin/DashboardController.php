@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Dosen;
 use App\Models\Hki;
 use App\Models\Kegiatan;
+use App\Models\LuaranBuku;
 use App\Models\LuaranJurnal;
 use App\Models\LuaranProsiding;
 use App\Models\Pkm;
@@ -17,45 +18,51 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        $currentYear = Carbon::now()->year;
+        $startYear = $currentYear - 4; // 5 tahun terakhir
+
         $dosens = Dosen::latest()->take(5)->with('fakultas', 'prodi', 'user')->get();
         $totalDosen = Dosen::count();
         $kegiatan = Kegiatan::latest()->with('penulis.fakultas', 'penulis.dosen')->take(5)->get();
-        $totalKegiatan = Kegiatan::count();
+        $totalKegiatan = Kegiatan::whereBetween('tahun', [$startYear, $currentYear])->count();
         $pkm = Pkm::latest()->with('penulis.fakultas', 'penulis.dosen')->take(5)->get();
-        $totalPkm = Pkm::count();
+        $totalPkm = Pkm::whereBetween('tahun', [$startYear, $currentYear])->count();
         $hki = Hki::latest()->with('penulis.fakultas', 'penulis.dosen')->take(5)->get();
-        $totalHki = Hki::count();
+        $totalHki = Hki::whereBetween('tahun', [$startYear, $currentYear])->count();
         $luaranJurnal = LuaranJurnal::latest()->with('penulis.fakultas', 'penulis.dosen')->take(5)->get();
-        $totalLuaranJurnal = LuaranJurnal::count();
+        $totalLuaranJurnal = LuaranJurnal::whereBetween('tahun', [$startYear, $currentYear])->count();
         $luaranProsiding = LuaranProsiding::latest()->with('penulis.fakultas', 'penulis.dosen')->take(5)->get();
-        $totalLuaranProsiding = LuaranProsiding::count();
+        $totalLuaranProsiding = LuaranProsiding::whereBetween('tahun', [$startYear, $currentYear])->count();
+        $luaranBuku = LuaranBuku::latest()->with('penulis.fakultas', 'penulis.dosen')->take(5)->get();
+        $totalLuaranBuku = LuaranBuku::whereBetween('tahun', [$startYear, $currentYear])->count();
         $user = auth()->user();
 
-        $currentYear = Carbon::now()->year;
-        $startYear = $currentYear - 2; // 3 tahun terakhir, sesuaikan kebutuhan
+        // hasil: [tahun => total]
+        $countByYear = fn(string $model) => $model::whereBetween('tahun', [$startYear, $currentYear])
+            ->selectRaw('tahun, COUNT(*) as total')
+            ->groupBy('tahun')
+            ->pluck('total', 'tahun');
 
-        $dataSources = [
-            'kegiatan' => Kegiatan::whereBetween('tahun', [$startYear, $currentYear])->get(['tahun']),
-            'pkm' => Pkm::whereBetween('tahun', [$startYear, $currentYear])->get(['tahun']),
-            'hki' => Hki::whereBetween('tahun', [$startYear, $currentYear])->get(['tahun']),
-            'luaran_jurnal' => LuaranJurnal::whereBetween('tahun', [$startYear, $currentYear])->get(['tahun']),
-            'prosiding' => LuaranProsiding::whereBetween('tahun', [$startYear, $currentYear])->get(['tahun']),
+        $series = [
+            'kegiatan' => $countByYear(Kegiatan::class),
+            'pkm' => $countByYear(Pkm::class),
+            'hki' => $countByYear(Hki::class),
+            'luaran_jurnal' => $countByYear(LuaranJurnal::class),
+            'prosiding' => $countByYear(LuaranProsiding::class),
+            'buku' => $countByYear(LuaranBuku::class),
         ];
 
-        $grouped = [];
-        foreach ($dataSources as $key => $items) {
-            foreach ($items->groupBy('tahun') as $tahun => $group) {
-                $grouped[$tahun][$key] = $group->count();
-            }
-        }
-
-        // isi semua tahun dalam rentang, walau count-nya 0, biar chart nggak bolong
+        // semua tahun dalam rentang tetap tampil, walau 0
         $chartData = collect(range($startYear, $currentYear))
-            ->map(fn($tahun) => array_merge(
-                ['date' => "$tahun-01-01", 'tahun' => $tahun],
-                array_fill_keys(['kegiatan', 'pkm', 'hki', 'luaran_jurnal', 'prosiding'], 0),
-                $grouped[$tahun] ?? []
-            ))
+            ->map(fn($tahun) => [
+                'tahun' => $tahun,
+                'kegiatan' => (int) ($series['kegiatan'][$tahun] ?? 0),
+                'pkm' => (int) ($series['pkm'][$tahun] ?? 0),
+                'hki' => (int) ($series['hki'][$tahun] ?? 0),
+                'luaran_jurnal' => (int) ($series['luaran_jurnal'][$tahun] ?? 0),
+                'prosiding' => (int) ($series['prosiding'][$tahun] ?? 0),
+                'buku' => (int) ($series['buku'][$tahun] ?? 0),
+            ])
             ->values();
 
         return Inertia::render('admin/dashboard', [
@@ -72,7 +79,9 @@ class DashboardController extends Controller
             'totalLuaranJurnal' => $totalLuaranJurnal,
             'luaranProsiding' => $luaranProsiding,
             'totalLuaranProsiding' => $totalLuaranProsiding,
-            'chartData' => $chartData
+            'luaranBuku' => $luaranBuku,
+            'totalLuaranBuku' => $totalLuaranBuku,
+            'chartData' => $chartData,
         ]);
     }
 }

@@ -39,7 +39,11 @@
         {{-- <link rel="icon" href="/favicon.ico" sizes="any">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         <link rel="icon" href="/favicon.svg"> --}}
-        <link rel="icon" href="{{ asset('images/logo_uca.png') }}">
+        @php
+            $logo = App\Models\SiteSettings::where("setting_key", "logo_url")->value("setting_value");
+            // dd($logo);
+        @endphp
+        <link rel="icon" href="{{ asset($logo) }}">
         {{-- <link rel="apple-touch-icon" href="/apple-touch-icon.png"> --}}
 
         @fonts

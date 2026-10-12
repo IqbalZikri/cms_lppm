@@ -123,7 +123,7 @@ export default function Profile({
                 </Form>
             </div>
 
-            {auth.user.id !== 1 && <DeleteUser />}
+            {/* {auth.user.id !== 1 && <DeleteUser />} */}
         </>
     );
 }

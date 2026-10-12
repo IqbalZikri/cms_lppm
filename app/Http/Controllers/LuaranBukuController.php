@@ -58,7 +58,6 @@ class LuaranBukuController extends Controller
             $query->where("penulis", auth()->user()->fakultas_id);
         })->search($request->query("search"))->with("penulis.fakultas", "penulis.dosen")->latest()->paginate(10)->withQueryString();
 
-
         return Inertia::render('uppm/luaran-buku/index', [
             "data" => $data,
             "filters" => $request->only("search")
@@ -126,6 +125,7 @@ class LuaranBukuController extends Controller
                 'isbn' => $validated['isbn'],
                 'tahun' => $validated['tahun'],
                 'link_berkas' => $validated['link_berkas'],
+                'user_id' => auth()->user()->id,
             ]);
 
             foreach ($validated['authors'] as $i => $author) {

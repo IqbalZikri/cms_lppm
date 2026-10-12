@@ -250,6 +250,19 @@ export default function Dosen({
                                     label: "Email",
                                 },
                             ]}
+                            renderActions={(item) => (
+                                <>
+                                    <Link
+                                        href={route(
+                                            "uppm.dosen.show",
+                                            item.id,
+                                        )}
+                                        viewTransition
+                                    >
+                                        <Button variant="default">Show</Button>
+                                    </Link>
+                                </>
+                            )}
                         />
                     </CardContent>
                 </Card>
