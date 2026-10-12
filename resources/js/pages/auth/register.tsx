@@ -635,12 +635,12 @@ function RegisterSteps({
                             name="email"
                             type="email"
                             autoComplete="email"
-                            placeholder="Contoh: nama@gmail.com"
+                            placeholder="Contoh: nama@uca.ac.id"
                             className={inputCls}
                             aria-invalid={!!err("email")}
                         />
                         <FieldDescription className="text-base">
-                            Email ini dipakai untuk masuk ke aplikasi.
+                            Email ini dipakai untuk masuk ke aplikasi, gunakan email @uca.ac.id.
                         </FieldDescription>
                         <InputError
                             message={err("email")}

@@ -17,34 +17,34 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // User::factory(10)->create();
-        User::create([
-            'name' => 'admin',
-            'email' => 'admin@example.com',
-            'email_verified_at' => now(),
-            'password' => Hash::make('admin'),
-            'role' => 'admin'
-        ]);
+        // User::create([
+        //     'name' => 'admin',
+        //     'email' => 'admin@example.com',
+        //     'email_verified_at' => now(),
+        //     'password' => Hash::make('admin'),
+        //     'role' => 'admin'
+        // ]);
 
-        User::create([
-            'name' => 'bambang',
-            'email' => 'user1@example.com',
-            'email_verified_at' => now(),
-            'password' => Hash::make('admin'),
-            'role' => 'dosen'
-        ]);
+        // User::create([
+        //     'name' => 'bambang',
+        //     'email' => 'user1@example.com',
+        //     'email_verified_at' => now(),
+        //     'password' => Hash::make('admin'),
+        //     'role' => 'dosen'
+        // ]);
 
-        User::factory()->count(10)->create();
+        // User::factory()->count(10)->create();
 
 
         $this->call([
-            FakultasSeeder::class,
-            ProdiSeeder::class,
-            DosenSeeder::class,
-            // KegiatanSeeder::class,
-            // PkmSeeder::class,
-            // HkiSeeder::class,
-            // LuaranJurnalSeeder::class,
-            // LuaranProsidingSeeder::class
+            // FakultasSeeder::class,
+            // ProdiSeeder::class,
+            // DosenSeeder::class,
+            KegiatanSeeder::class,
+            PkmSeeder::class,
+            HkiSeeder::class,
+            LuaranJurnalSeeder::class,
+            LuaranProsidingSeeder::class
         ]);
 
     }

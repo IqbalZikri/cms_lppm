@@ -29,11 +29,6 @@ Route::get("/penelitian", [PublicController::class, "penelitian"])->name("peneli
 Route::get('/publikasi', [PublicController::class, 'publikasi'])->name('publikasi');
 Route::get('/pkm', [PublicController::class, 'pkm'])->name('pkm');
 Route::get('/kontak', [PublicController::class, 'kontak'])->name('kontak');
-// Route::inertia("/profil", "public/profil")->name("profil");
-// Route::inertia("/berita", "public/berita")->name("berita");
-// Route::inertia("/penelitian", "public/penelitian")->name("penelitian");
-// Route::inertia("/publikasi", "public/publikasi")->name("publikasi");
-// Route::inertia("/kontak", "public/kontak")->name("kontak");
 
 Route::get('register', [SesiController::class, 'register'])->name('sesi.register');
 Route::post('register', [SesiController::class, 'registerAccount'])->name('sesi.registerAccount');

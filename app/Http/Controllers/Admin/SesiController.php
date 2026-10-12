@@ -34,7 +34,7 @@ class SesiController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
 
-            'email' => 'required|email|max:255|unique:users,email',
+            'email' => 'required|email|max:255|unique:users,email|regex:/@(uca|cendekia)\.ac\.id$/i',
 
             'password' => 'required|string|min:8|confirmed',
 
@@ -67,6 +67,7 @@ class SesiController extends Controller
             'email.email' => 'Silakan masukkan alamat email dengan format yang valid.',
             'email.max' => 'Alamat email tidak boleh lebih dari 255 karakter.',
             'email.unique' => 'Alamat email anda sudah terdaftar.',
+            'email.regex' => 'Alamat email harus menggunakan format @uca.ac.id',
 
             'password.required' => 'Silakan masukkan password.',
             'password.string' => 'Password harus berupa teks.',

@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->string('password');
             $table->enum('role', ['admin', 'uppm', 'dosen']);
             $table->foreignId("fakultas_id")->nullable()->constrained()->cascadeOnDelete();
+            $table->string("status_pembuatan")->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

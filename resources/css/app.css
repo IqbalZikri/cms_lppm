@@ -261,24 +261,24 @@
     --sidebar-border: #14663a;
 }
 
-/* .theme-beranda {
+ /* .public-theme {
     --background: #f7f4ec;
     font-family: "Plus Jakarta Sans", system-ui, sans-serif;
     color: #1c2a22;
     scroll-behavior: smooth;
-}
-.theme-beranda :focus-visible {
+} */
+/* .public-theme :focus-visible {
     outline: 3px solid #c9a55c;
     outline-offset: 2px;
-} */
+}  */
 /* ukuran dasar 17px hanya saat halaman publik tampil */
-/* html:has(.theme-beranda) {
+ html:has(.public-theme) {
     font-size: 17px;
     scrollbar-width: none;
 }
-html:has(.theme-beranda)::-webkit-scrollbar {
+html:has(.public-theme)::-webkit-scrollbar {
     display: none;
-} */
+} 
 @media (prefers-reduced-motion: reduce) {
     .theme-beranda * {
         animation: none !important;

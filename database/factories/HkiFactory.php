@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Hki;
 use App\Models\Penulis;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -29,6 +30,7 @@ class HkiFactory extends Factory
             'nomer_paten' => fake()->numberBetween(0, 200),
             'sumber_dana' => fake()->randomElement(["internal", "eksternal"]),
             'jumlah_dana' => fake()->numberBetween(5, 50) * 10000000,
+            "user_id" => User::pluck("id")->random()
         ];
     }
 
