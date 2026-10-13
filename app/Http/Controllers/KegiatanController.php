@@ -54,8 +54,9 @@ class KegiatanController extends Controller
     public function indexDosen(Request $request)
     {
         $dosen = Dosen::where('user_id', auth()->user()->id)->first();
-        $kegiatan = Kegiatan::whereHas('penulis', function ($query) use ($dosen) {
-            $query->where('dosen_id', $dosen->id);
+        $kegiatan = Kegiatan::where(function ($q) use ($dosen) {
+            $q->where('user_id', $dosen->user_id)
+                ->orWhereHas('penulis', fn($p) => $p->where('dosen_id', $dosen->user_id));
         })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10);
         return Inertia::render('dosen/kegiatan/index', [
             'kegiatan' => $kegiatan,

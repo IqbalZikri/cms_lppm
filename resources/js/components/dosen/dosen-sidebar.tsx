@@ -65,7 +65,7 @@ const mainNavItems: NavItem[] = [
             },
             {
                 title: "Luaran Buku",
-                href: route("admin.luaran_buku.index"),
+                href: route("dosen.luaran_buku.index"),
                 icon: BookOpen,
             },
         ],

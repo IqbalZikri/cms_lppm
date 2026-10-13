@@ -20,11 +20,16 @@ class Dosen extends Model
     ];
 
     protected $fillable = [
+        'sintaid',
         'fakultas_id',
         'prodi_id',
         'nidn',
         'nuptk',
         'nama_dosen',
+        'pendidikan_terakhir',
+        'jabatan_fungsional',
+        'gelar_depan',
+        'gelar_belakang',
         'jenis_kelamin',
         'tanggal_lahir',
         'tempat_lahir',

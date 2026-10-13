@@ -11,12 +11,10 @@ class Fakultas extends Model
     use HasFactory, Searchable;
 
     protected array $searchable = [
-        'kode_fakultas',
         'nama_fakultas'
     ];
     
     protected $fillable = [
-        'kode_fakultas',
         'nama_fakultas',
     ];
 

@@ -55,18 +55,18 @@ Route::middleware(['auth', 'role:uppm'])
         Route::delete('luaran_prosiding/{luaran_prosiding}', [LuaranProsidingController::class, 'destroy'])->name('luaran_prosiding.destroy');
 
         Route::get('luaran_jurnal', [LuaranJurnalController::class, 'indexRoleUppm'])->name('luaran_jurnal.index');
-        Route::get('luaran_jurnal/create', [LuaranJurnalController::class, 'createRoleUppm'])->name('luaran_jurnal.create');
+        Route::get('luaran_jurnal/create', [LuaranJurnalController::class, 'create'])->name('luaran_jurnal.create');
         Route::post('luaran_jurnal/create', [LuaranJurnalController::class, 'store'])->name('luaran_jurnal.store');
-        Route::get('luaran_jurnal//detail/{luaran_jurnal}', [LuaranJurnalController::class, 'showRoleUppm'])->name('luaran_jurnal.show');
-        Route::get('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'editRoleUppm'])->name('luaran_jurnal.edit');
+        Route::get('luaran_jurnal//detail/{luaran_jurnal}', [LuaranJurnalController::class, 'show'])->name('luaran_jurnal.show');
+        Route::get('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'edit'])->name('luaran_jurnal.edit');
         Route::put('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'update'])->name('luaran_jurnal.update');
         Route::delete('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'destroy'])->name('luaran_jurnal.destroy');
 
         Route::get('luaran_buku', [LuaranBukuController::class, 'indexUppm'])->name('luaran_buku.index');
-        Route::get('luaran_buku/create', [LuaranBukuController::class, 'createRoleUppm'])->name('luaran_buku.create');
+        Route::get('luaran_buku/create', [LuaranBukuController::class, 'create'])->name('luaran_buku.create');
         Route::post('luaran_buku/create', [LuaranBukuController::class, 'store'])->name('luaran_buku.store');
-        Route::get('luaran_buku//detail/{luaran_buku}', [LuaranBukuController::class, 'showRoleUppm'])->name('luaran_buku.show');
-        Route::get('luaran_buku/{luaran_buku}', [LuaranBukuController::class, 'editRoleUppm'])->name('luaran_buku.edit');
+        Route::get('luaran_buku//detail/{luaran_buku}', [LuaranBukuController::class, 'show'])->name('luaran_buku.show');
+        Route::get('luaran_buku/{luaran_buku}', [LuaranBukuController::class, 'edit'])->name('luaran_buku.edit');
         Route::put('luaran_buku/{luaran_buku}', [LuaranBukuController::class, 'update'])->name('luaran_buku.update');
         Route::delete('luaran_buku/{luaran_buku}', [LuaranBukuController::class, 'destroy'])->name('luaran_buku.destroy');
     });

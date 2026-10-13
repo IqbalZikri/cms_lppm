@@ -48,12 +48,13 @@ class LuaranProsidingController extends Controller
         ]);
     }
 
-    public function indexDosen(Request $request)
+    public function indexRoleDosen(Request $request)
     {
         $dosen = Dosen::where('user_id', auth()->user()->id)->with('penulis', 'fakultas')->first();
-        $data = LuaranProsiding::whereHas('penulis', function ($query) use ($dosen) {
-            $query->where('dosen_id', $dosen->id);
-        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10);
+        $data = LuaranProsiding::where(function ($q) use ($dosen) {
+            $q->where('user_id', $dosen->user_id)
+                ->orWhereHas('penulis', fn($p) => $p->where('dosen_id', $dosen->user_id));
+        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen', 'penulisLuar')->latest()->paginate(10);
         return Inertia::render('dosen/luaran-prosiding/index', [
             'data' => $data,
             'filters' => $request->only("search"),
@@ -62,9 +63,11 @@ class LuaranProsidingController extends Controller
 
     public function indexRoleUppm(Request $request)
     {
-        $data = LuaranProsiding::whereHas('penulis', function ($query) {
-            $query->where('fakultas_id', auth()->user()->fakultas_id);
-        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10)->withQueryString();
+        $user = auth()->user();
+        $data = LuaranProsiding::where(function ($q) use ($user) {
+            $q->where('user_id', $user->id)
+                ->orWhereHas('penulis', fn($p) => $p->where('fakultas_id', $user->fakultas_id));
+        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen', 'penulisLuar')->latest()->paginate(10)->withQueryString();
         return Inertia::render('uppm/luaran-prosiding/index', [
             'data' => $data,
             'filters' => $request->only("search"),

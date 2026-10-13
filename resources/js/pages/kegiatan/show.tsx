@@ -35,7 +35,7 @@ function formatRupiah(value: string | number) {
     }).format(number);
 }
 
-type PenulisRow =
+export type PenulisRow =
     | {
           tipe: "internal";
           urutan: number;

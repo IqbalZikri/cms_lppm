@@ -51,6 +51,10 @@ class HkiController extends Controller
             'abstrak' => ['nullable', 'string'],
             'semester' => ['nullable', 'in:Ganjil,Genap'],
             'tahun' => ['nullable', 'integer'],
+            'nomer_pengajuan_haki' => ['nullable', 'integer'],
+            'nomer_paten' => ['nullable', 'integer'],
+            'jumlah_dana' => ['nullable', 'integer'],
+            'sumber_dana' => ['nullable', 'in:internal, eksternal'],
             'link_berkas' => ['nullable', 'url'],
             'authors' => ['nullable', 'array'],
         ];

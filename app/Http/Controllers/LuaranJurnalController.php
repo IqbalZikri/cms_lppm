@@ -46,23 +46,26 @@ class LuaranJurnalController extends Controller
         ]);
     }
 
-    public function indexDosen(Request $request)
+    public function indexRoleDosen(Request $request)
     {
         $dosen = Dosen::where('user_id', auth()->user()->id)->with('penulis', 'fakultas')->first();
-        $data = LuaranJurnal::whereHas('penulis', function ($query) use ($dosen) {
-            $query->where('dosen_id', $dosen->id);
-        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10);
+        $data = LuaranJurnal::where(function ($q) use ($dosen) {
+            $q->where('user_id', $dosen->user_id)
+                ->orWhereHas('penulis', fn($p) => $p->where('dosen_id', $dosen->user_id));
+        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen', 'penulisLuar')->latest()->paginate(10);
         return Inertia::render('dosen/luaran-jurnal/index', [
             'data' => $data,
             'filters' => $request->only("search"),
         ]);
     }
 
-    public function indexUppm(Request $request)
+    public function indexRoleUppm(Request $request)
     {
-        $data = LuaranJurnal::whereHas('penulis', function ($query) {
-            $query->where('fakultas_id', auth()->user()->fakultas_id);
-        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10)->withQueryString();
+        $user = auth()->user();
+        $data = LuaranJurnal::where(function ($q) use ($user) {
+            $q->where('user_id', $user->id)
+                ->orWhereHas('penulis', fn($p) => $p->where('fakultas_id', $user->fakultas_id));
+        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen', 'penulisLuar')->latest()->paginate(10);
         return Inertia::render('uppm/luaran-jurnal/index', [
             'data' => $data,
             'filters' => $request->only("search"),
@@ -76,7 +79,29 @@ class LuaranJurnalController extends Controller
     {
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
         $role = auth()->user()->role;
-        return Inertia::render('luaran-jurnal/create', [
+
+        switch ($role) {
+            case 'admin':
+                return Inertia::render('luaran-jurnal/create', [
+                    'fakultas' => $fakultas,
+                    'role' => $role,
+                ]);
+                break;
+
+            default:
+                return Inertia::render('uppm/luaran-jurnal/create', [
+                    'fakultas' => $fakultas,
+                    'role' => $role,
+                ]);
+                break;
+        }
+    }
+
+    public function createRoleDosen()
+    {
+        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
+        $role = auth()->user()->role;
+        return Inertia::render('dosen/luaran-jurnal/create', [
             'fakultas' => $fakultas,
             'role' => $role,
         ]);
@@ -159,10 +184,28 @@ class LuaranJurnalController extends Controller
     public function show(LuaranJurnal $luaranJurnal)
     {
         $luaranJurnal->load('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
-        return Inertia::render('luaran-jurnal/show', [
-            'data' => $luaranJurnal,
-            'role' => auth()->user()->role,
-        ]);
+        $role = auth()->user()->role;
+        switch ($role) {
+            case 'admin':
+                return Inertia::render('luaran-jurnal/show', [
+                    'data' => $luaranJurnal,
+                    'role' => auth()->user()->role,
+                ]);
+                break;
+
+            case 'dosen':
+                return Inertia::render('dosen/luaran-jurnal/show', [
+                    'data' => $luaranJurnal,
+                    'role' => auth()->user()->role,
+                ]);
+
+            default:
+                return Inertia::render('uppm/luaran-jurnal/show', [
+                    'data' => $luaranJurnal,
+                    'role' => auth()->user()->role,
+                ]);
+                break;
+        }
     }
 
     /**
@@ -172,7 +215,32 @@ class LuaranJurnalController extends Controller
     {
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
         $luaranJurnal->load('penulis', 'penulisLuar');
-        return Inertia::render('luaran-jurnal/edit', [
+        $role = auth()->user();
+
+        switch ($role) {
+            case 'admin':
+                return Inertia::render('luaran-jurnal/edit', [
+                    'fakultas' => $fakultas,
+                    'data' => $luaranJurnal,
+                    'role' => auth()->user()->role
+                ]);
+                break;
+
+            default:
+                return Inertia::render('uppm/luaran-jurnal/edit', [
+                    'fakultas' => $fakultas,
+                    'data' => $luaranJurnal,
+                    'role' => auth()->user()->role
+                ]);
+                break;
+        }
+    }
+
+    public function editRoleDosen(LuaranJurnal $luaranJurnal)
+    {
+        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
+        $luaranJurnal->load('penulis', 'penulisLuar');
+        return Inertia::render('dosen/luaran-jurnal/edit', [
             'fakultas' => $fakultas,
             'data' => $luaranJurnal,
             'role' => auth()->user()->role

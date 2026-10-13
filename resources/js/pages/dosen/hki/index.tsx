@@ -145,7 +145,7 @@ export default function Hki({ data, filters }: Props) {
                                                     key={i}
                                                     className="flex flex-wrap items-center gap-1.5"
                                                 >
-                                                    <Badge className="whitespace-nowrap text-[13px]">
+                                                    <Badge className="whitespace-nowrap">
                                                         {
                                                             penulis.fakultas
                                                                 .nama_fakultas
@@ -167,7 +167,7 @@ export default function Hki({ data, filters }: Props) {
                                                     key={i}
                                                     className="flex flex-wrap items-center gap-1.5"
                                                 >
-                                                    <Badge className="whitespace-nowrap text-[13px]">
+                                                    <Badge className="whitespace-nowrap">
                                                         {
                                                             penulis.dosen
                                                                 .nama_dosen
@@ -193,7 +193,7 @@ export default function Hki({ data, filters }: Props) {
                                                                 className="flex flex-wrap items-center gap-1.5"
                                                             >
                                                                 <Badge
-                                                                    className="whitespace-nowrap text-[13px]"
+                                                                    className="whitespace-nowrap"
                                                                     variant={
                                                                         "outline"
                                                                     }
@@ -202,7 +202,7 @@ export default function Hki({ data, filters }: Props) {
                                                                         penulis.nama_universitas
                                                                     }
                                                                 </Badge>
-                                                                <Badge className="whitespace-nowrap text-[13px]">
+                                                                <Badge className="whitespace-nowrap">
                                                                     {
                                                                         penulis.nama_dosen
                                                                     }

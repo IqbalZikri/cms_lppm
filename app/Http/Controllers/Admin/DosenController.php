@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Imports\DosenImport;
 use App\Models\Dosen;
 use App\Models\Fakultas;
 use App\Models\Prodi;
@@ -11,7 +12,10 @@ use DB;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Log;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\ValidationException;
 use Storage;
+use Throwable;
 
 class DosenController extends Controller
 {
@@ -273,5 +277,39 @@ class DosenController extends Controller
     {
         $dosen = Dosen::where('fakultas_id', $id)->get();
         return response()->json($dosen);
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:5120'],
+        ], [
+            'file.required' => 'Pilih file Excel terlebih dahulu',
+            'file.mimes' => 'File harus berformat xlsx, xls, atau csv',
+            'file.max' => 'Ukuran file maksimal 5 MB',
+        ]);
+
+        try {
+            Excel::import(new DosenImport, $request->file('file'));
+        } catch (ValidationException $e) {
+            $errors = collect($e->failures())
+                ->map(fn($f) => "Baris {$f->row()}: " . implode(', ', $f->errors()))
+                ->values();
+
+            $sisa = $errors->count() - 20;
+            $errors = $errors->take(20);
+
+            if ($sisa > 0) {
+                $errors->push("... dan {$sisa} kesalahan lainnya");
+            }
+
+            return back()->with('import_errors', $errors->all());
+        } catch (Throwable $e) {
+            report($e);
+
+            return back()->with('error', 'Import gagal. Tidak ada data yang diproses sepenuhnya, silakan periksa file dan coba lagi.');
+        }
+
+        return back()->with('success', 'Data dosen berhasil diimport');
     }
 }

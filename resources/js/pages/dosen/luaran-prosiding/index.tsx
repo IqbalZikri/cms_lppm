@@ -69,7 +69,7 @@ export default function LuaranProsiding({ data, filters }: Props) {
                             <div>
                                 <CardTitle>Daftar Luaran Prosiding</CardTitle>
 
-                                <p className="text-muted-foreground mt-1 text-sm">
+                                <p className="text-muted-foreground mt-1">
                                     Informasi luaran prosiding yang terdaftar
                                     dalam sistem.
                                 </p>
@@ -125,7 +125,7 @@ export default function LuaranProsiding({ data, filters }: Props) {
                                                     key={i}
                                                     className="flex flex-wrap items-center gap-1.5"
                                                 >
-                                                    <Badge className="whitespace-nowrap text-[13px]">
+                                                    <Badge className="whitespace-nowrap">
                                                         {
                                                             penulis.fakultas
                                                                 .nama_fakultas
@@ -147,7 +147,7 @@ export default function LuaranProsiding({ data, filters }: Props) {
                                                     key={i}
                                                     className="flex flex-wrap items-center gap-1.5"
                                                 >
-                                                    <Badge className="whitespace-nowrap text-[13px]">
+                                                    <Badge className="whitespace-nowrap">
                                                         {
                                                             penulis.dosen
                                                                 .nama_dosen
@@ -159,11 +159,50 @@ export default function LuaranProsiding({ data, filters }: Props) {
                                     ),
                                 },
                                 {
+                                    id: "penulis_luar",
+                                    key: "penulis_luar",
+                                    label: "Penulis Luar Universitas",
+                                    render: (_, item) => (
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {item.penulis_luar.length !== 0 ? (
+                                                <>
+                                                    {item.penulis_luar.map(
+                                                        (penulis, i) => (
+                                                            <div
+                                                                key={i}
+                                                                className="flex flex-wrap items-center gap-1.5"
+                                                            >
+                                                                <Badge
+                                                                    className="whitespace-nowrap"
+                                                                    variant={
+                                                                        "outline"
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        penulis.nama_universitas
+                                                                    }
+                                                                </Badge>
+                                                                <Badge className="whitespace-nowrap">
+                                                                    {
+                                                                        penulis.nama_dosen
+                                                                    }
+                                                                </Badge>
+                                                            </div>
+                                                        ),
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <>-</>
+                                            )}
+                                        </div>
+                                    ),
+                                },
+                                {
                                     id: "periode",
                                     key: "semester",
                                     label: "Periode",
                                     render: (_, item) => (
-                                        <span className="whitespace-nowrap text-sm">
+                                        <span className="whitespace-nowrap">
                                             {item.semester} {item.tahun}
                                         </span>
                                     ),
@@ -177,7 +216,7 @@ export default function LuaranProsiding({ data, filters }: Props) {
                                             href={item.link_berkas}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-primary inline-flex items-center gap-1.5 text-sm hover:underline"
+                                            className="text-primary inline-flex items-center gap-1.5 hover:underline"
                                         >
                                             <FileText className="h-3.5 w-3.5" />
                                             Lihat

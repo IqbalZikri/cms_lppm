@@ -197,7 +197,7 @@ export default function Show({ data, role }: Props) {
                                                 </TableCell>
                                                 <TableCell>{p.asal}</TableCell>
                                                 <TableCell>
-                                                    <span className="rounded-full border px-2 py-0.5 text-xs text-muted-foreground">
+                                                    <span className="rounded-full border px-2 py-0.5 text-muted-foreground">
                                                         {p.tipe === "internal"
                                                             ? "Internal"
                                                             : "Luar Universitas"}

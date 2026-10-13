@@ -19,23 +19,27 @@ import {
 } from "@/components/ui/table";
 import { ArrowLeft, FileText, Pencil } from "lucide-react";
 import { LuaranProsiding } from "@/interface/luaran-prosiding";
+import { PenulisRow } from "@/pages/kegiatan/show";
 
 interface Props {
     data: LuaranProsiding;
 }
 
-function formatRupiah(value: string | number) {
-    const number = Number(value);
-    if (Number.isNaN(number)) return "-";
-    return new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-    }).format(number);
-}
-
-export default function Show({ data }: Props) {
-    const penulis = data.penulis ?? [];
+export default function Show({ data}: Props) {
+    const daftarPenulis: PenulisRow[] = [
+        ...(data.penulis ?? []).map((p) => ({
+            tipe: "internal" as const,
+            urutan: p.urutan,
+            nama_dosen: p.dosen?.nama_dosen ?? "-",
+            asal: p.fakultas?.nama_fakultas ?? "-",
+        })),
+        ...(data.penulis_luar ?? []).map((p) => ({
+            tipe: "luar" as const,
+            urutan: p.urutan,
+            nama_dosen: p.nama_dosen ?? "-",
+            asal: p.nama_universitas ?? "-",
+        })),
+    ].sort((a, b) => a.urutan - b.urutan);
 
     return (
         <>
@@ -65,9 +69,7 @@ export default function Show({ data }: Props) {
 
                 <Card className="w-full">
                     <CardHeader>
-                        <CardTitle className="text-xl">
-                            {data.judul}
-                        </CardTitle>
+                        <CardTitle className="text-xl">{data.judul}</CardTitle>
                         <CardDescription>
                             Detail Luaran Prosiding
                         </CardDescription>
@@ -117,13 +119,12 @@ export default function Show({ data }: Props) {
                             </Link>
                         </div>
 
-                        {/* Daftar penulis */}
-                        <div>
+                          <div>
                             <p className="text-muted-foreground mb-2 text-sm">
                                 Penulis
                             </p>
 
-                            {penulis.length === 0 ? (
+                            {daftarPenulis.length === 0 ? (
                                 <p className="text-muted-foreground text-sm">
                                     Belum ada data penulis.
                                 </p>
@@ -135,23 +136,30 @@ export default function Show({ data }: Props) {
                                                 No.
                                             </TableHead>
                                             <TableHead>Nama Dosen</TableHead>
-                                            <TableHead>Fakultas</TableHead>
+                                            <TableHead>
+                                                Fakultas / Universitas
+                                            </TableHead>
+                                            <TableHead>Keterangan</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {penulis.map((p, index) => (
+                                        {daftarPenulis.map((p, index) => (
                                             <TableRow
-                                                key={`${p.dosen_id}-${index}`}
+                                                key={`${p.tipe}-${p.urutan}-${index}`}
                                             >
                                                 <TableCell>
                                                     {index + 1}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {p.dosen.nama_dosen ?? "-"}
+                                                    {p.nama_dosen}
                                                 </TableCell>
+                                                <TableCell>{p.asal}</TableCell>
                                                 <TableCell>
-                                                    {p.fakultas.nama_fakultas ??
-                                                        "-"}
+                                                    <span className="rounded-full border px-2 py-0.5 text-muted-foreground">
+                                                        {p.tipe === "internal"
+                                                            ? "Internal"
+                                                            : "Luar Universitas"}
+                                                    </span>
                                                 </TableCell>
                                             </TableRow>
                                         ))}

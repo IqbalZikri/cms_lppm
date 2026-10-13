@@ -40,8 +40,6 @@ class LuaranBukuController extends Controller
             'count' => $counts[$f->id] ?? 0
         ]);
 
-        Log::info($totalLuaranBukuPerFakultas);
-
         return Inertia::render('admin/luaran-buku/index', [
             "data" => $data,
             "fakultas" => $fakultas,
@@ -54,9 +52,11 @@ class LuaranBukuController extends Controller
 
     public function indexUppm(Request $request)
     {
-        $data = LuaranBuku::whereHas('penulis', function ($query) {
-            $query->where("penulis", auth()->user()->fakultas_id);
-        })->search($request->query("search"))->with("penulis.fakultas", "penulis.dosen")->latest()->paginate(10)->withQueryString();
+        $user = auth()->user();
+        $data = LuaranBuku::where(function ($q) use ($user) {
+            $q->where('user_id', $user->id)
+                ->orWhereHas('penulis', fn($p) => $p->where('fakultas_id', $user->fakultas_id));
+        })->with("penulis.fakultas", "penulis.dosen", 'penulisLuar')->search($request->query("search"))->latest()->paginate(10)->withQueryString();
 
         return Inertia::render('uppm/luaran-buku/index', [
             "data" => $data,
@@ -64,12 +64,13 @@ class LuaranBukuController extends Controller
         ]);
     }
 
-    public function indexDosen(Request $request)
+    public function indexRoleDosen(Request $request)
     {
         $dosen = Dosen::where("user_id", auth()->user()->id)->first();
-        $data = LuaranBuku::whereHas("penulis", function ($query) use ($dosen) {
-            $query->where("dosen_id", $dosen->id);
-        })->with("penulis.fakultas", "penulis.dosen")->search($request->query("search"))->latest()->paginate(10)->withQueryString();
+        $data = LuaranBuku::where(function ($q) use ($dosen) {
+            $q->where('user_id', $dosen->user_id)
+                ->orWhereHas('penulis', fn($p) => $p->where('dosen_id', $dosen->user_id));
+        })->with("penulis.fakultas", "penulis.dosen", 'penulisLuar')->search($request->query("search"))->latest()->paginate(10)->withQueryString();
 
         return Inertia::render("dosen/luaran-buku/index", [
             "data" => $data,
@@ -82,11 +83,27 @@ class LuaranBukuController extends Controller
         $fakultas = Fakultas::select("id", "nama_fakultas")->get();
         $role = auth()->user()->role;
 
-        return Inertia::render("luaran-buku/create", [
-            "fakultas" => $fakultas,
-            "role" => $role
-        ]);
+        switch ($role) {
+            case 'admin':
+                return Inertia::render("luaran-buku/create", [
+                    "fakultas" => $fakultas,
+                    "role" => $role
+                ]);
+                break;
 
+            case 'dosen':
+                return Inertia::render("dosen/luaran-buku/create", [
+                    "fakultas" => $fakultas,
+                    "role" => $role
+                ]);
+                break;
+            default:
+                return Inertia::render("uppm/luaran-buku/create", [
+                    "fakultas" => $fakultas,
+                    "role" => $role
+                ]);
+                break;
+        }
     }
 
     /**
@@ -163,10 +180,30 @@ class LuaranBukuController extends Controller
     {
         $role = auth()->user()->role;
         $luaranBuku->load("penulis.fakultas", "penulis.dosen", "penulisLuar");
-        return Inertia::render("luaran-buku/show", [
-            "role" => $role,
-            "data" => $luaranBuku,
-        ]);
+
+        switch ($role) {
+            case 'admin':
+                return Inertia::render("luaran-buku/show", [
+                    "role" => $role,
+                    "data" => $luaranBuku,
+                ]);
+                break;
+
+            case 'dosen':
+                return Inertia::render("dosen/luaran-buku/show", [
+                    "role" => $role,
+                    "data" => $luaranBuku,
+                ]);
+                break;
+
+            default:
+                return Inertia::render("uppm/luaran-buku/show", [
+                    "role" => $role,
+                    "data" => $luaranBuku,
+                ]);
+                break;
+        }
+
     }
 
     /**
@@ -177,11 +214,32 @@ class LuaranBukuController extends Controller
         $luaranBuku->load("penulis.fakultas", "penulis.dosen", "penulisLuar");
         $role = auth()->user()->role;
         $fakultas = Fakultas::select("id", "nama_fakultas")->get();
-        return Inertia::render("luaran-buku/edit", [
-            "data" => $luaranBuku,
-            "role" => $role,
-            "fakultas" => $fakultas
-        ]);
+
+        switch ($role) {
+            case 'admin':
+                return Inertia::render("luaran-buku/edit", [
+                    "data" => $luaranBuku,
+                    "role" => $role,
+                    "fakultas" => $fakultas
+                ]);
+                break;
+
+            case 'dosen':
+                return Inertia::render("dosen/luaran-buku/edit", [
+                    "data" => $luaranBuku,
+                    "role" => $role,
+                    "fakultas" => $fakultas
+                ]);
+                break;
+
+            default:
+                return Inertia::render("uppm/luaran-buku/edit", [
+                    "data" => $luaranBuku,
+                    "role" => $role,
+                    "fakultas" => $fakultas
+                ]);
+                break;
+        }
     }
 
     /**

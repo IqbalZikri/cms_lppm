@@ -28,25 +28,15 @@ interface Props {
     fakultas: Fakultas[];
     filters: {
         search?: string;
-        cari_fakultas?: string;
     };
-    totalLuaranBukuPerFakultas: string[];
     totalLuaranBuku: number;
 }
 
-export default function LuaranBuku({
-    data,
-    fakultas,
-    filters,
-    totalLuaranBukuPerFakultas,
-}: Props) {
+export default function LuaranBuku({ data, filters }: Props) {
     const [search, setSearch] = useState(filters.search ?? "");
-    const [fakultasId, setFakultasId] = useState(filters.cari_fakultas ?? "");
 
     useEffect(() => {
-        const sama =
-            search === (filters.search ?? "") &&
-            fakultasId === (filters.cari_fakultas ?? "");
+        const sama = search === (filters.search ?? "");
 
         // tidak ada perubahan, jangan request (ini yang menjaga page tetap)
         if (sama) return;
@@ -56,7 +46,6 @@ export default function LuaranBuku({
                 route("uppm.luaran_buku.index"),
                 {
                     ...(search && { search }),
-                    ...(fakultasId && { cari_fakultas: fakultasId }),
                 },
                 {
                     preserveState: true,
@@ -67,7 +56,7 @@ export default function LuaranBuku({
         }, 300);
 
         return () => clearTimeout(timeout);
-    }, [search, fakultasId]);
+    }, [search]);
 
     return (
         <>
@@ -101,32 +90,6 @@ export default function LuaranBuku({
                         </div>
 
                         <div className="grid gap-3 items-center lg:block xl:flex">
-                            <Select
-                                value={fakultasId || "all"}
-                                onValueChange={(value) =>
-                                    setFakultasId(value === "all" ? "" : value)
-                                }
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Cari Fakultas..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectItem value="all">
-                                            Semua Fakultas
-                                        </SelectItem>
-                                        {fakultas.map((item) => (
-                                            <SelectItem
-                                                key={item.id}
-                                                value={String(item.id)}
-                                            >
-                                                {item.nama_fakultas}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-
                             <Field orientation="horizontal">
                                 <Input
                                     type="search"
@@ -176,7 +139,7 @@ export default function LuaranBuku({
                                                     key={i}
                                                     className="flex flex-wrap items-center gap-1.5"
                                                 >
-                                                    <Badge className="whitespace-nowrap text-[13px]">
+                                                    <Badge className="whitespace-nowrap">
                                                         {
                                                             penulis.fakultas
                                                                 .nama_fakultas
@@ -198,7 +161,7 @@ export default function LuaranBuku({
                                                     key={i}
                                                     className="flex flex-wrap items-center gap-1.5"
                                                 >
-                                                    <Badge className="whitespace-nowrap text-[13px]">
+                                                    <Badge className="whitespace-nowrap">
                                                         {
                                                             penulis.dosen
                                                                 .nama_dosen
@@ -206,6 +169,45 @@ export default function LuaranBuku({
                                                     </Badge>
                                                 </div>
                                             ))}
+                                        </div>
+                                    ),
+                                },
+                                {
+                                    id: "penulis_luar",
+                                    key: "penulis_luar",
+                                    label: "Penulis Luar Universitas",
+                                    render: (_, item) => (
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {item.penulis_luar.length !== 0 ? (
+                                                <>
+                                                    {item.penulis_luar.map(
+                                                        (penulis, i) => (
+                                                            <div
+                                                                key={i}
+                                                                className="flex flex-wrap items-center gap-1.5"
+                                                            >
+                                                                <Badge
+                                                                    className="whitespace-nowrap"
+                                                                    variant={
+                                                                        "outline"
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        penulis.nama_universitas
+                                                                    }
+                                                                </Badge>
+                                                                <Badge className="whitespace-nowrap">
+                                                                    {
+                                                                        penulis.nama_dosen
+                                                                    }
+                                                                </Badge>
+                                                            </div>
+                                                        ),
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <>-</>
+                                            )}
                                         </div>
                                     ),
                                 },

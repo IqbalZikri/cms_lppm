@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,12 +12,17 @@ return new class extends Migration
     {
         Schema::create('dosens', function (Blueprint $table) {
             $table->id();
+            $table->string('sintaid');
             $table->foreignId('fakultas_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('prodi_id')->nullable()->constrained()->nullOnDelete();
             $table->string('nidn')->nullable();
             $table->string('nuptk')->nullable();
             $table->string('nama_dosen');
-            $table->string('jenis_kelamin');
+            $table->enum('pendidikan_terakhir', ["sd", "smp", "sma", "s1", "s2", "s3"]);
+            $table->enum('jabatan_fungsional', ["asisten ahli", "lektor", "lektor kepala", "guru besar"]);
+            $table->string('gelar_depan');
+            $table->string('gelar_belakang');
+            $table->enum('jenis_kelamin', ["L", "P"]);
             $table->date('tanggal_lahir');
             $table->string('tempat_lahir');
             $table->text('alamat');

@@ -41,7 +41,7 @@
         <link rel="icon" href="/favicon.svg"> --}}
         @php
             $logo = App\Models\SiteSettings::where("setting_key", "logo_url")->value("setting_value");
-            // dd($logo);
+            $namaWebsite = App\Models\SiteSettings::where("setting_key", "nama_website")->value("setting_value");
         @endphp
         <link rel="icon" href="{{ asset($logo) }}">
         {{-- <link rel="apple-touch-icon" href="/apple-touch-icon.png"> --}}
@@ -51,7 +51,7 @@
         @viteReactRefresh
         @vite(['resources/css/app.css', 'resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
         <x-inertia::head>
-            <title>{{ config('app.name', 'Laravel') }}</title>
+            <title>{{ $namaWebsite }}</title>
         </x-inertia::head>
     </head>
     <body class="font-sans antialiased">
