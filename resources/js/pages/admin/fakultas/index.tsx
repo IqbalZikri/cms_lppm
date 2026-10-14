@@ -37,7 +37,6 @@ import { PaginatedData } from "@/interface/pagination";
 
 interface Fakultas {
     id: number;
-    kode_fakultas: string;
     nama_fakultas: string;
 }
 
@@ -123,16 +122,14 @@ export default function Fakultas({ data, filters }: FakultasPageProps) {
                         </div>
 
                         <div className="grid gap-3 items-center lg:block xl:flex">
-                                <Field orientation={"horizontal"}>
-                                    <Input
-                                        type="search"
-                                        placeholder="Cari Disini..."
-                                        value={search}
-                                        onChange={(e) =>
-                                            setSearch(e.target.value)
-                                        }
-                                    />
-                                </Field>
+                            <Field orientation={"horizontal"}>
+                                <Input
+                                    type="search"
+                                    placeholder="Cari Disini..."
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                />
+                            </Field>
                             <Dialog open={open} onOpenChange={setOpen}>
                                 <DialogTrigger asChild>
                                     <Button type="button" className="w-[200px]">
@@ -156,28 +153,6 @@ export default function Fakultas({ data, filters }: FakultasPageProps) {
                                                     </DialogTitle>
                                                 </DialogHeader>
                                                 <FieldGroup>
-                                                    <Field>
-                                                        <Label htmlFor="kode_fakultas">
-                                                            Kode Fakultas{" "}
-                                                            <span className="text-destructive">
-                                                                *
-                                                            </span>
-                                                        </Label>
-                                                        <Input
-                                                            name="kode_fakultas"
-                                                            id="kode_fakultas"
-                                                            placeholder="Kode Fakultas"
-                                                            autoComplete="off"
-                                                            required
-                                                        />
-                                                        {errors.kode_fakultas && (
-                                                            <p className="text-sm text-red-500">
-                                                                {
-                                                                    errors.kode_fakultas
-                                                                }
-                                                            </p>
-                                                        )}
-                                                    </Field>
                                                     <Field>
                                                         <Label htmlFor="nama_fakultas">
                                                             Nama Fakultas{" "}
@@ -232,10 +207,6 @@ export default function Fakultas({ data, filters }: FakultasPageProps) {
                             data={data}
                             columns={[
                                 {
-                                    key: "kode_fakultas",
-                                    label: "Kode Fakultas",
-                                },
-                                {
                                     key: "nama_fakultas",
                                     label: "Nama Fakultas",
                                 },
@@ -250,11 +221,6 @@ export default function Fakultas({ data, filters }: FakultasPageProps) {
                                         )}
                                         item={item}
                                         kolomInput={[
-                                            {
-                                                name: "kode_fakultas",
-                                                label: "Kode Fakultas",
-                                                required: true,
-                                            },
                                             {
                                                 name: "nama_fakultas",
                                                 label: "Nama Fakultas",

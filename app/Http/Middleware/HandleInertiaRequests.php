@@ -46,6 +46,7 @@ class HandleInertiaRequests extends Middleware
             'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'flash' => [
                 'success' => fn() => $request->session()->get('success'),
+                'import_skipped' => fn() => $request->session()->get('import_skipped'),
                 'error' => fn() => $request->session()->get('error'),
             ],
             'site' => fn() => Cache::remember('site.settings', 3600, function () {

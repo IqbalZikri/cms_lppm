@@ -18,6 +18,7 @@ import {
     Plus,
     Venus,
     Users,
+    FileSpreadsheet,
 } from "lucide-react";
 import { route } from "ziggy-js";
 import { DialogDelete } from "@/components/dialog-form";
@@ -190,6 +191,17 @@ export default function Dosen({
                             </form>
 
                             <Link
+                                href={route("admin.dosen.pageImport")}
+                                viewTransition
+                                className="w-full sm:w-auto"
+                            >
+                                <Button className="w-full sm:w-auto" variant={"success"}>
+                                    <FileSpreadsheet />
+                                    Import
+                                </Button>
+                            </Link>
+
+                            <Link
                                 href={route("admin.dosen.create")}
                                 viewTransition
                                 className="w-full sm:w-auto"
@@ -251,7 +263,7 @@ export default function Dosen({
                                                     : "secondary"
                                             }
                                         >
-                                            {value}
+                                            {value ?? "-"}
                                         </Badge>
                                     ),
                                 },

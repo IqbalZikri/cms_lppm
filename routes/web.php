@@ -65,6 +65,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::delete('user/{id}', [UserController::class, 'destroy'])->name('user.destroy');
 
         Route::get('dosen', [DosenController::class, 'index'])->name('dosen.index');
+        Route::get('dosen/page_import', [DosenController::class, 'pageImport'])->name('dosen.pageImport');
+        Route::post('dosen/import/preview', [DosenController::class, 'preview'])->name('dosen.preview');
+        Route::post('dosen/import', [DosenController::class, 'import'])->name('dosen.import');
         Route::get('dosen/create', [DosenController::class, 'create'])->name('dosen.create');
         Route::post('dosen/create', [DosenController::class, 'store'])->name('dosen.store');
         Route::get('dosen/show/{id}', [DosenController::class, 'show'])->name('dosen.show');

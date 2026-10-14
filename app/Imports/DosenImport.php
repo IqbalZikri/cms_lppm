@@ -10,13 +10,15 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Concerns\Importable;
+use Maatwebsite\Excel\Concerns\SkipsFailures;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 
-class DosenImport implements ToCollection, WithHeadingRow, WithValidation
+class DosenImport implements ToCollection, WithHeadingRow, WithValidation, SkipsOnFailure
 {
-    use Importable;
+    use Importable, SkipsFailures;
 
     public function rules(): array
     {
@@ -29,7 +31,6 @@ class DosenImport implements ToCollection, WithHeadingRow, WithValidation
             'email' => ["required", "email"],
             'pendidikan_terakhir' => ["required"],
             'jabatan_fungsional' => ["required"],
-            'gelar_belakang' => ["required"],
         ];
     }
 
@@ -44,7 +45,6 @@ class DosenImport implements ToCollection, WithHeadingRow, WithValidation
             "email.required" => "Email tidak boleh kosong",
             "pendidikan_terakhir.required" => "Pendidikan terakhir tidak boleh kosong",
             "jabatan_fungsional.required" => "Jabatan Fungsional tidak boleh kosong",
-            "gelar_belakang.required" => "Gelar belakang tidak boleh kosong",
         ];
     }
 
