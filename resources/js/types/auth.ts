@@ -1,3 +1,4 @@
+import { Dosen } from "./dosen";
 import { Fakultas } from "./fakultas";
 
 export type User = {
@@ -13,6 +14,7 @@ export type User = {
     created_at: string;
     updated_at: string;
     [key: string]: unknown;
+    dosen?: Dosen;
 };
 
 export type Auth = {

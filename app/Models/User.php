@@ -8,10 +8,12 @@ use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Fortify\Contracts\PasskeyUser;
 use Laravel\Fortify\PasskeyAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -29,7 +31,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password', 'role', 'fakultas_id'])]
+#[Fillable(['name', 'email', 'password', 'role', 'fakultas_id', 'avatar'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements PasskeyUser, MustVerifyEmail
 {
@@ -70,5 +72,14 @@ class User extends Authenticatable implements PasskeyUser, MustVerifyEmail
     public function hki()
     {
         return $this->hasMany(Hki::class);
+    }
+
+    protected function avatar(): Attribute
+    {
+        return Attribute::make(
+            get: fn(?string $value) => $value
+                ? Storage::disk('public')->url($value)
+                : null,
+        );
     }
 }

@@ -43,6 +43,12 @@ interface Props {
     chartData: ChartPoint[];
 }
 
+function toTitleCase(text: string): string {
+    return text
+        .toLowerCase()
+        .replace(/(^|\s)\S/g, (huruf) => huruf.toUpperCase());
+}
+
 export default function Dashboard({
     dosenLogin,
     totalKegiatan,
@@ -59,14 +65,17 @@ export default function Dashboard({
     luaranBukuTerbaru,
     chartData,
 }: Props) {
-    console.log(dosenLogin);
-    
     return (
         <>
             <Head title="Dashboard Dosen" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <h1 className="font-bold text-3xl">
-                    Selamat Datang {dosenLogin.nama_dosen}
+                    Selamat Datang{" "}
+                    {dosenLogin.gelar_depan +
+                        " " +
+                        toTitleCase(dosenLogin.nama_dosen) +
+                        " " +
+                        dosenLogin.gelar_belakang}
                 </h1>
                 <StatisticsCard
                     className="lg:grid-cols-4"

@@ -1,6 +1,12 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useInitials } from '@/hooks/use-initials';
-import type { User } from '@/types';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useInitials } from "@/hooks/use-initials";
+import type { User } from "@/types";
+
+function toTitleCase(text: string): string {
+    return text
+        .toLowerCase()
+        .replace(/(^|\s)\S/g, (huruf) => huruf.toUpperCase());
+}
 
 export function UserInfo({
     user,
@@ -10,6 +16,7 @@ export function UserInfo({
     showEmail?: boolean;
 }) {
     const getInitials = useInitials();
+    
 
     return (
         <>
@@ -20,7 +27,9 @@ export function UserInfo({
                 </AvatarFallback>
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
+                <span className="truncate font-medium">
+                    {toTitleCase(user.name)}
+                </span>
                 {showEmail && (
                     <span className="text-muted-foreground truncate text-xs">
                         {user.email}

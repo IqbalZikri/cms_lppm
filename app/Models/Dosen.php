@@ -59,4 +59,6 @@ class Dosen extends Model
     {
         return $this->hasMany(Penulis::class);
     }
+
+    protected $casts = ['tanggal_lahir' => 'date'];
 }

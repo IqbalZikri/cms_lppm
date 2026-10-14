@@ -1,16 +1,16 @@
-import { Link, router } from '@inertiajs/react';
-import { LogOut, Settings } from 'lucide-react';
+import { Link, router } from "@inertiajs/react";
+import { LogOut, Settings, User2 } from "lucide-react";
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
-import { UserInfo } from '@/components/user-info';
-import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
-import { logout } from '@/routes';
-import { edit } from '@/routes/profile';
-import type { User } from '@/types';
+} from "@/components/ui/dropdown-menu";
+import { UserInfo } from "@/components/user-info";
+import { useMobileNavigation } from "@/hooks/use-mobile-navigation";
+import { logout } from "@/routes";
+import type { User } from "@/types";
+import { route } from "ziggy-js";
 
 type Props = {
     user: User;
@@ -31,18 +31,19 @@ export function UserMenuContent({ user }: Props) {
                     <UserInfo user={user} showEmail={true} />
                 </div>
             </DropdownMenuLabel>
+            <DropdownMenuSeparator />
             <DropdownMenuGroup>
-                {/* <DropdownMenuItem asChild>
+                <DropdownMenuItem asChild>
                     <Link
                         className="block w-full cursor-pointer"
-                        href={edit()}
+                        href={route("profile.edit")}
                         prefetch
                         onClick={cleanup}
                     >
-                        <Settings className="mr-2" />
-                        Settings
+                        <User2 className="mr-2" />
+                        Profile
                     </Link>
-                </DropdownMenuItem> */}
+                </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>

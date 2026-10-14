@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\LuaranBukuController;
 use App\Http\Controllers\PkmController;
 use App\Http\Controllers\PublicController;
+use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get("/", [PublicController::class, "beranda"])->name("beranda");
@@ -37,6 +38,8 @@ Route::get('get-prodi/{id}', [ProdiController::class, 'getProdi'])->name('prodi.
 
 Route::middleware('auth')->group(function () {
     Route::get('get-dosen/{id}', [DosenController::class, 'getDosen'])->name('dosen.getDosen');
+    Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('profile/{id}', [ProfileController::class, 'updateProfileDosen'])->name('dosen.profile.updateProfileDosen');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -138,7 +141,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('luaran_buku/{luaran_buku}', [LuaranBukuController::class, 'edit'])->name('luaran_buku.edit');
         Route::put('luaran_buku/{luaran_buku}', [LuaranBukuController::class, 'update'])->name('luaran_buku.update');
         Route::delete('luaran_buku/{luaran_buku}', [LuaranBukuController::class, 'destroy'])->name('luaran_buku.destroy');
-
     });
 });
 
