@@ -8,6 +8,7 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Kegiatan } from "@/interface/kegiatan";
 import { PaginatedData } from "@/interface/pagination";
+import { formatNamaDosen, toTitleCase } from "@/lib/utils";
 import { Head, Link, router } from "@inertiajs/react";
 import { Activity, FileText, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -88,6 +89,15 @@ export default function IndexKegiatan({ kegiatan, filters }: Props) {
                             </Field>
 
                             <Link
+                                href={route("dosen.kegiatan.dihapus")}
+                                viewTransition
+                            >
+                                <Button variant={"destructive"}>
+                                    Kegiatan Dihapus
+                                </Button>
+                            </Link>
+
+                            <Link
                                 href={route("dosen.kegiatan.create")}
                                 viewTransition
                             >
@@ -130,9 +140,48 @@ export default function IndexKegiatan({ kegiatan, filters }: Props) {
                                                 key={i}
                                                 className="mr-2 rounded-md px-2 py-1 text-base"
                                             >
-                                                {penulis.dosen.nama_dosen}
+                                                {formatNamaDosen(penulis.dosen)}
                                             </Badge>
                                         )),
+                                },
+                                {
+                                    id: "penulis_luar",
+                                    key: "penulis_luar",
+                                    label: "Penulis Luar Universitas",
+                                    render: (_, item) => (
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {item.penulis_luar.length !== 0 ? (
+                                                <>
+                                                    {item.penulis_luar.map(
+                                                        (penulis, i) => (
+                                                            <div
+                                                                key={i}
+                                                                className="flex flex-wrap items-center gap-1.5"
+                                                            >
+                                                                <Badge
+                                                                    className="whitespace-nowrap text-[13px]"
+                                                                    variant={
+                                                                        "outline"
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        penulis.nama_universitas
+                                                                    }
+                                                                </Badge>
+                                                                <Badge className="whitespace-nowrap text-[13px]">
+                                                                    {
+                                                                        penulis.nama_dosen
+                                                                    }
+                                                                </Badge>
+                                                            </div>
+                                                        ),
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <>-</>
+                                            )}
+                                        </div>
+                                    ),
                                 },
                                 {
                                     id: "periode",
@@ -181,10 +230,10 @@ export default function IndexKegiatan({ kegiatan, filters }: Props) {
                                         <Button variant="outline">Edit</Button>
                                     </Link>
                                     <Link
-                                        href={route(
-                                            "dosen.kegiatan.show",
-                                            item.id,
-                                        )}
+                                        href={route(`dosen.kegiatan.show`, {
+                                            kegiatan: item.id,
+                                            from: "index",
+                                        })}
                                         viewTransition
                                     >
                                         <Button variant="default">Show</Button>

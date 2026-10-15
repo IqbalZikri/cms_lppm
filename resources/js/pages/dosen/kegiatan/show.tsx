@@ -20,9 +20,11 @@ import {
 import { ArrowLeft, FileText, Pencil } from "lucide-react";
 import { Kegiatan } from "@/interface/kegiatan";
 import { PenulisRow } from "@/pages/kegiatan/show";
+import { formatTanggal } from "@/lib/format-tanggal";
 
 interface Props {
     data: Kegiatan;
+    backUrl: string;
 }
 
 function formatRupiah(value: string | number) {
@@ -35,7 +37,7 @@ function formatRupiah(value: string | number) {
     }).format(number);
 }
 
-export default function Show({ data }: Props) {
+export default function Show({ data, backUrl }: Props) {
     const daftarPenulis: PenulisRow[] = [
         ...(data.penulis ?? []).map((p) => ({
             tipe: "internal" as const,
@@ -56,22 +58,24 @@ export default function Show({ data }: Props) {
             <Head title={`Detail - ${data.judul}`} />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
-                    <Link href={route("dosen.kegiatan.index")} viewTransition>
+                    <Link href={backUrl} viewTransition>
                         <Button variant="outline" size="sm">
                             <ArrowLeft className="mr-1 h-4 w-4" />
                             Kembali
                         </Button>
                     </Link>
 
-                    <Link
-                        href={route("admin.kegiatan.edit", data.id)}
-                        viewTransition
-                    >
-                        <Button size="sm">
-                            <Pencil className="mr-1 h-4 w-4" />
-                            Edit
-                        </Button>
-                    </Link>
+                    {!data.deleted_at && (
+                        <Link
+                            href={route("admin.kegiatan.edit", data.id)}
+                            viewTransition
+                        >
+                            <Button size="sm">
+                                <Pencil className="mr-1 h-4 w-4" />
+                                Edit
+                            </Button>
+                        </Link>
+                    )}
                 </div>
 
                 <Card className="w-full">
@@ -80,7 +84,9 @@ export default function Show({ data }: Props) {
                             {data.judul}
                         </CardTitle>
                         <CardDescription>
-                            Detail kegiatan penelitian
+                            Detail kegiatan penelitian,{" "}
+                            {data.deleted_at &&
+                                `data sudah dihapus pada ${formatTanggal(data.deleted_at)}`}
                         </CardDescription>
                     </CardHeader>
 

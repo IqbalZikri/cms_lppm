@@ -16,7 +16,9 @@ class Kegiatan extends Model
         'judul',
         'tahun',
         'penulis.fakultas.nama_fakultas',
+        'penulis.dosen.gelar_depan',
         'penulis.dosen.nama_dosen',
+        'penulis.dosen.gelar_belakang',
         'penulisLuar.nama_universitas',
         'penulisLuar.nama_dosen',
     ];

@@ -6,16 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import { Kegiatan } from "@/interface/kegiatan";
 import { PaginatedData } from "@/interface/pagination";
+import { Auth, User } from "@/types";
 import { Fakultas } from "@/types/fakultas";
 import { Head, Link, router } from "@inertiajs/react";
 import { Activity, ArrowLeft, FileText } from "lucide-react";
@@ -27,50 +20,44 @@ interface Props {
     fakultas: Fakultas[];
     filters: {
         search?: string;
-        cari_fakultas: string;
     };
-    role: string;
+    auth: Auth;
 }
 
-export default function KegiatanDihapus({
-    data,
-    fakultas,
-    filters,
-    role,
-}: Props) {
+export default function KegiatanDihapus({ data, filters, auth }: Props) {
     const [search, setSearch] = useState(filters.search ?? "");
-    const [fakultasId, setFakultasId] = useState(filters.cari_fakultas ?? "");
+    console.log(data);
 
     useEffect(() => {
-    const sama =
-        search === (filters.search ?? "") &&
-        fakultasId === (filters.cari_fakultas ?? "");
+        const sama = search === (filters.search ?? "");
 
-    if (sama) return;
+        if (sama) return;
 
-    const timeout = setTimeout(() => {
-        router.get(
-            route("kegiatan.dihapus"),
-            {
-                ...(search && { search }),
-                ...(fakultasId && { cari_fakultas: fakultasId }),
-            },
-            {
-                preserveState: true,
-                preserveScroll: true,
-                replace: true,
-            },
-        );
-    }, 300);
+        const timeout = setTimeout(() => {
+            router.get(
+                route("kegiatan.dihapus"),
+                {
+                    ...(search && { search }),
+                },
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    replace: true,
+                },
+            );
+        }, 300);
 
-    return () => clearTimeout(timeout);
-}, [search, fakultasId]);
+        return () => clearTimeout(timeout);
+    }, [search]);
 
     return (
         <>
             <Head title="Kegiatan Dihapus" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <Link href={route(role + ".kegiatan.index")} viewTransition>
+                <Link
+                    href={route(auth.user.role + ".kegiatan.index")}
+                    viewTransition
+                >
                     <Button>
                         <ArrowLeft />
                         Kembali
@@ -106,32 +93,6 @@ export default function KegiatanDihapus({
                         </div>
 
                         <div className="grid gap-3 items-center lg:block xl:flex">
-                            <Select
-                                value={fakultasId || "all"}
-                                onValueChange={(value) =>
-                                    setFakultasId(value === "all" ? "" : value)
-                                }
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Cari Fakultas..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectItem value="all">
-                                            Semua Fakultas
-                                        </SelectItem>
-                                        {fakultas.map((item) => (
-                                            <SelectItem
-                                                key={item.id}
-                                                value={String(item.id)}
-                                            >
-                                                {item.nama_fakultas}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-
                             <Field orientation="horizontal">
                                 <Input
                                     type="search"
@@ -140,17 +101,6 @@ export default function KegiatanDihapus({
                                     onChange={(e) => setSearch(e.target.value)}
                                 />
                             </Field>
-
-                            {/* <Link
-                                href={route("admin.kegiatan.create")}
-                                viewTransition
-                                className=""
-                            >
-                                <Button>
-                                    <Plus />
-                                    Tambah Penelitian Kegiatan
-                                </Button>
-                            </Link> */}
                         </div>
                     </CardHeader>
                     <CardContent>
@@ -274,7 +224,7 @@ export default function KegiatanDihapus({
                             renderActions={(item) => (
                                 <>
                                     <Link
-                                        href={route("admin.kegiatan.show", {
+                                        href={route(`dosen.kegiatan.show`, {
                                             kegiatan: item.id,
                                             from: "dihapus",
                                         })}
@@ -284,14 +234,17 @@ export default function KegiatanDihapus({
                                     </Link>
                                     <DialogRestore
                                         page="Penelitian Kegiatan"
-                                        actionUrl={route("kegiatan.restore", item.id)}
+                                        actionUrl={route(
+                                            "dosen.kegiatan.restore",
+                                            item.id,
+                                        )}
                                         label={item.judul}
                                         item={item}
                                     />
                                     <DialogDelete
                                         label={item.judul}
                                         actionUrl={route(
-                                            "admin.kegiatan.forceDelete",
+                                            "dosen.kegiatan.forceDelete",
                                             item.id,
                                         )}
                                         page="Penelitian Kegiatan"

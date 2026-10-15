@@ -57,7 +57,7 @@ class KegiatanController extends Controller
         $kegiatan = Kegiatan::where(function ($q) use ($dosen) {
             $q->where('user_id', $dosen->user_id)
                 ->orWhereHas('penulis', fn($p) => $p->where('dosen_id', $dosen->user_id));
-        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen')->latest()->paginate(10);
+        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen', 'penulisLuar')->latest()->paginate(10);
         return Inertia::render('dosen/kegiatan/index', [
             'kegiatan' => $kegiatan,
             'filters' => $request->only("search")
@@ -214,15 +214,23 @@ class KegiatanController extends Controller
         ]);
     }
 
-    public function showRoleDosen(string $id)
+    public function showRoleDosen(Request $request, Kegiatan $kegiatan)
     {
-        $data = Kegiatan::findOrFail($id);
-        $data->load('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
-        $fakultas = Fakultas::get();
+        $data = $kegiatan;
+        $data->load([
+            'penulis' => fn($q) => $q->withTrashed(),
+            'penulis.dosen',
+            'penulis.fakultas',
+            'penulisLuar' => fn($q) => $q->withTrashed(),
+        ]);
+
+        $backUrl = $request->query('from') === 'dihapus'
+            ? route('dosen.kegiatan.dihapus')
+            : route('dosen.kegiatan.index');
+
         return Inertia::render('dosen/kegiatan/show', [
             'data' => $data,
-            'fakultas' => $fakultas,
-            'role' => auth()->user()->role,
+            "backUrl" => $backUrl
         ]);
     }
 
@@ -391,7 +399,7 @@ class KegiatanController extends Controller
 
         if ($request->filled('cari_fakultas')) {
             $queryKegiatan->whereHas('penulis', function ($q) use ($request) {
-                  $q->withTrashed()->where("fakultas_id", $request->cari_fakultas);
+                $q->withTrashed()->where("fakultas_id", $request->cari_fakultas);
             });
         }
 
@@ -399,11 +407,31 @@ class KegiatanController extends Controller
         $fakultas = Fakultas::select("id", "nama_fakultas")->get();
         $role = auth()->user()->role;
 
-        return Inertia::render("dihapus/kegiatan", [
+        return Inertia::render("admin/kegiatan/dihapus", [
             'data' => $data,
             "fakultas" => $fakultas,
             'filters' => $request->only("search", "cari_fakultas"),
             "role" => $role
+        ]);
+    }
+
+    public function kegiatanDihapusRoleDosen(Request $request)
+    {
+        $dosen = Dosen::where("user_id", auth()->user()->id)->first();
+
+        $data = Kegiatan::onlyTrashed()->where(function ($q) use ($dosen) {
+            $q->where('user_id', $dosen->user_id)
+                ->orWhereHas('penulis', fn($p) => $p->withTrashed()->where('dosen_id', $dosen->user_id));
+        })->with([
+                    'penulis' => fn($q) => $q->withTrashed(),
+                    'penulis.dosen',
+                    'penulis.fakultas',
+                    'penulisLuar' => fn($q) => $q->withTrashed(),
+                ])->search($request->query("search"))->latest()->paginate(10)->withQueryString();
+
+        return Inertia::render("dosen/kegiatan/dihapus", [
+            "data" => $data,
+            "filters" => $request->only("search")
         ]);
     }
 

@@ -18,10 +18,13 @@ Route::middleware(['auth', 'role:dosen'])
         Route::get('kegiatan', [KegiatanController::class, 'indexDosen'])->name('kegiatan.index');
         Route::get('kegiatan/create', [KegiatanController::class, 'createRoleDosen'])->name('kegiatan.create');
         Route::post('kegiatan/create', [KegiatanController::class, 'store'])->name('kegiatan.store');
-        Route::get('kegiatan//detail/{id}', [KegiatanController::class, 'showRoleDosen'])->name('kegiatan.show');
+        Route::get('kegiatan//detail/{kegiatan}', [KegiatanController::class, 'showRoleDosen'])->name('kegiatan.show')->withTrashed();
         Route::get('kegiatan/{id}', [KegiatanController::class, 'editRoleDosen'])->name('kegiatan.edit');
         Route::put('kegiatan/{id}', [KegiatanController::class, 'update'])->name('kegiatan.update');
         Route::delete('kegiatan/{id}', [KegiatanController::class, 'destroy'])->name('kegiatan.destroy');
+        Route::get("kegiatan/dihapus", [KegiatanController::class, "kegiatanDihapusRoleDosen"])->name("kegiatan.dihapus");
+        Route::patch("kegiatan/{id}/restore", [KegiatanController::class, "restore"])->name("kegiatan.restore");
+        Route::delete("kegiatan/{id}/force-delete", [KegiatanController::class, "forceDelete"])->name("kegiatan.forceDelete");
 
         Route::get('pkm', [PkmController::class, 'indexRoleDosen'])->name('pkm.index');
         Route::get('pkm/create', [PkmController::class, 'createRoleDosen'])->name('pkm.create');

@@ -23,6 +23,7 @@ import { LuaranBuku } from "@/interface/luaran-buku";
 import { LuaranJurnal } from "@/interface/luaran-jurnal";
 import { LuaranProsiding } from "@/interface/luaran-prosiding";
 import { Pkm } from "@/interface/pkm";
+import { toTitleCase } from "@/lib/utils";
 import { Dosen } from "@/types/dosen";
 import { Head, Link } from "@inertiajs/react";
 
@@ -41,12 +42,6 @@ interface Props {
     luaranProsidingTerbaru: LuaranProsiding[];
     luaranBukuTerbaru: LuaranBuku[];
     chartData: ChartPoint[];
-}
-
-function toTitleCase(text: string): string {
-    return text
-        .toLowerCase()
-        .replace(/(^|\s)\S/g, (huruf) => huruf.toUpperCase());
 }
 
 export default function Dashboard({
@@ -71,7 +66,7 @@ export default function Dashboard({
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <h1 className="font-bold text-3xl">
                     Selamat Datang{" "}
-                    {dosenLogin.gelar_depan +
+                    {dosenLogin.gelar_depan ?? "" +
                         " " +
                         toTitleCase(dosenLogin.nama_dosen) +
                         " " +

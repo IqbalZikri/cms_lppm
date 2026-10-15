@@ -14,7 +14,7 @@ export type Dosen = {
     nuptk: string | null;
     nama_dosen: string;
     gelar_depan?: string | null;
-    gelar_belakang?: string | null;
+    gelar_belakang: string | null;
     pendidikan_terakhir: string | null;
     jabatan_fungsional: string | null;
     jenis_kelamin: string | null;
