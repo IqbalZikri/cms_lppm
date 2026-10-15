@@ -154,6 +154,16 @@ export default function Pkm({
                             </Field>
 
                             <Link
+                                href={route("pkm.dihapus")}
+                                className="w-full sm:w-auto"
+                                viewTransition
+                            >
+                                <Button variant={"destructive"}>
+                                    PKM yang Dihapus
+                                </Button>
+                            </Link>
+
+                            <Link
                                 href={route("admin.pkm.create")}
                                 viewTransition
                                 className="w-full sm:w-auto"
@@ -275,10 +285,13 @@ export default function Pkm({
                                         </Button>
                                     </Link>
                                     <Link
-                                        href={route("admin.pkm.show", item.id)}
+                                        href={route("admin.pkm.show", {
+                                            pkm: item.id,
+                                            from: "index",
+                                        })}
                                         viewTransition
                                     >
-                                        <Button>Show</Button>
+                                        <Button variant="default">Show</Button>
                                     </Link>
                                     <DialogDelete
                                         label={item.judul}

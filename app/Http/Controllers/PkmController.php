@@ -183,14 +183,47 @@ class PkmController extends Controller
         }
     }
 
-    public function show($id)
+    public function show(Request $request, Pkm $pkm)
     {
-        $data = Pkm::findOrFail($id);
-        $data->load('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
-        return Inertia::render('pkm/show', [
-            'data' => $data,
-            'role' => auth()->user()->role,
+        $data = $pkm;
+        Log::info($data);
+        $role = auth()->user()->role;
+        $data->load([
+            'penulis' => fn($q) => $q->withTrashed(),
+            'penulis.dosen',
+            'penulis.fakultas',
+            'penulisLuar' => fn($q) => $q->withTrashed(),
         ]);
+
+        $backUrl = $request->query('from') === 'dihapus'
+            ? route('pkm.dihapus')
+            : route($role . '.pkm.index');
+
+        switch ($role) {
+            case 'dosen':
+                return Inertia::render('dosen/pkm/show', [
+                    'data' => $data,
+                    'role' => auth()->user()->role,
+                    'backUrl' => $backUrl
+                ]);
+                break;
+
+            case 'uppm':
+                return Inertia::render('dosen/pkm/show', [
+                    'data' => $data,
+                    'role' => auth()->user()->role,
+                    'backUrl' => $backUrl
+                ]);
+                break;
+
+            default:
+                return Inertia::render('pkm/show', [
+                    'data' => $data,
+                    'role' => auth()->user()->role,
+                    'backUrl' => $backUrl
+                ]);
+                break;
+        }
     }
 
     public function showRoleDosen($id)
@@ -340,6 +373,70 @@ class PkmController extends Controller
         } catch (\Throwable $th) {
             Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
             return back()->with('error', 'Terjadi Kesalahan');
+        }
+    }
+
+    public function pkmDihapus(Request $request)
+    {
+        $queryKegiatan = Pkm::onlyTrashed()->with([
+            'penulis' => fn($q) => $q->withTrashed(),
+            'penulis.dosen',
+            'penulis.fakultas',
+            'penulisLuar' => fn($q) => $q->withTrashed(),
+        ]);
+
+        if ($request->filled('cari_fakultas')) {
+            $queryKegiatan->whereHas('penulis', function ($q) use ($request) {
+                $q->withTrashed()->where("fakultas_id", $request->cari_fakultas);
+            });
+        }
+
+        $data = $queryKegiatan->clone()->search($request->query('search'))->latest()->paginate(10)->withQueryString();
+        $fakultas = Fakultas::select("id", "nama_fakultas")->get();
+        $role = auth()->user()->role;
+
+        return Inertia::render("dihapus/pkm", [
+            'data' => $data,
+            "fakultas" => $fakultas,
+            'filters' => $request->only("search", "cari_fakultas"),
+            "role" => $role
+        ]);
+    }
+
+    public function restore($id)
+    {
+        $pkm = Pkm::onlyTrashed()->findOrFail($id);
+
+        try {
+            $pkm->penulis()->restore();
+            $pkm->penulisLuar()->restore();
+            $pkm->restore();
+
+            return back()->with("success", "Berhasil restore pkm");
+        } catch (\Throwable $th) {
+            Log::info($th->getMessage());
+            return back()->with("error", "Terjadi Kesalahan");
+        }
+    }
+
+    public function forceDelete($id)
+    {
+        $pkm = Pkm::onlyTrashed()->findOrFail($id);
+
+        DB::beginTransaction();
+
+        try {
+            $pkm->penulis()->forceDelete();
+            $pkm->penulisLuar()->forceDelete();
+            $pkm->forceDelete();
+
+            DB::commit();
+
+            return back()->with("success", "Berhasil menghapus penelitian pkm");
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            Log::info($th->getMessage());
+            return back()->with("error", "Terjadi Kesalahan");
         }
     }
 }

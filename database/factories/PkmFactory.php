@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Penulis;
 use App\Models\Pkm;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -27,6 +28,7 @@ class PkmFactory extends Factory
             'sumber_dana' => fake()->randomElement(["internal", "eksternal"]),
             'jumlah_dana' => fake()->numberBetween(5, 50) * 10000000,
             'link_berkas' => fake()->url,
+            'user_id' => User::pluck("id")->random()
         ];
     }
 

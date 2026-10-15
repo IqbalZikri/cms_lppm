@@ -13,4 +13,5 @@ export interface Pkm {
     jumlah_dana: string;
     penulis: Penulis[];
     penulis_luar: PenulisLuar[];
+    deleted_at: string | null;
 }

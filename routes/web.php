@@ -44,6 +44,9 @@ Route::middleware('auth')->group(function () {
     Route::get("kegiatan/dihapus", [KegiatanController::class, "kegiatanDihapus"])->name("kegiatan.dihapus");
     Route::patch('kegiatan/{id}/restore', [KegiatanController::class, 'restore'])->name('kegiatan.restore');
 
+    Route::get("pkm/dihapus", [PkmController::class, "pkmDihapus"])->name("pkm.dihapus");
+    Route::patch('pkm/{id}/restore', [PkmController::class, 'restore'])->name('pkm.restore');
+    Route::delete('pkm/{id}/force-delete', [PkmController::class, 'forceDelete'])->name('pkm.forceDelete');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -109,7 +112,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('pkm', [PkmController::class, 'indexAdmin'])->name('pkm.index');
         Route::get('pkm/create', [PkmController::class, 'create'])->name('pkm.create');
         Route::post('pkm/create', [PkmController::class, 'store'])->name('pkm.store');
-        Route::get('pkm//detail/{id}', [PkmController::class, 'show'])->name('pkm.show');
+        Route::get('pkm//detail/{pkm}', [PkmController::class, 'show'])->name('pkm.show')->withTrashed();
         Route::get('pkm/{id}', [PkmController::class, 'edit'])->name('pkm.edit');
         Route::put('pkm/{id}', [PkmController::class, 'update'])->name('pkm.update');
         Route::delete('pkm/{id}', [PkmController::class, 'destroy'])->name('pkm.destroy');
