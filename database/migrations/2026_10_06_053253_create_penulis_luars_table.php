@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->string("nama_universitas");
             $table->string("nama_dosen");
             $table->unsignedTinyInteger('urutan')->default(1);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -154,9 +154,17 @@ export default function Kegiatan({
                             </Field>
 
                             <Link
+                                href={route("kegiatan.dihapus")}
+                                viewTransition
+                            >
+                                <Button variant={"destructive"}>
+                                    Kegiatan Dihapus
+                                </Button>
+                            </Link>
+
+                            <Link
                                 href={route("admin.kegiatan.create")}
                                 viewTransition
-                                className=""
                             >
                                 <Button>
                                     <Plus />
@@ -295,10 +303,10 @@ export default function Kegiatan({
                                         <Button variant="outline">Edit</Button>
                                     </Link>
                                     <Link
-                                        href={route(
-                                            "admin.kegiatan.show",
-                                            item.id,
-                                        )}
+                                        href={route("admin.kegiatan.show", {
+                                            kegiatan: item.id,
+                                            from: "index",
+                                        })}
                                         viewTransition
                                     >
                                         <Button variant="default">Show</Button>

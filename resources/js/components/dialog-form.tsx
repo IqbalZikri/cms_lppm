@@ -78,6 +78,13 @@ type DialogArchivedProps<T extends { id: number }> = {
     status_published: string;
 };
 
+type DialogRestoreProps<T extends { id: number }> = {
+    page: string;
+    actionUrl: string;
+    item: T;
+    label: string;
+};
+
 export default function DialogFormCreate({
     page,
     actionUrl,
@@ -700,6 +707,71 @@ export function DialogArchived<T extends { id: number }>({
                                     {processing
                                         ? "...Mengarsipkan"
                                         : "Arsipkan"}
+                                </Button>
+                            </DialogFooter>
+                        </>
+                    )}
+                </Form>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+export function DialogRestore<T extends { id: number }>({
+    page,
+    actionUrl,
+    item,
+    label,
+}: DialogRestoreProps<T>) {
+    const [statusId, setStatusId] = useState<number | null>(null);
+
+    return (
+        <Dialog
+            open={statusId === item.id}
+            onOpenChange={(isOpen) => {
+                setStatusId(isOpen ? item.id : null);
+            }}
+        >
+            <DialogTrigger asChild>
+                <Button
+                    type="submit"
+                    variant={"secondary"}
+                >
+                    Restore
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <Form
+                    action={actionUrl}
+                    method="PATCH"
+                    onSuccess={() => setStatusId(null)}
+                    resetOnSuccess
+                >
+                    {({ processing }) => (
+                        <>
+                            <DialogHeader>
+                                <DialogTitle>
+                                    Restore{" "}
+                                    {page.charAt(0).toUpperCase() +
+                                        page.slice(1)}
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Apakah anda yakin ingin merestore{" "}
+                                    {page.toLowerCase()} {label}?
+                                </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button type="button" variant={"outline"}>
+                                        Kembali
+                                    </Button>
+                                </DialogClose>
+                                <Button
+                                    type="submit"
+                                    disabled={processing}
+                                    variant={"default"}
+                                >
+                                    {processing ? "...Merestore" : "Restore"}
                                 </Button>
                             </DialogFooter>
                         </>

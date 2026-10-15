@@ -19,10 +19,12 @@ import {
 } from "@/components/ui/table";
 import { ArrowLeft, FileText, Pencil } from "lucide-react";
 import { Kegiatan } from "@/interface/kegiatan";
+import { formatTanggal } from "@/lib/format-tanggal";
 
 interface Props {
     data: Kegiatan;
     role: string;
+    backUrl: string;
 }
 
 function formatRupiah(value: string | number) {
@@ -49,7 +51,7 @@ export type PenulisRow =
           asal: string;
       };
 
-export default function Show({ data, role }: Props) {
+export default function Show({ data, role, backUrl }: Props) {
     const daftarPenulis: PenulisRow[] = [
         ...(data.penulis ?? []).map((p) => ({
             tipe: "internal" as const,
@@ -70,7 +72,7 @@ export default function Show({ data, role }: Props) {
             <Head title={`Detail - ${data.judul}`} />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
-                    <Link href={route(role + ".kegiatan.index")} viewTransition>
+                    <Link href={backUrl} viewTransition>
                         <Button variant="outline" size="sm">
                             <ArrowLeft className="mr-1 h-4 w-4" />
                             Kembali
@@ -94,7 +96,10 @@ export default function Show({ data, role }: Props) {
                             {data.judul}
                         </CardTitle>
                         <CardDescription>
-                            Detail kegiatan penelitian
+                            Detail kegiatan penelitian,{" "}
+                            {data.deleted_at &&
+                                "data ini sudah dihapus pada " +
+                                    formatTanggal(data.deleted_at)}
                         </CardDescription>
                     </CardHeader>
 

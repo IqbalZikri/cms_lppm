@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Kegiatan;
 use App\Models\Penulis;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -26,6 +27,7 @@ class KegiatanFactory extends Factory
             'link_berkas' => fake()->url(),
             'sumber_dana' => fake()->randomElement(["internal", "eksternal"]),
             'jumlah_dana' => fake()->numberBetween(5, 50) * 10000000,
+            'user_id' => User::pluck("id")->random()
         ];
     }
 

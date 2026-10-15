@@ -192,15 +192,25 @@ class KegiatanController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, Kegiatan $kegiatan)
     {
-        $data = Kegiatan::findOrFail($id);
-        $data->load('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
-        $fakultas = Fakultas::get();
+        $data = $kegiatan;
+        $data->load([
+            'penulis' => fn($q) => $q->withTrashed(),
+            'penulis.dosen',
+            'penulis.fakultas',
+            'penulisLuar' => fn($q) => $q->withTrashed(),
+        ]);
+
+        $backUrl = $request->query('from') === 'dihapus'
+            ? route('kegiatan.dihapus')
+            : route('admin.kegiatan.index');
+
+
         return Inertia::render('kegiatan/show', [
             'data' => $data,
-            'fakultas' => $fakultas,
             'role' => auth()->user()->role,
+            'backUrl' => $backUrl
         ]);
     }
 
@@ -366,6 +376,71 @@ class KegiatanController extends Controller
         } catch (\Throwable $th) {
             Log::info($th->getMessage(), $th->getTrace());
             return back()->with('error', 'Terjadi Kesalahan');
+        }
+    }
+
+
+    public function kegiatanDihapus(Request $request)
+    {
+        $queryKegiatan = Kegiatan::onlyTrashed()->with([
+            'penulis' => fn($q) => $q->withTrashed(),
+            'penulis.dosen',
+            'penulis.fakultas',
+            'penulisLuar' => fn($q) => $q->withTrashed(),
+        ]);
+
+        if ($request->filled('cari_fakultas')) {
+            $queryKegiatan->whereHas('penulis', function ($q) use ($request) {
+                  $q->withTrashed()->where("fakultas_id", $request->cari_fakultas);
+            });
+        }
+
+        $data = $queryKegiatan->clone()->search($request->query('search'))->latest()->paginate(10)->withQueryString();
+        $fakultas = Fakultas::select("id", "nama_fakultas")->get();
+        $role = auth()->user()->role;
+
+        return Inertia::render("dihapus/kegiatan", [
+            'data' => $data,
+            "fakultas" => $fakultas,
+            'filters' => $request->only("search", "cari_fakultas"),
+            "role" => $role
+        ]);
+    }
+
+    public function restore($id)
+    {
+        $kegiatan = Kegiatan::onlyTrashed()->findOrFail($id);
+
+        try {
+            $kegiatan->penulis()->restore();
+            $kegiatan->penulisLuar()->restore();
+            $kegiatan->restore();
+
+            return back()->with("success", "Berhasil restore penelitian kegiatan");
+        } catch (\Throwable $th) {
+            Log::info($th->getMessage());
+            return back()->with("error", "Terjadi Kesalahan");
+        }
+    }
+
+    public function forceDelete($id)
+    {
+        $kegiatan = Kegiatan::onlyTrashed()->findOrFail($id);
+
+        DB::beginTransaction();
+
+        try {
+            $kegiatan->penulis()->forceDelete();
+            $kegiatan->penulisLuar()->forceDelete();
+            $kegiatan->forceDelete();
+
+            DB::commit();
+
+            return back()->with("success", "Berhasil menghapus penelitian kegiatan");
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            Log::info($th->getMessage());
+            return back()->with("error", "Terjadi Kesalahan");
         }
     }
 }

@@ -40,6 +40,10 @@ Route::middleware('auth')->group(function () {
     Route::get('get-dosen/{id}', [DosenController::class, 'getDosen'])->name('dosen.getDosen');
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('profile/{id}', [ProfileController::class, 'updateProfileDosen'])->name('dosen.profile.updateProfileDosen');
+
+    Route::get("kegiatan/dihapus", [KegiatanController::class, "kegiatanDihapus"])->name("kegiatan.dihapus");
+    Route::patch('kegiatan/{id}/restore', [KegiatanController::class, 'restore'])->name('kegiatan.restore');
+
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -96,10 +100,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('kegiatan', [KegiatanController::class, 'indexAdmin'])->name('kegiatan.index');
         Route::get('kegiatan/create', [KegiatanController::class, 'create'])->name('kegiatan.create');
         Route::post('kegiatan/create', [KegiatanController::class, 'store'])->name('kegiatan.store');
-        Route::get('kegiatan//detail/{id}', [KegiatanController::class, 'show'])->name('kegiatan.show');
+        Route::get('kegiatan/show/{kegiatan}', [KegiatanController::class, 'show'])->name('kegiatan.show')->withTrashed();
         Route::get('kegiatan/{id}', [KegiatanController::class, 'edit'])->name('kegiatan.edit');
         Route::put('kegiatan/{id}', [KegiatanController::class, 'update'])->name('kegiatan.update');
         Route::delete('kegiatan/{id}', [KegiatanController::class, 'destroy'])->name('kegiatan.destroy');
+        Route::delete('kegiatan/force-delete/{id}', [KegiatanController::class, 'forceDelete'])->name('kegiatan.forceDelete');
 
         Route::get('pkm', [PkmController::class, 'indexAdmin'])->name('pkm.index');
         Route::get('pkm/create', [PkmController::class, 'create'])->name('pkm.create');
