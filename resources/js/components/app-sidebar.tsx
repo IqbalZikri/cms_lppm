@@ -114,7 +114,7 @@ const mainNavItems: NavItem[] = [
         items: [
             {
                 title: "Kegiatan",
-                href: route("admin.kegiatan.index"),
+                href: route("kegiatan.index"),
                 icon: Activity,
             },
             {

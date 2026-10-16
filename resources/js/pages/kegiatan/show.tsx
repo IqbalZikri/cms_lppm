@@ -22,8 +22,7 @@ import { Kegiatan } from "@/interface/kegiatan";
 import { formatTanggal } from "@/lib/format-tanggal";
 
 interface Props {
-    data: Kegiatan;
-    role: string;
+    kegiatan: Kegiatan;
     backUrl: string;
 }
 
@@ -51,15 +50,15 @@ export type PenulisRow =
           asal: string;
       };
 
-export default function Show({ data, role, backUrl }: Props) {
+export default function Show({ kegiatan, backUrl }: Props) {
     const daftarPenulis: PenulisRow[] = [
-        ...(data.penulis ?? []).map((p) => ({
+        ...(kegiatan.penulis ?? []).map((p) => ({
             tipe: "internal" as const,
             urutan: p.urutan,
             nama_dosen: p.dosen?.nama_dosen ?? "-",
             asal: p.fakultas?.nama_fakultas ?? "-",
         })),
-        ...(data.penulis_luar ?? []).map((p) => ({
+        ...(kegiatan.penulis_luar ?? []).map((p) => ({
             tipe: "luar" as const,
             urutan: p.urutan,
             nama_dosen: p.nama_dosen ?? "-",
@@ -69,7 +68,7 @@ export default function Show({ data, role, backUrl }: Props) {
 
     return (
         <>
-            <Head title={`Detail - ${data.judul}`} />
+            <Head title={`Detail - ${kegiatan.judul}`} />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
                     <Link href={backUrl} viewTransition>
@@ -79,27 +78,29 @@ export default function Show({ data, role, backUrl }: Props) {
                         </Button>
                     </Link>
 
-                    <Link
-                        href={route(role + ".kegiatan.edit", data.id)}
-                        viewTransition
-                    >
-                        <Button size="sm">
-                            <Pencil className="mr-1 h-4 w-4" />
-                            Edit
-                        </Button>
-                    </Link>
+                    {!kegiatan.deleted_at && (
+                        <Link
+                            href={route("kegiatan.edit", kegiatan.id)}
+                            viewTransition
+                        >
+                            <Button size="sm">
+                                <Pencil className="mr-1 h-4 w-4" />
+                                Edit
+                            </Button>
+                        </Link>
+                    )}
                 </div>
 
                 <Card className="w-full">
                     <CardHeader>
                         <CardTitle className="text-xl flex justify-between">
-                            {data.judul}
+                            {kegiatan.judul}
                         </CardTitle>
                         <CardDescription>
                             Detail kegiatan penelitian,{" "}
-                            {data.deleted_at &&
-                                "data ini sudah dihapus pada " +
-                                    formatTanggal(data.deleted_at)}
+                            {kegiatan.deleted_at &&
+                                "kegiatan ini sudah dihapus pada " +
+                                    formatTanggal(kegiatan.deleted_at)}
                         </CardDescription>
                     </CardHeader>
 
@@ -110,20 +111,22 @@ export default function Show({ data, role, backUrl }: Props) {
                                 <p className="text-muted-foreground text-sm">
                                     Semester
                                 </p>
-                                <p className="font-medium">{data.semester}</p>
+                                <p className="font-medium">
+                                    {kegiatan.semester}
+                                </p>
                             </div>
                             <div>
                                 <p className="text-muted-foreground text-sm">
                                     Tahun
                                 </p>
-                                <p className="font-medium">{data.tahun}</p>
+                                <p className="font-medium">{kegiatan.tahun}</p>
                             </div>
                             <div>
                                 <p className="text-muted-foreground text-sm">
                                     Sumber Dana
                                 </p>
                                 <Badge variant="secondary" className="mt-1">
-                                    {data.sumber_dana === "internal"
+                                    {kegiatan.sumber_dana === "internal"
                                         ? "Internal"
                                         : "Eksternal"}
                                 </Badge>
@@ -133,7 +136,7 @@ export default function Show({ data, role, backUrl }: Props) {
                                     Jumlah Dana
                                 </p>
                                 <p className="font-medium">
-                                    {formatRupiah(data.jumlah_dana)}
+                                    {formatRupiah(kegiatan.jumlah_dana)}
                                 </p>
                             </div>
                         </div>
@@ -144,7 +147,7 @@ export default function Show({ data, role, backUrl }: Props) {
                                 Abstrak
                             </p>
                             <p className="text-sm leading-relaxed">
-                                {data.abstrak}
+                                {kegiatan.abstrak}
                             </p>
                         </div>
 
@@ -154,7 +157,7 @@ export default function Show({ data, role, backUrl }: Props) {
                                 Link Berkas
                             </p>
                             <Link
-                                href={data.link_berkas}
+                                href={kegiatan.link_berkas}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-1 text-sm text-blue-600 underline"
@@ -173,7 +176,7 @@ export default function Show({ data, role, backUrl }: Props) {
 
                             {daftarPenulis.length === 0 ? (
                                 <p className="text-muted-foreground text-sm">
-                                    Belum ada data penulis.
+                                    Belum ada kegiatan penulis.
                                 </p>
                             ) : (
                                 <Table>

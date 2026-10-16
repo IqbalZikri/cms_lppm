@@ -79,22 +79,27 @@ export default function Show({ data, role, backUrl }: Props) {
                         </Button>
                     </Link>
 
-                    <Link
-                        href={route(role + ".pkm.edit", data.id)}
-                        viewTransition
-                    >
-                        <Button size="sm">
-                            <Pencil className="mr-1 h-4 w-4" />
-                            Edit
-                        </Button>
-                    </Link>
+                    {!data.deleted_at && (
+                        <Link
+                            href={route(role + ".pkm.edit", data.id)}
+                            viewTransition
+                        >
+                            <Button size="sm">
+                                <Pencil className="mr-1 h-4 w-4" />
+                                Edit
+                            </Button>
+                        </Link>
+                    )}
                 </div>
 
                 <Card className="w-full">
                     <CardHeader>
                         <CardTitle className="text-xl">{data.judul}</CardTitle>
                         <CardDescription>
-                            Detail Pengabdian Kepada Masyarakat ( PKM ), {data.deleted_at && "data sudah dihapus pada " + formatTanggal(data.deleted_at)}
+                            Detail Pengabdian Kepada Masyarakat ( PKM ),{" "}
+                            {data.deleted_at &&
+                                "data sudah dihapus pada " +
+                                    formatTanggal(data.deleted_at)}
                         </CardDescription>
                     </CardHeader>
 

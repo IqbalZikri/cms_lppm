@@ -2,8 +2,7 @@ import { Head } from "@inertiajs/react";
 import FormKegiatan from "../forms/kegiatan/form";
 import { route } from "ziggy-js";
 import { Fakultas } from "@/interface/fakultas";
-import { Dosen } from "@/types/dosen";
-import Header from "@/components/header";
+
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -14,10 +13,9 @@ import {
 
 interface Props {
     fakultas: Fakultas[];
-    role: string;
 }
 
-export default function CreateKegiatan({ fakultas, role }: Props) {
+export default function CreateKegiatan({ fakultas }: Props) {
     return (
         <>
             <Head title="Tambah Penelitian Kegiatan" />
@@ -38,7 +36,7 @@ export default function CreateKegiatan({ fakultas, role }: Props) {
                             <BreadcrumbList>
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route(role + ".kegiatan.index")}
+                                        href={route("kegiatan.index")}
                                     >
                                         Penelitian Kegiatan
                                     </BreadcrumbLink>
@@ -46,7 +44,7 @@ export default function CreateKegiatan({ fakultas, role }: Props) {
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route(role + ".kegiatan.create")}
+                                        href={route("kegiatan.create")}
                                     >
                                         Tambah Penelitian Kegiatan
                                     </BreadcrumbLink>
@@ -55,7 +53,7 @@ export default function CreateKegiatan({ fakultas, role }: Props) {
                         </Breadcrumb>
                     </div>
                 </div>
-                <FormKegiatan fakultas={fakultas} role={role}/>
+                <FormKegiatan fakultas={fakultas}/>
             </div>
         </>
     );

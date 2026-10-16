@@ -2,473 +2,197 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\Dosen;
+use App\Actions\SyncKegiatanAuthors;
+use App\Http\Requests\KegiatanRequest;
 use App\Models\Fakultas;
 use App\Models\Kegiatan;
 use App\Models\Penulis;
-use DB;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Log;
 
 class KegiatanController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function indexAdmin(Request $request)
+    use AuthorizesRequests;
+    private const PER_PAGE = 10;
+
+    public function index(Request $request)
     {
-        $queryKegiatan = Kegiatan::query()->with('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
+        $this->authorize('viewAny', Kegiatan::class);
 
-        if ($request->filled('cari_fakultas')) {
-            $queryKegiatan->whereHas('penulis', function ($q) use ($request) {
-                $q->where('fakultas_id', $request->cari_fakultas);
-            });
-        }
+        $user = $request->user();
+        $filters = $request->only('search', 'cari_fakultas');
+        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
 
-        $data = $queryKegiatan->clone()->search($request->query('search'))->latest()->paginate(10)->withQueryString();
-        $fakultas = Fakultas::select("id", "nama_fakultas")->get();
-
-        $totalKegiatan = Kegiatan::count();
-        $counts = Penulis::where('penulisable_type', Kegiatan::class)
-            ->selectRaw('fakultas_id, count(*) as total')
-            ->groupBy('fakultas_id')
-            ->pluck('total', 'fakultas_id');
-
-        $totalKegiatanPerFakultas = $fakultas->map(fn($f) => [
-            'label' => $f->nama_fakultas,
-            'count' => $counts[$f->id] ?? 0,
-        ])->values();
-
-        return Inertia::render('admin/kegiatan/index', [
-            'data' => $data,
-            'filters' => $request->only('search', 'cari_fakultas'),
-            "fakultas" => $fakultas,
-            'totalKegiatanPerFakultas' => $totalKegiatanPerFakultas,
-            'totalKegiatan' => $totalKegiatan
-        ]);
-    }
-
-    public function indexDosen(Request $request)
-    {
-        $dosen = Dosen::where('user_id', auth()->user()->id)->first();
-        $kegiatan = Kegiatan::where(function ($q) use ($dosen) {
-            $q->where('user_id', $dosen->user_id)
-                ->orWhereHas('penulis', fn($p) => $p->where('dosen_id', $dosen->user_id));
-        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen', 'penulisLuar')->latest()->paginate(10);
-        return Inertia::render('dosen/kegiatan/index', [
-            'kegiatan' => $kegiatan,
-            'filters' => $request->only("search")
-        ]);
-    }
-
-    public function indexRoleUppm(Request $request)
-    {
-        $user = auth()->user();
-
-        $data = Kegiatan::where(function ($q) use ($user) {
-            $q->where('user_id', $user->id)
-                ->orWhereHas('penulis', fn($p) => $p->where('fakultas_id', $user->fakultas_id));
-        })
-            ->search($request->query('search'))
-            ->with('penulis.fakultas', 'penulis.dosen', 'penulisLuar')
+        $kegiatan = Kegiatan::visibleTo($user)
+            ->with($this->authorRelations())
+            ->filter($filters)
             ->latest()
-            ->paginate(10)
+            ->paginate(self::PER_PAGE)
             ->withQueryString();
 
-        return Inertia::render('uppm/kegiatan/index', [
-            'kegiatan' => $data,
-            "filters" => $request->only("search")
+        return Inertia::render('kegiatan/index', [
+            'kegiatan' => $kegiatan,
+            'filters' => $filters,
+            'fakultas' => $fakultas,
+            'stats' => $user->role === 'admin' ? $this->stats($fakultas) : null,
+        ]);
+    }
+
+    public function dihapus(Request $request)
+    {
+        $this->authorize('viewTrashed', Kegiatan::class);
+
+        $filters = $request->only('search', 'cari_fakultas');
+
+        $kegiatan = Kegiatan::onlyTrashed()
+            ->visibleTo($request->user())
+            ->with($this->authorRelations(withTrashed: true))
+            ->filter($filters)
+            ->latest()
+            ->paginate(self::PER_PAGE)
+            ->withQueryString();
+
+        return Inertia::render('kegiatan/dihapus', [
+            'kegiatan' => $kegiatan,
+            'filters' => $filters,
+            'fakultas' => Fakultas::select('id', 'nama_fakultas')->get(),
         ]);
     }
 
     public function create()
     {
-        $fakultas = Fakultas::get();
-        $role = auth()->user()->role;
+        $this->authorize('create', Kegiatan::class);
+
         return Inertia::render('kegiatan/create', [
-            'fakultas' => $fakultas,
-            'role' => $role,
+            'fakultas' => Fakultas::get(),
         ]);
     }
 
-    public function createRoleDosen()
+    public function show(Kegiatan $kegiatan, Request $request)
     {
-        $fakultas = Fakultas::get();
-        $role = auth()->user()->role;
-        return Inertia::render('dosen/kegiatan/create', [
-            'fakultas' => $fakultas,
-            'role' => $role,
-        ]);
-    }
-
-    public function createRoleUppm()
-    {
-        $fakultas = Fakultas::get();
-        $role = auth()->user()->role;
-        return Inertia::render('uppm/kegiatan/create', [
-            'fakultas' => $fakultas,
-            'role' => $role,
-        ]);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'judul' => 'required',
-            'abstrak' => 'required',
-            'semester' => 'required',
-            'tahun' => 'required',
-            'link_berkas' => 'required',
-            'sumber_dana' => 'required',
-            'jumlah_dana' => 'required|numeric',
-            'authors' => 'required|array|min:1',
-            'authors.*.tipe' => 'required|in:internal,luar',
-            'authors.*.fakultas_id' => 'required_if:authors.*.tipe,internal|nullable|exists:fakultas,id',
-            'authors.*.dosen_id' => 'required_if:authors.*.tipe,internal|nullable|exists:dosens,id',
-            'authors.*.nama_universitas' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
-            'authors.*.nama_dosen' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
-        ], [
-            'judul.required' => 'Silahkan isi judul kegiatan',
-            'abstrak.required' => 'Silahkan isi abstrak',
-            'semester.required' => 'Silahkan isi semester',
-            'tahun.required' => 'Silahkan isi tahun',
-            'link_berkas.required' => 'Silahkan isi link berkas',
-            'sumber_dana.required' => 'Silahkan isi sumber dana',
-            'jumlah_dana.required' => 'Silahkan isi jumlah dana',
-            'jumlah_dana.numeric' => 'Jumlah dana harus berupa angka',
-            'authors.required' => 'Silahkan tambahkan minimal satu penulis',
-            'authors.*.fakultas_id.required_if' => 'Silahkan pilih fakultas',
-            'authors.*.dosen_id.required_if' => 'Silahkan pilih dosen',
-            'authors.*.nama_universitas.required_if' => 'Silahkan isi nama universitas',
-            'authors.*.nama_dosen.required_if' => 'Silahkan isi nama dosen',
-        ]);
-
-        DB::beginTransaction();
-
-        try {
-            $kegiatan = Kegiatan::create([
-                'judul' => $validated['judul'],
-                'abstrak' => $validated['abstrak'],
-                'semester' => $validated['semester'],
-                'tahun' => $validated['tahun'],
-                'link_berkas' => $validated['link_berkas'],
-                'sumber_dana' => $validated['sumber_dana'],
-                'jumlah_dana' => $validated['jumlah_dana'],
-                'user_id' => auth()->user()->id,
-            ]);
-
-            foreach ($validated['authors'] as $i => $author) {
-                if ($author['tipe'] === 'internal') {
-                    $kegiatan->penulis()->create([
-                        'fakultas_id' => $author['fakultas_id'],
-                        'dosen_id' => $author['dosen_id'],
-                        'urutan' => $i + 1,
-                    ]);
-                } else {
-                    $kegiatan->penulisLuar()->create([
-                        'nama_universitas' => $author['nama_universitas'],
-                        'nama_dosen' => $author['nama_dosen'],
-                        'urutan' => $i + 1,
-                    ]);
-                }
-            }
-
-            DB::commit();
-
-            return redirect()->route(auth()->user()->role . '.kegiatan.index')->with('success', 'Berhasil menambahkan penelitian kegiatan');
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
-            return back()->with('error', 'Terjadi Kesalahan');
-        }
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Request $request, Kegiatan $kegiatan)
-    {
-        $data = $kegiatan;
-        $data->load([
-            'penulis' => fn($q) => $q->withTrashed(),
-            'penulis.dosen',
-            'penulis.fakultas',
-            'penulisLuar' => fn($q) => $q->withTrashed(),
-        ]);
+        $this->authorize('view', $kegiatan);
 
         $backUrl = $request->query('from') === 'dihapus'
             ? route('kegiatan.dihapus')
-            : route('admin.kegiatan.index');
-
+            : route('kegiatan.index');
 
         return Inertia::render('kegiatan/show', [
-            'data' => $data,
-            'role' => auth()->user()->role,
+            'kegiatan' => $kegiatan->load($this->authorRelations(withTrashed: true)),
             'backUrl' => $backUrl
         ]);
     }
 
-    public function showRoleDosen(Request $request, Kegiatan $kegiatan)
+    public function edit(Kegiatan $kegiatan)
     {
-        $data = $kegiatan;
-        $data->load([
-            'penulis' => fn($q) => $q->withTrashed(),
-            'penulis.dosen',
-            'penulis.fakultas',
-            'penulisLuar' => fn($q) => $q->withTrashed(),
-        ]);
+        $this->authorize('update', $kegiatan);
 
-        $backUrl = $request->query('from') === 'dihapus'
-            ? route('dosen.kegiatan.dihapus')
-            : route('dosen.kegiatan.index');
-
-        return Inertia::render('dosen/kegiatan/show', [
-            'data' => $data,
-            "backUrl" => $backUrl
-        ]);
-    }
-
-    public function showRoleUppm(string $id)
-    {
-        $data = Kegiatan::findOrFail($id);
-        $data->load('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
-        $fakultas = Fakultas::get();
-        return Inertia::render('uppm/kegiatan/show', [
-            'data' => $data,
-            'fakultas' => $fakultas,
-            'role' => auth()->user()->role,
-        ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        $kegiatan = Kegiatan::findOrFail($id);
-        $kegiatan->load('penulis', 'penulisLuar');
-        $fakultas = Fakultas::get();
-        $dosen = Dosen::get();
         return Inertia::render('kegiatan/edit', [
-            'kegiatan' => $kegiatan,
-            'fakultas' => $fakultas,
-            'dosen' => $dosen,
-            'role' => auth()->user()->role
+            'kegiatan' => $kegiatan->load('penulis', 'penulisLuar'),
+            'fakultas' => Fakultas::get(),
         ]);
     }
 
-    public function editRoleUppm(string $id)
+    public function store(KegiatanRequest $request, SyncKegiatanAuthors $syncAuthors)
     {
-        $kegiatan = Kegiatan::findOrFail($id);
-        $kegiatan->load('penulis', 'penulisLuar');
-        $fakultas = Fakultas::get();
-        $dosen = Dosen::get();
-        return Inertia::render('uppm/kegiatan/edit', [
-            'kegiatan' => $kegiatan,
-            'fakultas' => $fakultas,
-            'dosen' => $dosen,
-            'role' => auth()->user()->role
-        ]);
-    }
-
-    public function editRoleDosen(string $id)
-    {
-        $kegiatan = Kegiatan::findOrFail($id);
-        $kegiatan->load('penulis', 'penulisLuar');
-        $fakultas = Fakultas::get();
-        $dosen = Dosen::get();
-        return Inertia::render('dosen/kegiatan/edit', [
-            'kegiatan' => $kegiatan,
-            'fakultas' => $fakultas,
-            'dosen' => $dosen,
-            'role' => auth()->user()->role
-        ]);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        $kegiatan = Kegiatan::findOrFail($id);
-
-        $validated = $request->validate([
-            'judul' => 'required',
-            'abstrak' => 'required',
-            'semester' => 'required',
-            'tahun' => 'required',
-            'link_berkas' => 'required',
-            'sumber_dana' => 'required',
-            'jumlah_dana' => 'required|numeric',
-            'authors' => 'required|array|min:1',
-            'authors.*.tipe' => 'required|in:internal,luar',
-            'authors.*.fakultas_id' => 'required_if:authors.*.tipe,internal|nullable|exists:fakultas,id',
-            'authors.*.dosen_id' => 'required_if:authors.*.tipe,internal|nullable|exists:dosens,id',
-            'authors.*.nama_universitas' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
-            'authors.*.nama_dosen' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
-        ], [
-            'judul.required' => 'Silahkan isi judul kegiatan',
-            'abstrak.required' => 'Silahkan isi abstrak',
-            'semester.required' => 'Silahkan isi semester',
-            'tahun.required' => 'Silahkan isi tahun',
-            'link_berkas.required' => 'Silahkan isi link berkas',
-            'sumber_dana.required' => 'Silahkan isi sumber dana',
-            'jumlah_dana.required' => 'Silahkan isi jumlah dana',
-            'jumlah_dana.numeric' => 'Jumlah dana harus berupa angka',
-            'authors.required' => 'Silahkan tambahkan minimal satu penulis',
-            'authors.*.fakultas_id.required_if' => 'Silahkan pilih fakultas',
-            'authors.*.dosen_id.required_if' => 'Silahkan pilih dosen',
-            'authors.*.nama_universitas.required_if' => 'Silahkan isi nama universitas',
-            'authors.*.nama_dosen.required_if' => 'Silahkan isi nama dosen',
-        ]);
-
-        DB::beginTransaction();
-
-        try {
-            $kegiatan->update([
-                'judul' => $validated['judul'],
-                'abstrak' => $validated['abstrak'],
-                'semester' => $validated['semester'],
-                'tahun' => $validated['tahun'],
-                'link_berkas' => $validated['link_berkas'],
-                'sumber_dana' => $validated['sumber_dana'],
-                'jumlah_dana' => $validated['jumlah_dana'],
+        DB::transaction(function () use ($request, $syncAuthors) {
+            $kegiatan = Kegiatan::create([
+                ...$request->safe()->except('authors'),
+                'user_id' => $request->user()->id,
             ]);
 
+            $syncAuthors->handle($kegiatan, $request->validated('authors'));
+        });
+
+        return to_route('kegiatan.index')->with('success', 'Berhasil menambahkan kegiatan');
+    }
+
+    public function update(KegiatanRequest $request, Kegiatan $kegiatan, SyncKegiatanAuthors $syncAuthors)
+    {
+        DB::transaction(function () use ($request, $kegiatan, $syncAuthors) {
+            $kegiatan->update($request->safe()->except('authors'));
+            $syncAuthors->handle($kegiatan, $request->validated('authors'));
+        });
+
+        return to_route('kegiatan.index')->with('success', 'Berhasil memperbarui kegiatan');
+    }
+
+    public function destroy(Kegiatan $kegiatan)
+    {
+        $this->authorize('delete', $kegiatan);
+
+        DB::transaction(function () use ($kegiatan) {
             $kegiatan->penulis()->delete();
             $kegiatan->penulisLuar()->delete();
+            $kegiatan->delete();
+        });
 
-            foreach ($validated['authors'] as $i => $author) {
-                if ($author['tipe'] === 'internal') {
-                    $kegiatan->penulis()->create([
-                        'fakultas_id' => $author['fakultas_id'],
-                        'dosen_id' => $author['dosen_id'],
-                        'urutan' => $i + 1,
-                    ]);
-                } else {
-                    $kegiatan->penulisLuar()->create([
-                        'nama_universitas' => $author['nama_universitas'],
-                        'nama_dosen' => $author['nama_dosen'],
-                        'urutan' => $i + 1,
-                    ]);
-                }
-            }
-
-            DB::commit();
-
-            return redirect()->route(auth()->user()->role . '.kegiatan.index')->with('success', 'Berhasil memperbarui kegiatan penelitian');
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
-            return back()->with('error', 'Terjadi Kesalahan');
-        }
+        return back()->with('success', 'Berhasil menghapus kegiatan');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function restore(Kegiatan $kegiatan)
     {
-        $data = Kegiatan::findOrFail($id);
-        try {
-            $data->penulis()->delete();
-            $data->penulisLuar()->delete();
-            $data->delete();
-            return back()->with('success', 'Berhasil menghapus kegiatan penelitian');
-        } catch (\Throwable $th) {
-            Log::info($th->getMessage(), $th->getTrace());
-            return back()->with('error', 'Terjadi Kesalahan');
-        }
-    }
+        $this->authorize('restore', $kegiatan);
 
-
-    public function kegiatanDihapus(Request $request)
-    {
-        $queryKegiatan = Kegiatan::onlyTrashed()->with([
-            'penulis' => fn($q) => $q->withTrashed(),
-            'penulis.dosen',
-            'penulis.fakultas',
-            'penulisLuar' => fn($q) => $q->withTrashed(),
-        ]);
-
-        if ($request->filled('cari_fakultas')) {
-            $queryKegiatan->whereHas('penulis', function ($q) use ($request) {
-                $q->withTrashed()->where("fakultas_id", $request->cari_fakultas);
-            });
-        }
-
-        $data = $queryKegiatan->clone()->search($request->query('search'))->latest()->paginate(10)->withQueryString();
-        $fakultas = Fakultas::select("id", "nama_fakultas")->get();
-        $role = auth()->user()->role;
-
-        return Inertia::render("admin/kegiatan/dihapus", [
-            'data' => $data,
-            "fakultas" => $fakultas,
-            'filters' => $request->only("search", "cari_fakultas"),
-            "role" => $role
-        ]);
-    }
-
-    public function kegiatanDihapusRoleDosen(Request $request)
-    {
-        $dosen = Dosen::where("user_id", auth()->user()->id)->first();
-
-        $data = Kegiatan::onlyTrashed()->where(function ($q) use ($dosen) {
-            $q->where('user_id', $dosen->user_id)
-                ->orWhereHas('penulis', fn($p) => $p->withTrashed()->where('dosen_id', $dosen->user_id));
-        })->with([
-                    'penulis' => fn($q) => $q->withTrashed(),
-                    'penulis.dosen',
-                    'penulis.fakultas',
-                    'penulisLuar' => fn($q) => $q->withTrashed(),
-                ])->search($request->query("search"))->latest()->paginate(10)->withQueryString();
-
-        return Inertia::render("dosen/kegiatan/dihapus", [
-            "data" => $data,
-            "filters" => $request->only("search")
-        ]);
-    }
-
-    public function restore($id)
-    {
-        $kegiatan = Kegiatan::onlyTrashed()->findOrFail($id);
-
-        try {
+        DB::transaction(function () use ($kegiatan) {
             $kegiatan->penulis()->restore();
             $kegiatan->penulisLuar()->restore();
             $kegiatan->restore();
+        });
 
-            return back()->with("success", "Berhasil restore penelitian kegiatan");
-        } catch (\Throwable $th) {
-            Log::info($th->getMessage());
-            return back()->with("error", "Terjadi Kesalahan");
-        }
+        return back()->with('success', 'Berhasil memulihkan kegiatan');
     }
 
-    public function forceDelete($id)
+    public function forceDelete(Kegiatan $kegiatan)
     {
-        $kegiatan = Kegiatan::onlyTrashed()->findOrFail($id);
+        $this->authorize('forceDelete', $kegiatan);
 
-        DB::beginTransaction();
-
-        try {
+        DB::transaction(function () use ($kegiatan) {
             $kegiatan->penulis()->forceDelete();
             $kegiatan->penulisLuar()->forceDelete();
             $kegiatan->forceDelete();
+        });
 
-            DB::commit();
+        return back()->with('success', 'Berhasil menghapus permanen kegiatan');
+    }
 
-            return back()->with("success", "Berhasil menghapus penelitian kegiatan");
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            Log::info($th->getMessage());
-            return back()->with("error", "Terjadi Kesalahan");
+    /**
+     * Statistik kegiatan (khusus admin).
+     */
+    private function stats(Collection $fakultas): array
+    {
+        $counts = Penulis::where('penulisable_type', Kegiatan::class)
+            ->selectRaw('fakultas_id, count(*) as total')
+            ->groupBy('fakultas_id')
+            ->pluck('total', 'fakultas_id');
+
+        return [
+            'total' => Kegiatan::count(),
+            'perFakultas' => $fakultas->map(fn($f) => [
+                'label' => $f->nama_fakultas,
+                'count' => $counts[$f->id] ?? 0,
+            ])->values(),
+        ];
+    }
+
+    /**
+     * Relasi penulis yang di-load. Untuk data terhapus, penulisnya
+     * ikut di-soft-delete sehingga harus pakai withTrashed().
+     */
+    private function authorRelations(bool $withTrashed = false): array
+    {
+        if (!$withTrashed) {
+            return ['penulis.fakultas', 'penulis.dosen', 'penulisLuar'];
         }
+
+        return [
+            'penulis' => fn($q) => $q->withTrashed(),
+            'penulis.dosen',
+            'penulis.fakultas',
+            'penulisLuar' => fn($q) => $q->withTrashed(),
+        ];
     }
 }

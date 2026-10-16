@@ -41,10 +41,24 @@ Route::middleware('auth')->group(function () {
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('profile/{id}', [ProfileController::class, 'updateProfileDosen'])->name('dosen.profile.updateProfileDosen');
 
-    Route::get("kegiatan/dihapus", [KegiatanController::class, "kegiatanDihapus"])->name("kegiatan.dihapus");
-    Route::get("dosen/kegiatan/dihapus", [KegiatanController::class, "kegiatanDihapus"])->name("dosen.kegiatan.dihapus");
-    Route::patch('kegiatan/{id}/restore', [KegiatanController::class, 'restore'])->name('kegiatan.restore');
-    Route::delete('kegiatan/force-delete/{id}', [KegiatanController::class, 'forceDelete'])->name('kegiatan.forceDelete');
+    // Route::get("kegiatan/dihapus", [KegiatanController::class, "kegiatanDihapus"])->name("kegiatan.dihapus");
+    // Route::get("dosen/kegiatan/dihapus", [KegiatanController::class, "kegiatanDihapus"])->name("dosen.kegiatan.dihapus");
+    // Route::patch('kegiatan/{id}/restore', [KegiatanController::class, 'restore'])->name('kegiatan.restore');
+    // Route::delete('kegiatan/force-delete/{id}', [KegiatanController::class, 'forceDelete'])->name('kegiatan.forceDelete');
+
+    Route::get('kegiatan/dihapus', [KegiatanController::class, 'dihapus'])
+        ->name('kegiatan.dihapus'); // harus SEBELUM resource, kalau tidak "dihapus" dianggap {kegiatan}
+
+    Route::patch('kegiatan/{kegiatan}/restore', [KegiatanController::class, 'restore'])
+        ->withTrashed()
+        ->name('kegiatan.restore');
+
+    Route::delete('kegiatan/{kegiatan}/force', [KegiatanController::class, 'forceDelete'])
+        ->withTrashed()
+        ->name('kegiatan.force-delete');
+
+    Route::resource('kegiatan', KegiatanController::class)->except('destroy')->withTrashed(['show']);
+    Route::delete('kegiatan/{kegiatan}', [KegiatanController::class, 'destroy'])->name('kegiatan.destroy');
 
     Route::get("pkm/dihapus", [PkmController::class, "pkmDihapus"])->name("pkm.dihapus");
     Route::patch('pkm/{id}/restore', [PkmController::class, 'restore'])->name('pkm.restore');

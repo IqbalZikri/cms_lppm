@@ -59,11 +59,7 @@ function RequiredMark() {
     return <span className="ml-0.5 text-red-500">*</span>;
 }
 
-export default function FormKegiatan({
-    fakultas,
-    kegiatan,
-    role,
-}: Props) {
+export default function FormKegiatan({ fakultas, kegiatan, role }: Props) {
     const isEdit = !!kegiatan;
     const [semester, setSemester] = useState(kegiatan?.semester ?? "");
     const [sumberDana, setSumberDana] = useState(kegiatan?.sumber_dana ?? "");
@@ -71,29 +67,12 @@ export default function FormKegiatan({
         kegiatan?.jumlah_dana ? String(kegiatan?.jumlah_dana) : "",
     );
 
-    const actionAdmin = isEdit
-        ? route("admin.kegiatan.update", kegiatan!.id)
-        : route("admin.kegiatan.store");
-
-    const actionDosen = isEdit
-        ? route("dosen.kegiatan.update", kegiatan!.id)
-        : route("dosen.kegiatan.store");
-
-    const actionUppm = isEdit
-        ? route("uppm.kegiatan.update", kegiatan!.id)
-        : route("uppm.kegiatan.store");
+    const action = isEdit
+        ? route("kegiatan.update", kegiatan!.id)
+        : route("kegiatan.store");
 
     return (
-        <Form
-            action={
-                role === "dosen"
-                    ? actionDosen
-                    : role === "uppm"
-                      ? actionUppm
-                      : actionAdmin
-            }
-            method={isEdit ? "put" : "post"}
-        >
+        <Form action={action} method={isEdit ? "put" : "post"}>
             {({ errors, processing }) => (
                 <Card className="w-full shadow-sm">
                     <CardContent className="grid grid-cols-1 gap-8 pt-6 lg:grid-cols-3 lg:gap-10">
@@ -407,13 +386,7 @@ export default function FormKegiatan({
 
                     <CardFooter className="flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-end">
                         <Link
-                            href={
-                                role === "dosen"
-                                    ? route("dosen.kegiatan.index")
-                                    : role === "uppm"
-                                      ? route("uppm.kegiatan.index")
-                                      : route("admin.kegiatan.index")
-                            }
+                            href={route("kegiatan.index")}
                             viewTransition
                             className="w-full sm:w-auto"
                         >
