@@ -2,14 +2,27 @@
 
 namespace App\Models;
 
+use App\Concerns\FilterFakultas;
+use App\Concerns\Visible;
 use App\Models\Concerns\Searchable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class LuaranBuku extends Model
 {
-    use Searchable, HasFactory;
+    use Searchable, HasFactory, Visible, FilterFakultas, SoftDeletes;
+
+    protected array $searchable = [
+        "judul",
+        "isbn",
+        "tahun",
+        "penulis.fakultas.nama_fakultas",
+        "penulis.dosen.nama_dosen",
+        "penulisLuar.nama_universitas",
+        "penulisLuar.nama_dosen",
+    ];
 
     protected $fillable = [
         "judul",

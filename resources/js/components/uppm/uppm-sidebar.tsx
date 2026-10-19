@@ -51,12 +51,12 @@ const mainNavItems: NavItem[] = [
         items: [
             {
                 title: "Kegiatan",
-                href: route("uppm.kegiatan.index"),
+                href: route("kegiatan.index"),
                 icon: Activity,
             },
             {
                 title: "PKM",
-                href: route("uppm.pkm.index"),
+                href: route("pkm.index"),
                 icon: HandHeart,
             },
         ],
@@ -67,17 +67,17 @@ const mainNavItems: NavItem[] = [
         items: [
             {
                 title: "Luaran Prosiding",
-                href: route("uppm.luaran_prosiding.index"),
+                href: route("luaran_prosiding.index"),
                 icon: ScrollText,
             },
             {
                 title: "Luaran Jurnal",
-                href: route("uppm.luaran_jurnal.index"),
+                href: route("luaran_jurnal.index"),
                 icon: Notebook,
             },
             {
                 title: "Luaran Buku",
-                href: route("uppm.luaran_buku.index"),
+                href: route("luaran_buku.index"),
                 icon: BookOpen,
             },
         ],

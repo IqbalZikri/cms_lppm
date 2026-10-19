@@ -1,7 +1,6 @@
 import { Penulis } from "./penulis";
 import { PenulisLuar } from "./penulis-luar";
 
-
 export interface LuaranBuku {
     id: number;
     judul: string;
@@ -10,4 +9,5 @@ export interface LuaranBuku {
     link_berkas: string;
     penulis: Penulis[];
     penulis_luar: PenulisLuar[];
+    deleted_at: Date;
 }

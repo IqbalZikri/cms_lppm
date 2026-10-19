@@ -279,7 +279,7 @@ export default function Dihapus({ data, fakultas, filters }: Props) {
 Dihapus.layout = {
     breadcrumbs: [
         {
-            title: "Pengabdian Kepada Masyarakat yang Dihapus",
+            title: "Luaran Prosiding yang Dihapus",
         },
     ],
 };

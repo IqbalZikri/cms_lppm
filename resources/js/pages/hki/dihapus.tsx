@@ -1,42 +1,55 @@
-import { DialogDelete } from "@/components/dialog-form";
+import { DialogDelete, DialogRestore } from "@/components/dialog-form";
 import Header from "@/components/header";
+import StatisticsCard from "@/components/statistic-card";
 import TablePage from "@/components/table-page";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Fakultas } from "@/interface/fakultas";
-import { LuaranBuku as LuaranBukuInterface } from "@/interface/luaran-buku";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { LuaranJurnal } from "@/interface/luaran-jurnal";
 import { PaginatedData } from "@/interface/pagination";
+import { Fakultas } from "@/types/fakultas";
 import { Head, Link, router } from "@inertiajs/react";
-import { FileText, Plus, ScrollText } from "lucide-react";
+import { ArrowLeft, FileText, HandHeart, Plus } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import { route } from "ziggy-js";
 
 interface Props {
-    data: PaginatedData<LuaranBukuInterface>;
+    data: PaginatedData<LuaranJurnal>;
     fakultas: Fakultas[];
     filters: {
         search?: string;
+        cari_fakultas?: string;
     };
-    totalLuaranBuku: number;
 }
 
-export default function LuaranBuku({ data, filters }: Props) {
+export default function Dihapus({ data, fakultas, filters }: Props) {
     const [search, setSearch] = useState(filters.search ?? "");
+    const [fakultasId, setFakultasId] = useState(filters.cari_fakultas ?? "");
 
     useEffect(() => {
-        const sama = search === (filters.search ?? "");
+        const sama =
+            search === (filters.search ?? "") &&
+            fakultasId === (filters.cari_fakultas ?? "");
 
         // tidak ada perubahan, jangan request (ini yang menjaga page tetap)
         if (sama) return;
 
         const timeout = setTimeout(() => {
             router.get(
-                route("dosen.luaran_buku.index"),
+                route("LuaranJurnal.dihapus"),
                 {
                     ...(search && { search }),
+                    ...(fakultasId && { cari_fakultas: fakultasId }),
                 },
                 {
                     preserveState: true,
@@ -47,40 +60,74 @@ export default function LuaranBuku({ data, filters }: Props) {
         }, 300);
 
         return () => clearTimeout(timeout);
-    }, [search]);
+    }, [search, fakultasId]);
 
     return (
         <>
-            <Head title="Luaran Buku" />
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 sm:p-6">
+            <Head title="HKI yang Dihapus" />
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <Link href={route("admin.hki.index")} viewTransition>
+                    <Button>
+                        <ArrowLeft />
+                        Kembali
+                    </Button>
+                </Link>
                 <Header
-                    page="Luaran Buku"
+                    page="HKI yang Dihapus"
                     breadcrumb={[
                         {
-                            label: "Luaran Buku",
-                            href: "dosen.luaran_buku.index",
+                            label: "HKI",
+                            href: "admin.hki.index",
                         },
                     ]}
                 />
 
-                <Card className="shadow-sm">
+                <Card>
                     <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-3">
                             <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-                                <ScrollText className="h-5 w-5" />
+                                <HandHeart className="h-5 w-5" />
                             </div>
 
                             <div>
-                                <CardTitle>Daftar Luaran Buku</CardTitle>
+                                <CardTitle>
+                                    Daftar HKI yang Dihapus
+                                </CardTitle>
 
                                 <p className="text-muted-foreground mt-1 text-sm">
-                                    Informasi Luaran Buku yang terdaftar dalam
+                                    Informasi HKI yang dihapus dalam
                                     sistem.
                                 </p>
                             </div>
                         </div>
 
                         <div className="grid gap-3 items-center lg:block xl:flex">
+                            <Select
+                                value={fakultasId || "all"}
+                                onValueChange={(value) =>
+                                    setFakultasId(value === "all" ? "" : value)
+                                }
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Cari Fakultas..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem value="all">
+                                            Semua Fakultas
+                                        </SelectItem>
+                                        {fakultas.map((item) => (
+                                            <SelectItem
+                                                key={item.id}
+                                                value={String(item.id)}
+                                            >
+                                                {item.nama_fakultas}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+
                             <Field orientation="horizontal">
                                 <Input
                                     type="search"
@@ -89,79 +136,40 @@ export default function LuaranBuku({ data, filters }: Props) {
                                     onChange={(e) => setSearch(e.target.value)}
                                 />
                             </Field>
-
-                            <Link
-                                href={route("dosen.luaran_buku.create")}
-                                viewTransition
-                                className="w-full sm:w-auto"
-                            >
-                                <Button className="w-full sm:w-auto">
-                                    <Plus />
-                                    Tambah Luaran Buku
-                                </Button>
-                            </Link>
                         </div>
                     </CardHeader>
-                    <CardContent className="pt-6">
-                        <TablePage<LuaranBukuInterface>
+                    <CardContent>
+                        <TablePage<LuaranJurnal>
                             data={data}
                             columns={[
                                 {
-                                    id: "judul",
                                     key: "judul",
                                     label: "Judul",
-                                    render: (_, item) => (
-                                        <span
-                                            className="line-clamp-2 max-w-xs font-medium"
-                                            title={item.judul}
-                                        >
-                                            {item.judul}
-                                        </span>
-                                    ),
                                 },
                                 {
                                     id: "fakultas",
                                     key: "penulis",
                                     label: "Fakultas",
-                                    render: (_, item) => (
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {item.penulis.map((penulis, i) => (
-                                                <div
-                                                    key={i}
-                                                    className="flex flex-wrap items-center gap-1.5"
-                                                >
-                                                    <Badge className="whitespace-nowrap">
-                                                        {
-                                                            penulis.fakultas
-                                                                .nama_fakultas
-                                                        }
-                                                    </Badge>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ),
+                                    render: (_, item) =>
+                                        item.penulis.map((penulis, i) => (
+                                            <Badge key={i} className="mr-2">
+                                                {penulis.fakultas.nama_fakultas}
+                                            </Badge>
+                                        )),
                                 },
                                 {
                                     id: "dosen",
                                     key: "penulis",
-                                    label: "Penulis",
-                                    render: (_, item) => (
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {item.penulis.map((penulis, i) => (
-                                                <div
-                                                    key={i}
-                                                    className="flex flex-wrap items-center gap-1.5"
-                                                >
-                                                    <Badge className="whitespace-nowrap">
-                                                        {
-                                                            penulis.dosen
-                                                                .nama_dosen
-                                                        }
-                                                    </Badge>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ),
+                                    label: "Dosen",
+                                    render: (_, item) =>
+                                        item.penulis.map((penulis, i) => (
+                                            <Badge
+                                                key={i}
+                                                className="mr-2 rounded-md px-2 py-1 text-xs"
+                                            >
+                                                {penulis.dosen.nama_dosen}
+                                            </Badge>
+                                        )),
                                 },
                                 {
                                     id: "penulis_luar",
@@ -178,7 +186,7 @@ export default function LuaranBuku({ data, filters }: Props) {
                                                                 className="flex flex-wrap items-center gap-1.5"
                                                             >
                                                                 <Badge
-                                                                    className="whitespace-nowrap"
+                                                                    className="whitespace-nowrap text-[13px]"
                                                                     variant={
                                                                         "outline"
                                                                     }
@@ -187,7 +195,7 @@ export default function LuaranBuku({ data, filters }: Props) {
                                                                         penulis.nama_universitas
                                                                     }
                                                                 </Badge>
-                                                                <Badge className="whitespace-nowrap">
+                                                                <Badge className="whitespace-nowrap text-[13px]">
                                                                     {
                                                                         penulis.nama_dosen
                                                                     }
@@ -200,6 +208,16 @@ export default function LuaranBuku({ data, filters }: Props) {
                                                 <>-</>
                                             )}
                                         </div>
+                                    ),
+                                },
+                                {
+                                    id: "periode",
+                                    key: "semester",
+                                    label: "Periode",
+                                    render: (_, item) => (
+                                        <span className="whitespace-nowrap text-sm">
+                                            {item.semester} {item.tahun}
+                                        </span>
                                     ),
                                 },
                                 {
@@ -220,40 +238,35 @@ export default function LuaranBuku({ data, filters }: Props) {
                                 },
                             ]}
                             renderActions={(item) => (
-                                <div className="flex items-center gap-3">
+                                <>
                                     <Link
-                                        href={route(
-                                            "dosen.luaran_buku.show",
-                                            item.id,
-                                        )}
+                                        href={route("admin.hki.show", {
+                                            hki: item.id,
+                                            from: "dihapus",
+                                        })}
                                         viewTransition
                                     >
-                                        <Button
-                                            variant="outline"
-                                            title="Lihat detail"
-                                        >
-                                            Show
-                                        </Button>
+                                        <Button variant="default">Show</Button>
                                     </Link>
-                                    <Link
-                                        href={route(
-                                            "dosen.luaran_buku.edit",
+                                    <DialogRestore
+                                        page="HKI"
+                                        actionUrl={route(
+                                            "admin.hki.restore",
                                             item.id,
                                         )}
-                                        viewTransition
-                                    >
-                                        <Button title="Edit">Edit</Button>
-                                    </Link>
+                                        label={item.judul}
+                                        item={item}
+                                    />
                                     <DialogDelete
                                         label={item.judul}
                                         actionUrl={route(
-                                            "dosen.luaran_buku.destroy",
+                                            "admin.hki.force-delete",
                                             item.id,
                                         )}
-                                        page="Luaran Buku"
+                                        page="HKI"
                                         item={item}
                                     />
-                                </div>
+                                </>
                             )}
                         />
                     </CardContent>
@@ -263,10 +276,10 @@ export default function LuaranBuku({ data, filters }: Props) {
     );
 }
 
-LuaranBuku.layout = {
+Dihapus.layout = {
     breadcrumbs: [
         {
-            title: "Luaran Buku",
+            title: "HKI yang Dihapus",
         },
     ],
 };

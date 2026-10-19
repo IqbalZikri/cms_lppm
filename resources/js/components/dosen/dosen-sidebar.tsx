@@ -44,7 +44,7 @@ const mainNavItems: NavItem[] = [
             },
             {
                 title: "PKM",
-                href: route("dosen.pkm.index"),
+                href: route("pkm.index"),
                 icon: HandHeart,
             },
         ],
@@ -55,17 +55,17 @@ const mainNavItems: NavItem[] = [
         items: [
             {
                 title: "Luaran Prosiding",
-                href: route("dosen.luaran_prosiding.index"),
+                href: route("luaran_prosiding.index"),
                 icon: ScrollText,
             },
             {
                 title: "Luaran Jurnal",
-                href: route("dosen.luaran_jurnal.index"),
+                href: route("luaran_jurnal.index"),
                 icon: Notebook,
             },
             {
                 title: "Luaran Buku",
-                href: route("dosen.luaran_buku.index"),
+                href: route("luaran_buku.index"),
                 icon: BookOpen,
             },
         ],

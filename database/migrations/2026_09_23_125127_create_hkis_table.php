@@ -24,6 +24,7 @@ return new class extends Migration {
             $table->enum('sumber_dana', ['internal', 'eksternal'])->nullable();
             $table->string('status_pengajuan')->nullable();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

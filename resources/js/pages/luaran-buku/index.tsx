@@ -7,33 +7,51 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Fakultas } from "@/interface/fakultas";
+import { LuaranBuku as LuaranBukuInterface } from "@/interface/luaran-buku";
 import { LuaranProsiding as LuaranProsidingInterface } from "@/interface/luaran-prosiding";
 import { PaginatedData } from "@/interface/pagination";
 import { Head, Link, router } from "@inertiajs/react";
-import { FileText, Plus, ScrollText } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Eye, FileText, Pencil, Plus, ScrollText } from "lucide-react";
+import { FormEvent, useEffect, useState } from "react";
 import { route } from "ziggy-js";
 
 interface Props {
-    data: PaginatedData<LuaranProsidingInterface>;
+    data: PaginatedData<LuaranBukuInterface>;
+    fakultas: Fakultas[];
     filters: {
         search?: string;
+        cari_fakultas?: string;
     };
+    stats: Stats | null;
 }
 
-export default function LuaranProsiding({ data, filters }: Props) {
+export default function LuaranBuku({ data, fakultas, filters, stats }: Props) {
     const [search, setSearch] = useState(filters.search ?? "");
+    const [fakultasId, setFakultasId] = useState(filters.cari_fakultas ?? "");
 
     useEffect(() => {
-        const sama = search === (filters.search ?? "");
+        const sama =
+            search === (filters.search ?? "") &&
+            fakultasId === (filters.cari_fakultas ?? "");
 
+        // tidak ada perubahan, jangan request (ini yang menjaga page tetap)
         if (sama) return;
 
         const timeout = setTimeout(() => {
             router.get(
-                route("uppm.luaran_prosiding.index"),
+                route("luaran_buku.index"),
                 {
                     ...(search && { search }),
+                    ...(fakultasId && { cari_fakultas: fakultasId }),
                 },
                 {
                     preserveState: true,
@@ -44,20 +62,33 @@ export default function LuaranProsiding({ data, filters }: Props) {
         }, 300);
 
         return () => clearTimeout(timeout);
-    }, [search]);
+    }, [search, fakultasId]);
+
     return (
         <>
-            <Head title="Luaran Prosiding" />
+            <Head title="Luaran Buku" />
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 sm:p-6">
                 <Header
-                    page="Luaran Prosiding"
+                    page="Luaran Buku"
                     breadcrumb={[
                         {
-                            label: "Luaran Prosiding",
-                            href: "uppm.luaran_prosiding.index",
+                            label: "Luaran Buku",
+                            href: "luaran_buku.index",
                         },
                     ]}
                 />
+
+                {stats && (
+                    <StatisticsCard
+                        dataCard={[
+                            {
+                                label: "Total Luaran Buku",
+                                count: stats.total,
+                            },
+                            ...stats.perFakultas,
+                        ]}
+                    />
+                )}
 
                 <Card className="shadow-sm">
                     <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
@@ -67,38 +98,78 @@ export default function LuaranProsiding({ data, filters }: Props) {
                             </div>
 
                             <div>
-                                <CardTitle>Daftar Luaran Prosiding</CardTitle>
+                                <CardTitle>Daftar Luaran Buku</CardTitle>
 
                                 <p className="text-muted-foreground mt-1 text-sm">
-                                    Informasi luaran prosiding yang terdaftar
-                                    dalam sistem.
+                                    Informasi Luaran Buku yang terdaftar dalam
+                                    sistem.
                                 </p>
                             </div>
                         </div>
 
                         <div className="grid gap-3 items-center lg:block xl:flex">
+                            <Select
+                                value={fakultasId || "all"}
+                                onValueChange={(value) =>
+                                    setFakultasId(value === "all" ? "" : value)
+                                }
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Cari Fakultas..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem value="all">
+                                            Semua Fakultas
+                                        </SelectItem>
+                                        {fakultas.map((item) => (
+                                            <SelectItem
+                                                key={item.id}
+                                                value={String(item.id)}
+                                            >
+                                                {item.nama_fakultas}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+
                             <Field orientation="horizontal">
                                 <Input
                                     type="search"
-                                    placeholder="Cari Disini..."
+                                    placeholder="Search..."
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                 />
                             </Field>
+
                             <Link
-                                href={route("uppm.luaran_prosiding.create")}
+                                href={route("luaran_buku.dihapus")}
+                                viewTransition
+                                className="w-full sm:w-auto"
+                            >
+                                <Button
+                                    className="w-full sm:w-auto"
+                                    variant={"destructive"}
+                                >
+                                    Luaran Buku yang Dihapus
+                                </Button>
+                            </Link>
+
+                            <Link
+                                href={route("luaran_buku.create")}
                                 viewTransition
                                 className="w-full sm:w-auto"
                             >
                                 <Button className="w-full sm:w-auto">
                                     <Plus />
-                                    Tambah Luaran Prosiding
+                                    Tambah Luaran Buku
                                 </Button>
                             </Link>
                         </div>
                     </CardHeader>
                     <CardContent className="pt-6">
-                        <TablePage<LuaranProsidingInterface>
+                        <TablePage<LuaranBukuInterface>
                             data={data}
                             columns={[
                                 {
@@ -125,7 +196,7 @@ export default function LuaranProsiding({ data, filters }: Props) {
                                                     key={i}
                                                     className="flex flex-wrap items-center gap-1.5"
                                                 >
-                                                    <Badge className="whitespace-nowrap">
+                                                    <Badge className="whitespace-nowrap text-[13px]">
                                                         {
                                                             penulis.fakultas
                                                                 .nama_fakultas
@@ -147,7 +218,7 @@ export default function LuaranProsiding({ data, filters }: Props) {
                                                     key={i}
                                                     className="flex flex-wrap items-center gap-1.5"
                                                 >
-                                                    <Badge className="whitespace-nowrap">
+                                                    <Badge className="whitespace-nowrap text-[13px]">
                                                         {
                                                             penulis.dosen
                                                                 .nama_dosen
@@ -173,7 +244,7 @@ export default function LuaranProsiding({ data, filters }: Props) {
                                                                 className="flex flex-wrap items-center gap-1.5"
                                                             >
                                                                 <Badge
-                                                                    className="whitespace-nowrap"
+                                                                    className="whitespace-nowrap text-[13px]"
                                                                     variant={
                                                                         "outline"
                                                                     }
@@ -182,7 +253,7 @@ export default function LuaranProsiding({ data, filters }: Props) {
                                                                         penulis.nama_universitas
                                                                     }
                                                                 </Badge>
-                                                                <Badge className="whitespace-nowrap">
+                                                                <Badge className="whitespace-nowrap text-[13px]">
                                                                     {
                                                                         penulis.nama_dosen
                                                                     }
@@ -195,16 +266,6 @@ export default function LuaranProsiding({ data, filters }: Props) {
                                                 <>-</>
                                             )}
                                         </div>
-                                    ),
-                                },
-                                {
-                                    id: "periode",
-                                    key: "semester",
-                                    label: "Periode",
-                                    render: (_, item) => (
-                                        <span className="whitespace-nowrap text-sm">
-                                            {item.semester} {item.tahun}
-                                        </span>
                                     ),
                                 },
                                 {
@@ -227,10 +288,10 @@ export default function LuaranProsiding({ data, filters }: Props) {
                             renderActions={(item) => (
                                 <div className="flex items-center gap-3">
                                     <Link
-                                        href={route(
-                                            "uppm.luaran_prosiding.show",
-                                            item.id,
-                                        )}
+                                        href={route("luaran_buku.show", {
+                                            luaran_buku: item.id,
+                                            from: "index",
+                                        })}
                                         viewTransition
                                     >
                                         <Button
@@ -242,7 +303,7 @@ export default function LuaranProsiding({ data, filters }: Props) {
                                     </Link>
                                     <Link
                                         href={route(
-                                            "uppm.luaran_prosiding.edit",
+                                            "luaran_buku.edit",
                                             item.id,
                                         )}
                                         viewTransition
@@ -252,7 +313,7 @@ export default function LuaranProsiding({ data, filters }: Props) {
                                     <DialogDelete
                                         label={item.judul}
                                         actionUrl={route(
-                                            "uppm.luaran_prosiding.destroy",
+                                            "luaran_buku.destroy",
                                             item.id,
                                         )}
                                         page="Penelitian Kegiatan"
@@ -268,10 +329,10 @@ export default function LuaranProsiding({ data, filters }: Props) {
     );
 }
 
-LuaranProsiding.layout = {
+LuaranBuku.layout = {
     breadcrumbs: [
         {
-            title: "Luaran Prosiding",
+            title: "Luaran Buku",
         },
     ],
 };

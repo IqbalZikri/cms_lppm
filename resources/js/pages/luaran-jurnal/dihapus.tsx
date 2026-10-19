@@ -76,7 +76,7 @@ export default function Dihapus({ data, fakultas, filters }: Props) {
                     page="Luaran Jurnal yang Dihapus"
                     breadcrumb={[
                         {
-                            label: "LuaranJurnal",
+                            label: "Luaran Jurnal",
                             href: "luaran_jurnal.index",
                         },
                     ]}

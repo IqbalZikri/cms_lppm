@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
+use App\Concerns\FilterFakultas;
+use App\Concerns\Visible;
 use App\Enums\StatusPengajuan;
 use App\Models\Concerns\Searchable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Hki extends Model
 {
-    use HasFactory, Searchable;
+    use HasFactory, Searchable, Visible, FilterFakultas, SoftDeletes;
 
     protected array $searchable = [
         "jenis_hki",

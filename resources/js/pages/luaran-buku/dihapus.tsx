@@ -1,39 +1,55 @@
-import { DialogDelete } from "@/components/dialog-form";
+import { DialogDelete, DialogRestore } from "@/components/dialog-form";
 import Header from "@/components/header";
+import StatisticsCard from "@/components/statistic-card";
 import TablePage from "@/components/table-page";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Kegiatan } from "@/interface/kegiatan";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { LuaranJurnal } from "@/interface/luaran-jurnal";
 import { PaginatedData } from "@/interface/pagination";
-import { formatNamaDosen, toTitleCase } from "@/lib/utils";
+import { Fakultas } from "@/types/fakultas";
 import { Head, Link, router } from "@inertiajs/react";
-import { Activity, FileText, Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ArrowLeft, FileText, HandHeart, Plus } from "lucide-react";
+import { FormEvent, useEffect, useState } from "react";
 import { route } from "ziggy-js";
 
 interface Props {
-    kegiatan: PaginatedData<Kegiatan>;
+    data: PaginatedData<LuaranJurnal>;
+    fakultas: Fakultas[];
     filters: {
         search?: string;
+        cari_fakultas?: string;
     };
 }
 
-export default function IndexKegiatan({ kegiatan, filters }: Props) {
+export default function Dihapus({ data, fakultas, filters }: Props) {
     const [search, setSearch] = useState(filters.search ?? "");
+    const [fakultasId, setFakultasId] = useState(filters.cari_fakultas ?? "");
 
     useEffect(() => {
-        const sama = search === (filters.search ?? "");
+        const sama =
+            search === (filters.search ?? "") &&
+            fakultasId === (filters.cari_fakultas ?? "");
 
+        // tidak ada perubahan, jangan request (ini yang menjaga page tetap)
         if (sama) return;
 
         const timeout = setTimeout(() => {
             router.get(
-                route("dosen.kegiatan.index"),
+                route("LuaranJurnal.dihapus"),
                 {
                     ...(search && { search }),
+                    ...(fakultasId && { cari_fakultas: fakultasId }),
                 },
                 {
                     preserveState: true,
@@ -44,77 +60,91 @@ export default function IndexKegiatan({ kegiatan, filters }: Props) {
         }, 300);
 
         return () => clearTimeout(timeout);
-    }, [search]);
+    }, [search, fakultasId]);
 
     return (
         <>
-            <Head title="Kegiatan Penelitian" />
+            <Head title="Luaran Buku yang Dihapus" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <Link href={route("luaran_buku.index")} viewTransition>
+                    <Button>
+                        <ArrowLeft />
+                        Kembali
+                    </Button>
+                </Link>
                 <Header
-                    page="Penelitian Kegiatan"
+                    page="Luaran Buku yang Dihapus"
                     breadcrumb={[
                         {
-                            label: "Penelitian Kegiatan",
-                            href: "dosen.kegiatan.index",
+                            label: "Luaran Buku",
+                            href: "luaran_buku.index",
                         },
                     ]}
                 />
+
                 <Card>
                     <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-3">
                             <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-                                <Activity className="h-5 w-5" />
+                                <HandHeart className="h-5 w-5" />
                             </div>
 
                             <div>
                                 <CardTitle>
-                                    Daftar Penelitian Kegiatan
+                                    Daftar Luaran Buku yang Dihapus
                                 </CardTitle>
 
                                 <p className="text-muted-foreground mt-1 text-sm">
-                                    Informasi penelitian kegiatan yang terdaftar
-                                    dalam sistem.
+                                    Informasi Luaran Buku yang dihapus dalam
+                                    sistem.
                                 </p>
                             </div>
                         </div>
 
                         <div className="grid gap-3 items-center lg:block xl:flex">
+                            <Select
+                                value={fakultasId || "all"}
+                                onValueChange={(value) =>
+                                    setFakultasId(value === "all" ? "" : value)
+                                }
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Cari Fakultas..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem value="all">
+                                            Semua Fakultas
+                                        </SelectItem>
+                                        {fakultas.map((item) => (
+                                            <SelectItem
+                                                key={item.id}
+                                                value={String(item.id)}
+                                            >
+                                                {item.nama_fakultas}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+
                             <Field orientation="horizontal">
                                 <Input
                                     type="search"
-                                    placeholder="Cari Disini..."
+                                    placeholder="Search..."
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                 />
                             </Field>
-
-                            <Link
-                                href={route("dosen.kegiatan.dihapus")}
-                                viewTransition
-                            >
-                                <Button variant={"destructive"}>
-                                    Kegiatan Dihapus
-                                </Button>
-                            </Link>
-
-                            <Link
-                                href={route("dosen.kegiatan.create")}
-                                viewTransition
-                            >
-                                <Button>
-                                    <Plus />
-                                    Tambah Penelitian Kegiatan
-                                </Button>
-                            </Link>
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <TablePage<Kegiatan>
-                            data={kegiatan}
+                        <TablePage<LuaranJurnal>
+                            data={data}
                             columns={[
                                 {
                                     key: "judul",
-                                    label: "Judul Kegiatan",
+                                    label: "Judul",
                                 },
                                 {
                                     id: "fakultas",
@@ -122,10 +152,7 @@ export default function IndexKegiatan({ kegiatan, filters }: Props) {
                                     label: "Fakultas",
                                     render: (_, item) =>
                                         item.penulis.map((penulis, i) => (
-                                            <Badge
-                                                key={i}
-                                                className="mr-2 text-base"
-                                            >
+                                            <Badge key={i} className="mr-2">
                                                 {penulis.fakultas.nama_fakultas}
                                             </Badge>
                                         )),
@@ -138,9 +165,9 @@ export default function IndexKegiatan({ kegiatan, filters }: Props) {
                                         item.penulis.map((penulis, i) => (
                                             <Badge
                                                 key={i}
-                                                className="mr-2 rounded-md px-2 py-1 text-base"
+                                                className="mr-2 rounded-md px-2 py-1 text-xs"
                                             >
-                                                {formatNamaDosen(penulis.dosen)}
+                                                {penulis.dosen.nama_dosen}
                                             </Badge>
                                         )),
                                 },
@@ -188,17 +215,9 @@ export default function IndexKegiatan({ kegiatan, filters }: Props) {
                                     key: "semester",
                                     label: "Periode",
                                     render: (_, item) => (
-                                        <div className="flex flex-wrap gap-4">
-                                            <Badge className="text-base">
-                                                {item.semester}
-                                            </Badge>
-                                            <Badge
-                                                variant={"secondary"}
-                                                className="text-base"
-                                            >
-                                                {item.tahun}
-                                            </Badge>
-                                        </div>
+                                        <span className="whitespace-nowrap text-sm">
+                                            {item.semester} {item.tahun}
+                                        </span>
                                     ),
                                 },
                                 {
@@ -221,30 +240,30 @@ export default function IndexKegiatan({ kegiatan, filters }: Props) {
                             renderActions={(item) => (
                                 <>
                                     <Link
-                                        href={route(
-                                            "dosen.kegiatan.edit",
-                                            item.id,
-                                        )}
-                                        viewTransition
-                                    >
-                                        <Button variant="outline">Edit</Button>
-                                    </Link>
-                                    <Link
-                                        href={route(`dosen.kegiatan.show`, {
-                                            kegiatan: item.id,
-                                            from: "index",
+                                        href={route("luaran_buku.show", {
+                                            luaran_buku: item.id,
+                                            from: "dihapus",
                                         })}
                                         viewTransition
                                     >
                                         <Button variant="default">Show</Button>
                                     </Link>
+                                    <DialogRestore
+                                        page="Luaran Buku"
+                                        actionUrl={route(
+                                            "luaran_buku.restore",
+                                            item.id,
+                                        )}
+                                        label={item.judul}
+                                        item={item}
+                                    />
                                     <DialogDelete
                                         label={item.judul}
                                         actionUrl={route(
-                                            "dosen.kegiatan.destroy",
+                                            "luaran_buku.force-delete",
                                             item.id,
                                         )}
-                                        page="Penelitian Kegiatan"
+                                        page="Luaran Buku"
                                         item={item}
                                     />
                                 </>
@@ -257,10 +276,10 @@ export default function IndexKegiatan({ kegiatan, filters }: Props) {
     );
 }
 
-IndexKegiatan.layout = {
+Dihapus.layout = {
     breadcrumbs: [
         {
-            title: "Penelitian Kegiatan",
+            title: "Luaran Buku yang Dihapus",
         },
     ],
 };

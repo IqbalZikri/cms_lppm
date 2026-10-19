@@ -17,4 +17,5 @@ export interface Hki {
     penulis: Penulis[];
     penulis_luar: PenulisLuar[];
     user_id: number;
+    deleted_at: Date
 }

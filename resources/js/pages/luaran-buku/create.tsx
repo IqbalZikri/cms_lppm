@@ -12,10 +12,9 @@ import FormLuaranBuku from "../forms/luaran-buku/form";
 
 interface Props {
     fakultas: Fakultas[];
-    role: string;
 }
 
-export default function CreateLuaranBuku({ fakultas, role }: Props) {
+export default function CreateLuaranBuku({ fakultas }: Props) {
     return (
         <>
             <Head title="Tambah Luaran Buku" />
@@ -37,7 +36,7 @@ export default function CreateLuaranBuku({ fakultas, role }: Props) {
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
                                         href={route(
-                                            role + ".luaran_buku.index",
+                                            "luaran_buku.index",
                                         )}
                                     >
                                         Luaran Buku
@@ -47,7 +46,7 @@ export default function CreateLuaranBuku({ fakultas, role }: Props) {
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
                                         href={route(
-                                            role + ".luaran_buku.create",
+                                            "luaran_buku.create",
                                         )}
                                     >
                                         Tambah Luaran Buku
@@ -57,7 +56,7 @@ export default function CreateLuaranBuku({ fakultas, role }: Props) {
                         </Breadcrumb>
                     </div>
                 </div>
-                <FormLuaranBuku fakultas={fakultas} role={role} />
+                <FormLuaranBuku fakultas={fakultas} />
             </div>
         </>
     );

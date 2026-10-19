@@ -31,7 +31,6 @@ import SectionHeading from "@/components/section-heading";
 interface Props {
     fakultas: Fakultas[];
     luaranBuku?: LuaranBuku;
-    role?: string;
 }
 
 type TipePenulis = "internal" | "luar";
@@ -101,20 +100,12 @@ function RequiredMark() {
     return <span className="ml-0.5 text-red-500">*</span>;
 }
 
-export default function FormLuaranBuku({ fakultas, luaranBuku, role }: Props) {
+export default function FormLuaranBuku({ fakultas, luaranBuku }: Props) {
     const isEdit = !!luaranBuku;
 
-    const actionAdmin = isEdit
-        ? route("admin.luaran_buku.update", luaranBuku!.id)
-        : route("admin.luaran_buku.store");
-
-    const actionDosen = isEdit
-        ? route("dosen.luaran_buku.update", luaranBuku!.id)
-        : route("dosen.luaran_buku.store");
-
-    const actionUppm = isEdit
-        ? route("uppm.luaran_buku.update", luaranBuku!.id)
-        : route("uppm.luaran_buku.store");
+    const action = isEdit
+        ? route("luaran_buku.update", luaranBuku!.id)
+        : route("luaran_buku.store");
 
     const [authors, setAuthors] = useState<AuthorRow[]>(() =>
         buildInitialAuthors(luaranBuku?.penulis, luaranBuku?.penulis_luar),
@@ -215,16 +206,7 @@ export default function FormLuaranBuku({ fakultas, luaranBuku, role }: Props) {
     }
 
     return (
-        <Form
-            action={
-                role === "dosen"
-                    ? actionDosen
-                    : role === "uppm"
-                      ? actionUppm
-                      : actionAdmin
-            }
-            method={isEdit ? "put" : "post"}
-        >
+        <Form action={action} method={isEdit ? "put" : "post"}>
             {({ errors, processing }) => (
                 <Card className="w-full shadow-sm">
                     <CardContent className="grid grid-cols-1 gap-8 pt-6 lg:grid-cols-3 lg:gap-10">
@@ -680,13 +662,7 @@ export default function FormLuaranBuku({ fakultas, luaranBuku, role }: Props) {
 
                     <CardFooter className="flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-end">
                         <Link
-                            href={
-                                role === "dosen"
-                                    ? route("dosen.luaran_buku.index")
-                                    : role === "uppm"
-                                      ? route("uppm.luaran_buku.index")
-                                      : route("admin.luaran_buku.index")
-                            }
+                            href={route("luaran_buku.index")}
                             viewTransition
                             className="w-full sm:w-auto"
                         >

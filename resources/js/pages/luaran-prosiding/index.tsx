@@ -332,7 +332,7 @@ export default function LuaranProsiding({
                                             "luaran_prosiding.destroy",
                                             item.id,
                                         )}
-                                        page="Penelitian Kegiatan"
+                                        page="Luaran Prosiding"
                                         item={item}
                                     />
                                 </div>

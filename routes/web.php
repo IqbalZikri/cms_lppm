@@ -69,15 +69,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('luaran_jurnal', LuaranJurnalController::class)->except('destroy')->withTrashed(['show']);
     Route::delete('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'destroy'])->name('luaran_jurnal.destroy');
 
-
+    Route::get('luaran_buku/dihapus', [LuaranBukuController::class, 'dihapus'])->name('luaran_buku.dihapus');
+    Route::patch('luaran_buku/{luaran_buku}/restore', [LuaranBukuController::class, 'restore'])->withTrashed()->name('luaran_buku.restore');
+    Route::delete('luaran_buku/{luaran_buku}/force', [LuaranBukuController::class, 'forceDelete'])->withTrashed()->name('luaran_buku.force-delete');
+    Route::resource('luaran_buku', LuaranBukuController::class)->except('destroy')->withTrashed(['show']);
+    Route::delete('luaran_buku/{luaran_buku}', [LuaranBukuController::class, 'destroy'])->name('luaran_buku.destroy');
 
     Route::get('site_setting', [SiteSettingsController::class, 'index'])->name('site_setting.index');
     Route::put('site_setting', [SiteSettingsController::class, 'update'])->name('site_setting.update');
 });
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::prefix('admin')->name('admin.')->group(function () {
+foreach (['admin', 'dosen', 'uppm'] as $role) {
+    Route::middleware(['auth', "role:{$role}"])->prefix($role)->name("{$role}.")->group(function () {
+
+        // admin
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        // dosen
+        Route::get('dosen/dashboard', [\App\Http\Controllers\Dosen\DashboardController::class, 'index'])->name('dashboard');
+
+        // uppm
+        Route::get('uppm/dashboard', [\App\Http\Controllers\Uppm\DashboardController::class, 'index'])->name('dashboard');
 
         Route::get('fakultas', [FakultasController::class, 'index'])->name('fakultas.index');
         Route::post('fakultas/store', [FakultasController::class, 'store'])->name('fakultas.store');
@@ -88,6 +100,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::post('prodi', [ProdiController::class, 'store'])->name('prodi.store');
         Route::put('prodi/{id}', [ProdiController::class, 'update'])->name('prodi.update');
         Route::delete('prodi/{id}', [ProdiController::class, 'destroy'])->name('prodi.destroy');
+
+        Route::get('uppm/prodi', [\App\Http\Controllers\Uppm\ProdiController::class, 'index'])->name('prodi.index');
 
         Route::get('user', [UserController::class, 'index'])->name('user.index');
         Route::post('user', [UserController::class, 'store'])->name('user.store');
@@ -105,6 +119,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::put('dosen/edit/{id}', [DosenController::class, 'update'])->name('dosen.update');
         Route::delete('dosen/{id}', [DosenController::class, 'destroy'])->name('dosen.destroy');
 
+        Route::get('uppm/dosen', [\App\Http\Controllers\Uppm\DosenController::class, 'index'])->name('dosen.index');
+        Route::get('uppm/dosen/{id}', [\App\Http\Controllers\Uppm\DosenController::class, 'show'])->name('dosen.show');
+
         Route::get('kategori', [KategoriController::class, 'index'])->name('kategori.index');
         Route::post('kategori', [KategoriController::class, 'store'])->name('kategori.store');
         Route::put('kategori/{kategori}', [KategoriController::class, 'update'])->name('kategori.update');
@@ -120,25 +137,16 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::delete('berita/{berita}', [BeritaController::class, 'destroy'])->name('berita.destroy');
         Route::put('berita/archived/{berita}', [BeritaController::class, 'archivedBerita'])->name('berita.archivedBerita');
 
-        Route::get('hki', [HkiController::class, 'indexAdmin'])->name('hki.index');
+        Route::get("hki/dihapus", [HkiController::class, 'dihapus'])->name('hki.dihapus');
+        Route::patch('hki/{hki}/restore', [HkiController::class, 'restore'])->withTrashed()->name('hki.restore');
+        Route::delete('hki/{hki}/force', [HkiController::class, 'forceDelete'])->withTrashed()->name('hki.force-delete');
+        Route::get('hki', [HkiController::class, 'index'])->name('hki.index');
         Route::get('hki/create', [HkiController::class, 'create'])->name('hki.create');
         Route::post('hki/create', [HkiController::class, 'store'])->name('hki.store');
-        Route::get('hki//detail/{hki}', [HkiController::class, 'show'])->name('hki.show');
-        Route::put('hki//update-status/{id}', [HkiController::class, 'updateStatusPengajuan'])->name('hki.updateStatusPengajuan');
+        Route::get('hki/detail/{hki}', [HkiController::class, 'show'])->name('hki.show')->withTrashed();
+        Route::put('hki/{hki}/update-status', [HkiController::class, 'updateStatus'])->name('hki.updateStatusPengajuan');
         Route::get('hki/{hki}', [HkiController::class, 'edit'])->name('hki.edit');
         Route::put('hki/{hki}', [HkiController::class, 'update'])->name('hki.update');
         Route::delete('hki/{hki}', [HkiController::class, 'destroy'])->name('hki.destroy');
-
-        Route::get('luaran_buku', [LuaranBukuController::class, 'indexAdmin'])->name('luaran_buku.index');
-        Route::get('luaran_buku/create', [LuaranBukuController::class, 'create'])->name('luaran_buku.create');
-        Route::post('luaran_buku/create', [LuaranBukuController::class, 'store'])->name('luaran_buku.store');
-        Route::get('luaran_buku//detail/{luaran_buku}', [LuaranBukuController::class, 'show'])->name('luaran_buku.show');
-        Route::get('luaran_buku/{luaran_buku}', [LuaranBukuController::class, 'edit'])->name('luaran_buku.edit');
-        Route::put('luaran_buku/{luaran_buku}', [LuaranBukuController::class, 'update'])->name('luaran_buku.update');
-        Route::delete('luaran_buku/{luaran_buku}', [LuaranBukuController::class, 'destroy'])->name('luaran_buku.destroy');
     });
-});
-
-require __DIR__ . '/settings.php';
-require __DIR__ . '/dosen.php';
-require __DIR__ . '/uppm.php';
+}

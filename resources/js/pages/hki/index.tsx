@@ -155,6 +155,16 @@ export default function Hki({
                             </Field>
 
                             <Link
+                                href={route("admin.hki.dihapus")}
+                                viewTransition
+                                className="w-full sm:w-auto"
+                            >
+                                <Button className="w-full sm:w-auto" variant={"destructive"}>
+                                    Hak Kekayaan Intelektual yang Dihapus
+                                </Button>
+                            </Link>
+
+                            <Link
                                 href={route("admin.hki.create")}
                                 viewTransition
                                 className="w-full sm:w-auto"

@@ -14,10 +14,9 @@ import { LuaranBuku } from "@/interface/luaran-buku";
 interface Props {
     fakultas: Fakultas[];
     data: LuaranBuku;
-    role: string;
 }
 
-export default function editLuaranBuku({ fakultas, data, role }: Props) {
+export default function editLuaranBuku({ fakultas, data }: Props) {
     return (
         <>
             <Head title="Edit Luaran Buku" />
@@ -38,7 +37,7 @@ export default function editLuaranBuku({ fakultas, data, role }: Props) {
                             <BreadcrumbList>
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route("admin.luaran_buku.index")}
+                                        href={route("luaran_buku.index")}
                                     >
                                         Luaran Buku
                                     </BreadcrumbLink>
@@ -47,7 +46,7 @@ export default function editLuaranBuku({ fakultas, data, role }: Props) {
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
                                         href={route(
-                                            "admin.luaran_buku.edit",
+                                            "luaran_buku.edit",
                                             data.id,
                                         )}
                                     >
@@ -61,7 +60,6 @@ export default function editLuaranBuku({ fakultas, data, role }: Props) {
                 <FormLuaranBuku
                     fakultas={fakultas}
                     luaranBuku={data}
-                    role={role}
                 />
             </div>
         </>

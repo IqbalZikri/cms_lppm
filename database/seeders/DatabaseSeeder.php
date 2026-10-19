@@ -16,21 +16,21 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::create([
-        //     'name' => 'admin',
-        //     'email' => 'admin@example.com',
-        //     'email_verified_at' => now(),
-        //     'password' => Hash::make('admin'),
-        //     'role' => 'admin'
-        // ]);
+        User::create([
+            'name' => 'admin',
+            'email' => 'admin@example.com',
+            'email_verified_at' => now(),
+            'password' => Hash::make('admin'),
+            'role' => 'admin'
+        ]);
 
-        // User::create([
-        //     'name' => 'bambang',
-        //     'email' => 'user1@example.com',
-        //     'email_verified_at' => now(),
-        //     'password' => Hash::make('admin'),
-        //     'role' => 'dosen'
-        // ]);
+        User::create([
+            'name' => 'bambang',
+            'email' => 'user1@example.com',
+            'email_verified_at' => now(),
+            'password' => Hash::make('admin'),
+            'role' => 'dosen'
+        ]);
 
         // User::factory()->count(10)->create();
 
@@ -42,7 +42,7 @@ class DatabaseSeeder extends Seeder
             // KegiatanSeeder::class,
             // PkmSeeder::class,
             // LuaranProsidingSeeder::class,
-            LuaranJurnalSeeder::class,
+            // LuaranJurnalSeeder::class,
             // LuaranBukuSeeder::class
             // HkiSeeder::class,
         ]);

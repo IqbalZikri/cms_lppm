@@ -140,7 +140,7 @@ const mainNavItems: NavItem[] = [
             },
             {
                 title: "Luaran Buku",
-                href: route("admin.luaran_buku.index"),
+                href: route("luaran_buku.index"),
                 icon: BookOpen,
             },
         ],

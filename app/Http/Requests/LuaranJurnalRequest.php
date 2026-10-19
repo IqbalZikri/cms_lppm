@@ -26,7 +26,7 @@ class LuaranJurnalRequest extends FormRequest
     public function rules(): array
     {
         return [
-        'jenis_luaran_jurnal' => ['required'],
+            'jenis_luaran_jurnal' => ['required'],
             'judul' => ['required', 'string'],
             'abstrak' => ['required', 'string'],
             'semester' => ['required'],

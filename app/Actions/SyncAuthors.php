@@ -2,14 +2,16 @@
 
 namespace App\Actions;
 
+use Illuminate\Database\Eloquent\Model;
+
 class SyncAuthors
 {
-    public function handle($model, array $authors): void
+    public function handle(Model $model, array $authors): void
     {
         $model->penulis()->forceDelete();
         $model->penulisLuar()->forceDelete();
 
-        foreach ($authors as $i => $author) {
+        foreach (array_values($authors) as $i => $author) {
             $urutan = $i + 1;
 
             if ($author['tipe'] === 'internal') {

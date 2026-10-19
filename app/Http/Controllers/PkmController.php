@@ -62,7 +62,7 @@ class PkmController extends Controller
 
     public function dihapus(Request $request)
     {
-        $this->authorize('view', Pkm::class);
+        $this->authorize('viewAny', Pkm::class);
 
         $filters = $request->only('search', 'cari_fakultas');
 

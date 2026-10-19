@@ -21,7 +21,7 @@ import { LuaranBuku } from "@/interface/luaran-buku";
 
 interface Props {
     data: LuaranBuku;
-    role: string;
+    backUrl: string;
 }
 
 type PenulisRow =
@@ -38,7 +38,7 @@ type PenulisRow =
           asal: string;
       };
 
-export default function Show({ data, role }: Props) {
+export default function Show({ data, backUrl }: Props) {
     const daftarPenulis: PenulisRow[] = [
         ...(data.penulis ?? []).map((p) => ({
             tipe: "internal" as const,
@@ -59,25 +59,24 @@ export default function Show({ data, role }: Props) {
             <Head title={`Detail - ${data.judul}`} />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
-                    <Link
-                        href={route(role + ".luaran_buku.index")}
-                        viewTransition
-                    >
+                    <Link href={backUrl} viewTransition>
                         <Button variant="outline" size="sm">
                             <ArrowLeft className="mr-1 h-4 w-4" />
                             Kembali
                         </Button>
                     </Link>
 
-                    <Link
-                        href={route(role + ".luaran_buku.edit", data.id)}
-                        viewTransition
-                    >
-                        <Button size="sm">
-                            <Pencil className="mr-1 h-4 w-4" />
-                            Edit
-                        </Button>
-                    </Link>
+                    {!data.deleted_at && (
+                        <Link
+                            href={route("luaran_buku.edit", data.id)}
+                            viewTransition
+                        >
+                            <Button size="sm">
+                                <Pencil className="mr-1 h-4 w-4" />
+                                Edit
+                            </Button>
+                        </Link>
+                    )}
                 </div>
 
                 <Card className="w-full">
