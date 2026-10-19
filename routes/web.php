@@ -62,6 +62,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('luaran_prosiding', LuaranProsidingController::class)->except('destroy')->withTrashed(['show']);
     Route::delete('luaran_prosiding/{luaran_prosiding}', [LuaranProsidingController::class, 'destroy'])->name('luaran_prosiding.destroy');
 
+    // Luaran Jurnal
+    Route::get('luaran_jurnal/dihapus', [LuaranJurnalController::class, 'dihapus'])->name('luaran_jurnal.dihapus');
+    Route::patch('luaran_jurnal/{luaran_jurnal}/restore', [LuaranJurnalController::class, 'restore'])->withTrashed()->name('luaran_jurnal.restore');
+    Route::delete('luaran_jurnal/{luaran_jurnal}/force', [LuaranJurnalController::class, 'forceDelete'])->withTrashed()->name('luaran_jurnal.force-delete');
+    Route::resource('luaran_jurnal', LuaranJurnalController::class)->except('destroy')->withTrashed(['show']);
+    Route::delete('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'destroy'])->name('luaran_jurnal.destroy');
+
 
 
     Route::get('site_setting', [SiteSettingsController::class, 'index'])->name('site_setting.index');
@@ -121,14 +128,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('hki/{hki}', [HkiController::class, 'edit'])->name('hki.edit');
         Route::put('hki/{hki}', [HkiController::class, 'update'])->name('hki.update');
         Route::delete('hki/{hki}', [HkiController::class, 'destroy'])->name('hki.destroy');
-
-        Route::get('luaran_jurnal', [LuaranJurnalController::class, 'indexAdmin'])->name('luaran_jurnal.index');
-        Route::get('luaran_jurnal/create', [LuaranJurnalController::class, 'create'])->name('luaran_jurnal.create');
-        Route::post('luaran_jurnal/create', [LuaranJurnalController::class, 'store'])->name('luaran_jurnal.store');
-        Route::get('luaran_jurnal//detail/{luaran_jurnal}', [LuaranJurnalController::class, 'show'])->name('luaran_jurnal.show');
-        Route::get('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'edit'])->name('luaran_jurnal.edit');
-        Route::put('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'update'])->name('luaran_jurnal.update');
-        Route::delete('luaran_jurnal/{luaran_jurnal}', [LuaranJurnalController::class, 'destroy'])->name('luaran_jurnal.destroy');
 
         Route::get('luaran_buku', [LuaranBukuController::class, 'indexAdmin'])->name('luaran_buku.index');
         Route::get('luaran_buku/create', [LuaranBukuController::class, 'create'])->name('luaran_buku.create');

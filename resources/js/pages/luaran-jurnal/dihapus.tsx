@@ -1,4 +1,4 @@
-import { DialogDelete } from "@/components/dialog-form";
+import { DialogDelete, DialogRestore } from "@/components/dialog-form";
 import Header from "@/components/header";
 import StatisticsCard from "@/components/statistic-card";
 import TablePage from "@/components/table-page";
@@ -15,37 +15,24 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Fakultas } from "@/interface/fakultas";
-import { LuaranJurnal as LuaranJurnalInterface } from "@/interface/luaran-jurnal";
+import { LuaranJurnal } from "@/interface/luaran-jurnal";
 import { PaginatedData } from "@/interface/pagination";
+import { Fakultas } from "@/types/fakultas";
 import { Head, Link, router } from "@inertiajs/react";
-import { FileText, Notebook, Plus } from "lucide-react";
+import { ArrowLeft, FileText, HandHeart, Plus } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import { route } from "ziggy-js";
 
 interface Props {
-    data: PaginatedData<LuaranJurnalInterface>;
+    data: PaginatedData<LuaranJurnal>;
     fakultas: Fakultas[];
-    totalLuaranJurnal: number;
-    totalLuaranJurnalPerFakultas: string[];
     filters: {
         search?: string;
         cari_fakultas?: string;
     };
 }
 
-export default function LuaranJurnal({
-    data,
-    fakultas,
-    totalLuaranJurnal,
-    totalLuaranJurnalPerFakultas,
-    filters,
-}: Props) {
-    const statistikFakultas = totalLuaranJurnalPerFakultas.map((item: any) => ({
-        label: item.label,
-        count: item.count,
-    }));
-
+export default function Dihapus({ data, fakultas, filters }: Props) {
     const [search, setSearch] = useState(filters.search ?? "");
     const [fakultasId, setFakultasId] = useState(filters.cari_fakultas ?? "");
 
@@ -59,7 +46,7 @@ export default function LuaranJurnal({
 
         const timeout = setTimeout(() => {
             router.get(
-                route("admin.luaran_jurnal.index"),
+                route("LuaranJurnal.dihapus"),
                 {
                     ...(search && { search }),
                     ...(fakultasId && { cari_fakultas: fakultasId }),
@@ -77,40 +64,38 @@ export default function LuaranJurnal({
 
     return (
         <>
-            <Head title="Luaran Jurnal" />
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 sm:p-6">
+            <Head title="Luaran Jurnal yang Dihapus" />
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <Link href={route("luaran_jurnal.index")} viewTransition>
+                    <Button>
+                        <ArrowLeft />
+                        Kembali
+                    </Button>
+                </Link>
                 <Header
-                    page="Luaran Jurnal"
+                    page="Luaran Jurnal yang Dihapus"
                     breadcrumb={[
                         {
-                            label: "Luaran Jurnal",
-                            href: "admin.hki.index",
+                            label: "LuaranJurnal",
+                            href: "luaran_jurnal.index",
                         },
                     ]}
                 />
 
-                <StatisticsCard
-                    dataCard={[
-                        {
-                            label: "Luaran Jurnal",
-                            count: totalLuaranJurnal,
-                        },
-                        ...statistikFakultas,
-                    ]}
-                />
-
-                <Card className="shadow-sm">
+                <Card>
                     <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-3">
                             <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-                                <Notebook className="h-5 w-5" />
+                                <HandHeart className="h-5 w-5" />
                             </div>
 
                             <div>
-                                <CardTitle>Daftar Luaran Jurnal</CardTitle>
+                                <CardTitle>
+                                    Daftar Luaran Jurnal yang Dihapus
+                                </CardTitle>
 
                                 <p className="text-muted-foreground mt-1 text-sm">
-                                    Informasi luaran jurnal yang terdaftar dalam
+                                    Informasi Luaran Jurnal yang dihapus dalam
                                     sistem.
                                 </p>
                             </div>
@@ -146,84 +131,45 @@ export default function LuaranJurnal({
                             <Field orientation="horizontal">
                                 <Input
                                     type="search"
-                                    placeholder="Cari Disini..."
+                                    placeholder="Search..."
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                 />
                             </Field>
-
-                            <Link
-                                href={route("admin.luaran_jurnal.create")}
-                                viewTransition
-                                className="w-full sm:w-auto"
-                            >
-                                <Button className="w-full sm:w-auto">
-                                    <Plus />
-                                    Tambah Luaran Jurnal
-                                </Button>
-                            </Link>
                         </div>
                     </CardHeader>
-                    <CardContent className="pt-6">
-                        <TablePage<LuaranJurnalInterface>
+                    <CardContent>
+                        <TablePage<LuaranJurnal>
                             data={data}
                             columns={[
                                 {
-                                    id: "judul",
                                     key: "judul",
                                     label: "Judul",
-                                    render: (_, item) => (
-                                        <span
-                                            className="line-clamp-2 max-w-xs font-medium"
-                                            title={item.judul}
-                                        >
-                                            {item.judul}
-                                        </span>
-                                    ),
                                 },
                                 {
-                                    id: "penulis",
+                                    id: "fakultas",
                                     key: "penulis",
                                     label: "Fakultas",
-                                    render: (_, item) => (
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {item.penulis.map((penulis, i) => (
-                                                <div
-                                                    key={i}
-                                                    className="flex flex-wrap items-center gap-1.5"
-                                                >
-                                                    <Badge className="whitespace-nowrap text-[13px]">
-                                                        {
-                                                            penulis.fakultas
-                                                                .nama_fakultas
-                                                        }
-                                                    </Badge>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ),
+                                    render: (_, item) =>
+                                        item.penulis.map((penulis, i) => (
+                                            <Badge key={i} className="mr-2">
+                                                {penulis.fakultas.nama_fakultas}
+                                            </Badge>
+                                        )),
                                 },
                                 {
-                                    id: "penulis",
+                                    id: "dosen",
                                     key: "penulis",
-                                    label: "Penulis",
-                                    render: (_, item) => (
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {item.penulis.map((penulis, i) => (
-                                                <div
-                                                    key={i}
-                                                    className="flex flex-wrap items-center gap-1.5"
-                                                >
-                                                    <Badge className="whitespace-nowrap text-[13px]">
-                                                        {
-                                                            penulis.dosen
-                                                                .nama_dosen
-                                                        }
-                                                    </Badge>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ),
+                                    label: "Dosen",
+                                    render: (_, item) =>
+                                        item.penulis.map((penulis, i) => (
+                                            <Badge
+                                                key={i}
+                                                className="mr-2 rounded-md px-2 py-1 text-xs"
+                                            >
+                                                {penulis.dosen.nama_dosen}
+                                            </Badge>
+                                        )),
                                 },
                                 {
                                     id: "penulis_luar",
@@ -292,40 +238,35 @@ export default function LuaranJurnal({
                                 },
                             ]}
                             renderActions={(item) => (
-                                <div className="flex items-center gap-3">
+                                <>
                                     <Link
-                                        href={route(
-                                            "admin.luaran_jurnal.show",
-                                            item.id,
-                                        )}
+                                        href={route("luaran_jurnal.show", {
+                                            luaran_jurnal: item.id,
+                                            from: "dihapus",
+                                        })}
                                         viewTransition
                                     >
-                                        <Button
-                                            variant="outline"
-                                            title="Lihat detail"
-                                        >
-                                            Show
-                                        </Button>
+                                        <Button variant="default">Show</Button>
                                     </Link>
-                                    <Link
-                                        href={route(
-                                            "admin.luaran_jurnal.edit",
+                                    <DialogRestore
+                                        page="Luaran Jurnal"
+                                        actionUrl={route(
+                                            "luaran_jurnal.restore",
                                             item.id,
                                         )}
-                                        viewTransition
-                                    >
-                                        <Button title="Edit">Edit</Button>
-                                    </Link>
+                                        label={item.judul}
+                                        item={item}
+                                    />
                                     <DialogDelete
                                         label={item.judul}
                                         actionUrl={route(
-                                            "admin.luaran_jurnal.destroy",
+                                            "luaran_jurnal.force-delete",
                                             item.id,
                                         )}
-                                        page="luaran jurnal"
+                                        page="Luaran Jurnal"
                                         item={item}
                                     />
-                                </div>
+                                </>
                             )}
                         />
                     </CardContent>
@@ -335,10 +276,10 @@ export default function LuaranJurnal({
     );
 }
 
-LuaranJurnal.layout = {
+Dihapus.layout = {
     breadcrumbs: [
         {
-            title: "Luaran Jurnal",
+            title: "Luaran Jurnal yang Dihapus",
         },
     ],
 };

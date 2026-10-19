@@ -46,47 +46,25 @@ import FormPenulis from "@/components/form-penulis";
 interface Props {
     fakultas: Fakultas[];
     luaranJurnal?: LuaranJurnal;
-    role?: string;
 }
 
 function RequiredMark() {
     return <span className="ml-0.5 text-red-500">*</span>;
 }
 
-export default function FormLuaranJurnal({
-    fakultas,
-    luaranJurnal,
-    role,
-}: Props) {
+export default function FormLuaranJurnal({ fakultas, luaranJurnal }: Props) {
     const isEdit = !!luaranJurnal;
     const [jenisluaranJurnal, setJenisluaranJurnal] = useState(
         luaranJurnal?.jenis_luaran_jurnal ?? "",
     );
     const [semester, setSemester] = useState(luaranJurnal?.semester ?? "");
 
-    const actionAdmin = isEdit
-        ? route("admin.luaran_jurnal.update", luaranJurnal!.id)
-        : route("admin.luaran_jurnal.store");
-
-    const actionDosen = isEdit
-        ? route("dosen.luaran_jurnal.update", luaranJurnal!.id)
-        : route("dosen.luaran_jurnal.store");
-
-    const actionUppm = isEdit
-        ? route("uppm.luaran_jurnal.update", luaranJurnal!.id)
-        : route("uppm.luaran_jurnal.store");
+    const action = isEdit
+        ? route("luaran_jurnal.update", luaranJurnal!.id)
+        : route("luaran_jurnal.store");
 
     return (
-        <Form
-            action={
-                role === "dosen"
-                    ? actionDosen
-                    : role === "uppm"
-                      ? actionUppm
-                      : actionAdmin
-            }
-            method={isEdit ? "put" : "post"}
-        >
+        <Form action={action} method={isEdit ? "put" : "post"}>
             {({ errors, processing }) => (
                 <Card className="w-full shadow-sm">
                     <CardContent className="grid grid-cols-1 gap-8 pt-6 lg:grid-cols-3 lg:gap-10">
@@ -353,18 +331,16 @@ export default function FormLuaranJurnal({
                             </div>
                         </div>
 
-                       <FormPenulis fakultas={fakultas} data={luaranJurnal} errors={errors}/>
+                        <FormPenulis
+                            fakultas={fakultas}
+                            data={luaranJurnal}
+                            errors={errors}
+                        />
                     </CardContent>
 
                     <CardFooter className="flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-end">
                         <Link
-                            href={
-                                role === "dosen"
-                                    ? route("dosen.luaran_jurnal.index")
-                                    : role === "uppm"
-                                      ? route("uppm.luaran_jurnal.index")
-                                      : route("admin.luaran_jurnal.index")
-                            }
+                            href={route("luaran_jurnal.index")}
                             viewTransition
                             className="w-full sm:w-auto"
                         >

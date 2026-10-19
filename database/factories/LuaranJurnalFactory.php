@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\LuaranJurnal;
 use App\Models\Penulis;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -25,6 +26,7 @@ class LuaranJurnalFactory extends Factory
             'semester' => fake()->randomElement(["Ganjil", "Genap"]),
             'tahun' => fake()->numberBetween(now()->subYears(3)->year, now()->year),
             'link_berkas' => fake()->url(),
+            'user_id' => User::pluck('id')->random()
         ];
     }
 

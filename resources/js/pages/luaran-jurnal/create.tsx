@@ -12,10 +12,9 @@ import FormLuaranJurnal from "../forms/luaran-jurnal/form";
 
 interface Props {
     fakultas: Fakultas[];
-    role: string;
 }
 
-export default function CreateLuaranJurnal({ fakultas, role }: Props) {
+export default function CreateLuaranJurnal({ fakultas }: Props) {
     return (
         <>
             <Head title="Tambah Luaran Jurnal" />
@@ -37,7 +36,7 @@ export default function CreateLuaranJurnal({ fakultas, role }: Props) {
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
                                         href={route(
-                                            role + ".luaran_jurnal.index",
+                                            "luaran_jurnal.index",
                                         )}
                                     >
                                         Luaran Jurnal
@@ -47,7 +46,7 @@ export default function CreateLuaranJurnal({ fakultas, role }: Props) {
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
                                         href={route(
-                                            role + ".luaran_jurnal.create",
+                                            "luaran_jurnal.create",
                                         )}
                                     >
                                         Tambah Luaran Jurnal
@@ -57,7 +56,7 @@ export default function CreateLuaranJurnal({ fakultas, role }: Props) {
                         </Breadcrumb>
                     </div>
                 </div>
-                <FormLuaranJurnal fakultas={fakultas} role={role} />
+                <FormLuaranJurnal fakultas={fakultas} />
             </div>
         </>
     );

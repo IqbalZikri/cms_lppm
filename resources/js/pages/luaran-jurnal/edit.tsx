@@ -39,7 +39,7 @@ export default function EditLuaranJurnal({ fakultas, data }: Props) {
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
                                         href={route(
-                                            "admin.luaran_jurnal.index",
+                                            "luaran_jurnal.index",
                                         )}
                                     >
                                         Luaran Jurnal
@@ -49,7 +49,7 @@ export default function EditLuaranJurnal({ fakultas, data }: Props) {
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
                                         href={route(
-                                            "admin.luaran_jurnal.edit",
+                                            "luaran_jurnal.edit",
                                             data.id,
                                         )}
                                     >

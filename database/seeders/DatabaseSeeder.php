@@ -41,8 +41,8 @@ class DatabaseSeeder extends Seeder
             // DosenSeeder::class,
             // KegiatanSeeder::class,
             // PkmSeeder::class,
-            LuaranProsidingSeeder::class,
-            // LuaranJurnalSeeder::class,
+            // LuaranProsidingSeeder::class,
+            LuaranJurnalSeeder::class,
             // LuaranBukuSeeder::class
             // HkiSeeder::class,
         ]);

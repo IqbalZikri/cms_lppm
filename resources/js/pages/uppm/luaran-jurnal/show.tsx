@@ -23,9 +23,10 @@ import { PenulisRow } from "@/pages/kegiatan/show";
 
 interface Props {
     data: LuaranJurnal;
+    backUrl: string;
 }
 
-export default function Show({ data }: Props) {
+export default function Show({ data, backUrl }: Props) {
     const daftarPenulis: PenulisRow[] = [
         ...(data.penulis ?? []).map((p) => ({
             tipe: "internal" as const,
@@ -47,7 +48,7 @@ export default function Show({ data }: Props) {
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
                     <Link
-                        href={route("uppm.luaran_jurnal.index")}
+                        href={backUrl}
                         viewTransition
                     >
                         <Button variant="outline" size="sm">

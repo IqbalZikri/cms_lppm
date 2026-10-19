@@ -135,7 +135,7 @@ const mainNavItems: NavItem[] = [
             },
             {
                 title: "Luaran Jurnal",
-                href: route("admin.luaran_jurnal.index"),
+                href: route("luaran_jurnal.index"),
                 icon: Notebook,
             },
             {

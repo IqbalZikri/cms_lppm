@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
+use App\Concerns\FilterFakultas;
+use App\Concerns\Visible;
 use App\Models\Concerns\Searchable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class LuaranJurnal extends Model
 {
-    use HasFactory, Searchable;
+    use HasFactory, Searchable, SoftDeletes, Visible, FilterFakultas;
 
     protected array $searchable = [
         "jenis_luaran_jurnal",
@@ -30,6 +33,8 @@ class LuaranJurnal extends Model
         'link_berkas',
         'user_id',
     ];
+
+
 
     public function penulis(): MorphMany
     {

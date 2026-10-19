@@ -11,4 +11,5 @@ export interface LuaranJurnal {
     link_berkas: string;
     penulis: Penulis[];
     penulis_luar: PenulisLuar[];
+    deleted_at: Date;
 }
