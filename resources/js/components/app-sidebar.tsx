@@ -119,7 +119,7 @@ const mainNavItems: NavItem[] = [
             },
             {
                 title: "PKM",
-                href: route("admin.pkm.index"),
+                href: route("pkm.index"),
                 icon: HandHeart,
             },
         ],

@@ -23,6 +23,11 @@ import { FileText, HandHeart, Plus } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import { route } from "ziggy-js";
 
+interface Stats {
+    total: number;
+    perFakultas: { label: string; count: number }[];
+}
+
 interface Props {
     data: PaginatedData<PkmInterface>;
     fakultas: Fakultas[];
@@ -30,22 +35,10 @@ interface Props {
         search?: string;
         cari_fakultas?: string;
     };
-    totalPkm: number;
-    totalPkmPerFakultas: string[];
+    stats: Stats | null;
 }
 
-export default function Pkm({
-    data,
-    fakultas,
-    filters,
-    totalPkm,
-    totalPkmPerFakultas,
-}: Props) {
-    const statistikFakultas = totalPkmPerFakultas.map((item: any) => ({
-        label: item.label,
-        count: item.count,
-    }));
-
+export default function Pkm({ data, fakultas, filters, stats }: Props) {
     const [search, setSearch] = useState(filters.search ?? "");
     const [fakultasId, setFakultasId] = useState(filters.cari_fakultas ?? "");
 
@@ -59,7 +52,7 @@ export default function Pkm({
 
         const timeout = setTimeout(() => {
             router.get(
-                route("admin.pkm.index"),
+                route("pkm.index"),
                 {
                     ...(search && { search }),
                     ...(fakultasId && { cari_fakultas: fakultasId }),
@@ -84,19 +77,18 @@ export default function Pkm({
                     breadcrumb={[
                         {
                             label: "PKM",
-                            href: "admin.pkm.index",
+                            href: "pkm.index",
                         },
                     ]}
                 />
-                <StatisticsCard
-                    dataCard={[
-                        {
-                            label: "Total PKM",
-                            count: totalPkm,
-                        },
-                        ...statistikFakultas,
-                    ]}
-                />
+                {stats && (
+                    <StatisticsCard
+                        dataCard={[
+                            { label: "Kegiatan", count: stats.total },
+                            ...stats.perFakultas,
+                        ]}
+                    />
+                )}
 
                 <Card>
                     <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
@@ -164,7 +156,7 @@ export default function Pkm({
                             </Link>
 
                             <Link
-                                href={route("admin.pkm.create")}
+                                href={route("pkm.create")}
                                 viewTransition
                                 className="w-full sm:w-auto"
                             >
@@ -277,7 +269,7 @@ export default function Pkm({
                             renderActions={(item) => (
                                 <>
                                     <Link
-                                        href={route("admin.pkm.edit", item.id)}
+                                        href={route("pkm.edit", item.id)}
                                         viewTransition
                                     >
                                         <Button variant={"outline"}>
@@ -285,7 +277,7 @@ export default function Pkm({
                                         </Button>
                                     </Link>
                                     <Link
-                                        href={route("admin.pkm.show", {
+                                        href={route("pkm.show", {
                                             pkm: item.id,
                                             from: "index",
                                         })}
@@ -296,7 +288,7 @@ export default function Pkm({
                                     <DialogDelete
                                         label={item.judul}
                                         actionUrl={route(
-                                            "admin.pkm.destroy",
+                                            "pkm.destroy",
                                             item.id,
                                         )}
                                         page="Penelitian Pengabdian Kepada Masyarakat"

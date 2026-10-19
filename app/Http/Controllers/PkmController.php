@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\SyncAuthors;
+use App\Http\Requests\PkmRequest;
 use App\Models\Dosen;
 use App\Models\Fakultas;
 use App\Models\Penulis;
 use App\Models\Pkm;
 use DB;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -14,429 +18,176 @@ use Log;
 
 class PkmController extends Controller
 {
-    public function indexAdmin(Request $request)
+    use AuthorizesRequests;
+    private const PER_PAGE = 10;
+
+    private function stats(Collection $fakultas): array
     {
-        $pkm = Pkm::query()->with('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
-
-        if ($request->filled('cari_fakultas')) {
-            $pkm->whereHas('penulis', function ($q) use ($request) {
-                $q->where('fakultas_id', $request->cari_fakultas);
-            });
-        }
-
-        $data = $pkm->clone()->search($request->query('search'))->latest()->paginate(10)->withQueryString();
-        $fakultas = Fakultas::select('id', "nama_fakultas")->get();
-
-        $totalPkm = Pkm::count();
         $counts = Penulis::where('penulisable_type', Pkm::class)
             ->selectRaw('fakultas_id, count(*) as total')
             ->groupBy('fakultas_id')
             ->pluck('total', 'fakultas_id');
 
-        $totalPkmPerFakultas = $fakultas->map(fn($f) => [
-            'label' => $f->nama_fakultas,
-            'count' => $counts[$f->id] ?? 0,
-        ])->values();
+        return [
+            'total' => Pkm::count(),
+            'perFakultas' => $fakultas->map(fn($f) => [
+                'label' => $f->nama_fakultas,
+                'count' => $counts[$f->id] ?? 0,
+            ])->values(),
+        ];
+    }
 
-        return Inertia::render('admin/pkm/index', [
-            'data' => $data,
+    public function index(Request $request)
+    {
+        $this->authorize('viewAny', Pkm::class);
+
+        $user = $request->user();
+        $filters = $request->only('search', 'cari_fakultas');
+        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
+
+        $pkm = Pkm::visibleTo($user)
+            ->with($this->authorRelations())
+            ->filter($filters)
+            ->latest()
+            ->paginate(self::PER_PAGE)
+            ->withQueryString();
+
+        return Inertia::render('pkm/index', [
+            'data' => $pkm,
+            'filters' => $filters,
             'fakultas' => $fakultas,
-            'filters' => $request->only('search', 'cari_fakultas'),
-            'totalPkm' => $totalPkm,
-            'totalPkmPerFakultas' => $totalPkmPerFakultas,
+            'stats' => $user->role === 'admin' ? $this->stats($fakultas) : null,
         ]);
     }
 
-    public function indexRoleDosen(Request $request)
+    public function dihapus(Request $request)
     {
-        $dosen = Dosen::where('user_id', auth()->user()->id)->first();
-        $data = Pkm::where(function ($q) use ($dosen) {
-            $q->where('user_id', $dosen->user_id)
-                ->orWhereHas('penulis', fn($p) => $p->where('dosen_id', $dosen->user_id));
-        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen', 'penulisLuar')->latest()->paginate(10)->withQueryString();
-        return Inertia::render('dosen/pkm/index', [
-            'data' => $data,
-            'filters' => $request->only("search"),
-        ]);
-    }
+        $this->authorize('viewTrashed', Pkm::class);
 
-    public function indexRoleUppm(Request $request)
-    {
-        $user = auth()->user();
-        $data = Pkm::where(function ($q) use ($user) {
-            $q->where('user_id', $user->id)
-                ->orWhereHas('penulis', fn($p) => $p->where('fakultas_id', $user->fakultas_id));
-        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen', 'penulisLuar')->latest()->paginate(10)->withQueryString();
+        $filters = $request->only('search', 'cari_fakultas');
 
-        return Inertia::render('uppm/pkm/index', [
-            'data' => $data,
-            'filters' => $request->only("search")
+        $pkm = Pkm::onlyTrashed()
+            ->visibleTo($request->user())
+            ->with($this->authorRelations(withTrashed: true))
+            ->filter($filters)
+            ->latest()
+            ->paginate(self::PER_PAGE)
+            ->withQueryString();
+
+        return Inertia::render('pkm/dihapus', [
+            'pkm' => $pkm,
+            'filters' => $filters,
+            'fakultas' => Fakultas::select('id', 'nama_fakultas')->get(),
         ]);
     }
 
     public function create()
     {
-        $fakultas = Fakultas::get();
-        $role = auth()->user()->role;
+        $this->authorize('create', pkm::class);
+
         return Inertia::render('pkm/create', [
-            'fakultas' => $fakultas,
-            'role' => $role,
+            'fakultas' => Fakultas::get(),
         ]);
     }
 
-    public function createRoleDosen()
+    public function show(Pkm $pkm, Request $request)
     {
-        $fakultas = Fakultas::get();
-        $role = auth()->user()->role;
-        return Inertia::render('dosen/pkm/create', [
-            'fakultas' => $fakultas,
-            'role' => $role,
-        ]);
-    }
-
-    public function createRoleUppm()
-    {
-        $fakultas = Fakultas::get();
-        $role = auth()->user()->role;
-        return Inertia::render('uppm/pkm/create', [
-            'fakultas' => $fakultas,
-            'role' => $role,
-        ]);
-    }
-
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'jenis_pkm' => ['required', Rule::in(['pelaksanaan', 'jurnal'])],
-            'judul' => 'required',
-            'gambar' => 'nullable|max:2048|mimes:png,jpg,jpeg',
-            'abstrak' => 'required',
-            'semester' => 'required',
-            'tahun' => 'required',
-            'link_berkas' => 'required',
-            'sumber_dana' => ['required', Rule::in(['internal', 'eksternal'])],
-            'jumlah_dana' => 'required|numeric',
-            'authors' => 'required|array|min:1',
-            'authors.*.tipe' => 'required|in:internal,luar',
-            'authors.*.fakultas_id' => 'required_if:authors.*.tipe,internal|nullable|exists:fakultas,id',
-            'authors.*.dosen_id' => 'required_if:authors.*.tipe,internal|nullable|exists:dosens,id',
-            'authors.*.nama_universitas' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
-            'authors.*.nama_dosen' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
-        ], [
-            'jenis_pkm.required' => 'Silahkan pilih jenis pkm',
-            'judul.required' => 'Silahkan isi judul',
-            'gambar.max' => 'Gambar tidak bisa lebih dari 2 MB',
-            'gambar.mimes' => 'Format file harus berupa jpg / jpeg / png',
-            'abstrak.required' => 'Silahkan isi abstrak',
-            'semester.required' => 'Silahkan isi semester',
-            'tahun.required' => 'Silahkan isi tahun',
-            'link_berkas.required' => 'Silahkan isi link berkas',
-            'sumber_dana.required' => 'Silahkan isi sumber dana',
-            'sumber_dana.in' => 'Sumber dana tidak valid',
-            'jumlah_dana.required' => 'Silahkan isi jumlah dana',
-            'jumlah_dana.numeric' => 'Jumlah dana harus berupa angka',
-            'authors.required' => 'Silahkan tambahkan minimal satu penulis',
-            'authors.*.fakultas_id.required_if' => 'Silahkan pilih fakultas',
-            'authors.*.dosen_id.required_if' => 'Silahkan pilih dosen',
-            'authors.*.nama_universitas.required_if' => 'Silahkan isi nama universitas',
-            'authors.*.nama_dosen.required_if' => 'Silahkan isi nama dosen',
-        ]);
-
-        DB::beginTransaction();
-
-        try {
-            $pkm = Pkm::create([
-                'jenis_pkm' => $validated['jenis_pkm'],
-                'judul' => $validated['judul'],
-                'abstrak' => $validated['abstrak'],
-                'semester' => $validated['semester'],
-                'tahun' => $validated['tahun'],
-                'link_berkas' => $validated['link_berkas'],
-                'sumber_dana' => $validated['sumber_dana'],
-                'jumlah_dana' => $validated['jumlah_dana'],
-                'user_id' => auth()->user()->id,
-            ]);
-
-            foreach ($validated['authors'] as $i => $author) {
-                if ($author['tipe'] === 'internal') {
-                    $pkm->penulis()->create([
-                        'fakultas_id' => $author['fakultas_id'],
-                        'dosen_id' => $author['dosen_id'],
-                        'urutan' => $i + 1,
-                    ]);
-                } else {
-                    $pkm->penulisLuar()->create([
-                        'nama_universitas' => $author['nama_universitas'],
-                        'nama_dosen' => $author['nama_dosen'],
-                        'urutan' => $i + 1,
-                    ]);
-                }
-            }
-
-            DB::commit();
-
-            return redirect()->route(auth()->user()->role . '.pkm.index')->with('success', 'Berhasil menambahkan pkm');
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
-            return back()->with('error', 'Terjadi Kesalahan');
-        }
-    }
-
-    public function show(Request $request, Pkm $pkm)
-    {
-        $data = $pkm;
-        Log::info($data);
-        $role = auth()->user()->role;
-        $data->load([
-            'penulis' => fn($q) => $q->withTrashed(),
-            'penulis.dosen',
-            'penulis.fakultas',
-            'penulisLuar' => fn($q) => $q->withTrashed(),
-        ]);
+        $this->authorize('view', $pkm);
 
         $backUrl = $request->query('from') === 'dihapus'
             ? route('pkm.dihapus')
-            : route($role . '.pkm.index');
+            : route('pkm.index');
 
-        switch ($role) {
-            case 'dosen':
-                return Inertia::render('dosen/pkm/show', [
-                    'data' => $data,
-                    'role' => auth()->user()->role,
-                    'backUrl' => $backUrl
-                ]);
-                break;
-
-            case 'uppm':
-                return Inertia::render('dosen/pkm/show', [
-                    'data' => $data,
-                    'role' => auth()->user()->role,
-                    'backUrl' => $backUrl
-                ]);
-                break;
-
-            default:
-                return Inertia::render('pkm/show', [
-                    'data' => $data,
-                    'role' => auth()->user()->role,
-                    'backUrl' => $backUrl
-                ]);
-                break;
-        }
-    }
-
-    public function showRoleDosen($id)
-    {
-        $data = Pkm::findOrFail($id);
-        $data->load('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
-        return Inertia::render('dosen/pkm/show', [
-            'data' => $data,
-            'role' => auth()->user()->role,
+        return Inertia::render('pkm/show', [
+            'pkm' => $pkm->load($this->authorRelations(withTrashed: true)),
+            'backUrl' => $backUrl
         ]);
     }
 
-    public function showRoleUppm($id)
+    public function edit(Pkm $pkm)
     {
-        $data = Pkm::findOrFail($id);
-        $data->load('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
-        return Inertia::render('uppm/pkm/show', [
-            'data' => $data,
-            'role' => auth()->user()->role,
-        ]);
-    }
+        $this->authorize('update', $pkm);
 
-    public function edit($id)
-    {
-        $data = Pkm::findOrFail($id);
-        $data->load('penulis', 'penulisLuar');
-        $fakultas = Fakultas::get();
         return Inertia::render('pkm/edit', [
-            'data' => $data,
-            'fakultas' => $fakultas,
-            'role' => auth()->user()->role,
+            'pkm' => $pkm->load('penulis', 'penulisLuar'),
+            'fakultas' => Fakultas::get(),
         ]);
     }
 
-    public function editRoleDosen($id)
+    public function store(PkmRequest $request, SyncAuthors $syncAuthors)
     {
-        $data = Pkm::findOrFail($id);
-        $data->load('penulis', 'penulisLuar');
-        $fakultas = Fakultas::get();
-        return Inertia::render('dosen/pkm/edit', [
-            'data' => $data,
-            'fakultas' => $fakultas,
-            'role' => auth()->user()->role,
-        ]);
-    }
-
-    public function editRoleUppm($id)
-    {
-        $data = Pkm::findOrFail($id);
-        $data->load('penulis', 'penulisLuar');
-        $fakultas = Fakultas::get();
-        return Inertia::render('uppm/pkm/edit', [
-            'data' => $data,
-            'fakultas' => $fakultas,
-            'role' => auth()->user()->role,
-        ]);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $validated = $request->validate([
-            'jenis_pkm' => ['required', Rule::in(['pelaksanaan', 'jurnal'])],
-            'judul' => 'required',
-            'abstrak' => 'required',
-            'semester' => 'required',
-            'tahun' => 'required',
-            'link_berkas' => 'required',
-            'sumber_dana' => ['required', Rule::in(['internal', 'eksternal'])],
-            'jumlah_dana' => 'required|numeric',
-            'authors' => 'required|array|min:1',
-            'authors.*.tipe' => 'required|in:internal,luar',
-            'authors.*.fakultas_id' => 'required_if:authors.*.tipe,internal|nullable|exists:fakultas,id',
-            'authors.*.dosen_id' => 'required_if:authors.*.tipe,internal|nullable|exists:dosens,id',
-            'authors.*.nama_universitas' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
-            'authors.*.nama_dosen' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
-        ], [
-            'jenis_pkm.required' => 'Silahkan pilih jenis pkm',
-            'judul.required' => 'Silahkan isi judul',
-            'abstrak.required' => 'Silahkan isi abstrak',
-            'semester.required' => 'Silahkan isi semester',
-            'tahun.required' => 'Silahkan isi tahun',
-            'link_berkas.required' => 'Silahkan isi link berkas',
-            'sumber_dana.required' => 'Silahkan isi sumber dana',
-            'sumber_dana.in' => 'Sumber dana tidak valid',
-            'jumlah_dana.required' => 'Silahkan isi jumlah dana',
-            'jumlah_dana.numeric' => 'Jumlah dana harus berupa angka',
-            'authors.required' => 'Silahkan tambahkan minimal satu penulis',
-            'authors.*.fakultas_id.required_if' => 'Silahkan pilih fakultas',
-            'authors.*.dosen_id.required_if' => 'Silahkan pilih dosen',
-            'authors.*.nama_universitas.required_if' => 'Silahkan isi nama universitas',
-            'authors.*.nama_dosen.required_if' => 'Silahkan isi nama dosen',
-        ]);
-
-        DB::beginTransaction();
-
-        try {
-            $pkm = Pkm::findOrFail($id);
-            $pkm->update([
-                'jenis_pkm' => $validated['jenis_pkm'],
-                'judul' => $validated['judul'],
-                'abstrak' => $validated['abstrak'],
-                'semester' => $validated['semester'],
-                'tahun' => $validated['tahun'],
-                'link_berkas' => $validated['link_berkas'],
-                'sumber_dana' => $validated['sumber_dana'],
-                'jumlah_dana' => $validated['jumlah_dana'],
+        DB::transaction(function () use ($request, $syncAuthors) {
+            $pkm = Pkm::create([
+                ...$request->safe()->except('authors'),
+                'user_id' => $request->user()->id,
             ]);
 
-            $pkm->penulis()->delete();
-            $pkm->penulisLuar()->delete();
+            $syncAuthors->handle($pkm, $request->validated('authors'));
+        });
 
-            foreach ($validated['authors'] as $i => $author) {
-                if ($author['tipe'] === 'internal') {
-                    $pkm->penulis()->create([
-                        'fakultas_id' => $author['fakultas_id'],
-                        'dosen_id' => $author['dosen_id'],
-                        'urutan' => $i + 1,
-                    ]);
-                } else {
-                    $pkm->penulisLuar()->create([
-                        'nama_universitas' => $author['nama_universitas'],
-                        'nama_dosen' => $author['nama_dosen'],
-                        'urutan' => $i + 1,
-                    ]);
-                }
-            }
-
-            DB::commit();
-
-            return redirect()->route(auth()->user()->role . '.pkm.index')->with('success', 'Berhasil memperbarui pkm');
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
-            return back()->with('error', 'Terjadi Kesalahan');
-        }
+        return to_route('pkm.index')->with('success', 'Berhasil menambahkan kegiatan');
     }
 
-    public function destroy($id)
+    public function update(PkmRequest $request, Pkm $pkm, SyncAuthors $syncAuthors)
     {
-        $data = Pkm::findOrFail($id);
+        DB::transaction(function () use ($request, $pkm, $syncAuthors) {
+            $pkm->update($request->safe()->except('authors'));
+            $syncAuthors->handle($pkm, $request->validated('authors'));
+        });
 
-        try {
-            $data->penulis()->delete();
-            $data->penulisLuar()->delete();
-            $data->delete();
-            return back()->with('success', 'Berhasil menghapus pkm');
-        } catch (\Throwable $th) {
-            Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
-            return back()->with('error', 'Terjadi Kesalahan');
-        }
+        return to_route('pkm.index')->with('success', 'Berhasil memperbarui kegiatan');
     }
 
-    public function pkmDihapus(Request $request)
+    public function destroy(Pkm $kegiatan)
     {
-        $queryKegiatan = Pkm::onlyTrashed()->with([
+        $this->authorize('delete', $kegiatan);
+
+        DB::transaction(function () use ($kegiatan) {
+            $kegiatan->penulis()->delete();
+            $kegiatan->penulisLuar()->delete();
+            $kegiatan->delete();
+        });
+
+        return back()->with('success', 'Berhasil menghapus kegiatan');
+    }
+
+    public function restore(Pkm $kegiatan)
+    {
+        $this->authorize('restore', $kegiatan);
+
+        DB::transaction(function () use ($kegiatan) {
+            $kegiatan->penulis()->restore();
+            $kegiatan->penulisLuar()->restore();
+            $kegiatan->restore();
+        });
+
+        return back()->with('success', 'Berhasil memulihkan kegiatan');
+    }
+
+    public function forceDelete(Pkm $pkm)
+    {
+        $this->authorize('forceDelete', $pkm);
+
+        DB::transaction(function () use ($pkm) {
+            $pkm->penulis()->forceDelete();
+            $pkm->penulisLuar()->forceDelete();
+            $pkm->forceDelete();
+        });
+
+        return back()->with('success', 'Berhasil menghapus permanen kegiatan');
+    }
+
+    private function authorRelations(bool $withTrashed = false): array
+    {
+        if (!$withTrashed) {
+            return ['penulis.fakultas', 'penulis.dosen', 'penulisLuar'];
+        }
+
+        return [
             'penulis' => fn($q) => $q->withTrashed(),
             'penulis.dosen',
             'penulis.fakultas',
             'penulisLuar' => fn($q) => $q->withTrashed(),
-        ]);
-
-        if ($request->filled('cari_fakultas')) {
-            $queryKegiatan->whereHas('penulis', function ($q) use ($request) {
-                $q->withTrashed()->where("fakultas_id", $request->cari_fakultas);
-            });
-        }
-
-        $data = $queryKegiatan->clone()->search($request->query('search'))->latest()->paginate(10)->withQueryString();
-        $fakultas = Fakultas::select("id", "nama_fakultas")->get();
-        $role = auth()->user()->role;
-
-        return Inertia::render("dihapus/pkm", [
-            'data' => $data,
-            "fakultas" => $fakultas,
-            'filters' => $request->only("search", "cari_fakultas"),
-            "role" => $role
-        ]);
-    }
-
-    public function restore($id)
-    {
-        $pkm = Pkm::onlyTrashed()->findOrFail($id);
-
-        try {
-            $pkm->penulis()->restore();
-            $pkm->penulisLuar()->restore();
-            $pkm->restore();
-
-            return back()->with("success", "Berhasil restore pkm");
-        } catch (\Throwable $th) {
-            Log::info($th->getMessage());
-            return back()->with("error", "Terjadi Kesalahan");
-        }
-    }
-
-    public function forceDelete($id)
-    {
-        $pkm = Pkm::onlyTrashed()->findOrFail($id);
-
-        DB::beginTransaction();
-
-        try {
-            $pkm->penulis()->forceDelete();
-            $pkm->penulisLuar()->forceDelete();
-            $pkm->forceDelete();
-
-            DB::commit();
-
-            return back()->with("success", "Berhasil menghapus penelitian pkm");
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            Log::info($th->getMessage());
-            return back()->with("error", "Terjadi Kesalahan");
-        }
+        ];
     }
 }

@@ -41,24 +41,30 @@ Route::middleware('auth')->group(function () {
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('profile/{id}', [ProfileController::class, 'updateProfileDosen'])->name('dosen.profile.updateProfileDosen');
 
-    // Route::get("kegiatan/dihapus", [KegiatanController::class, "kegiatanDihapus"])->name("kegiatan.dihapus");
-    // Route::get("dosen/kegiatan/dihapus", [KegiatanController::class, "kegiatanDihapus"])->name("dosen.kegiatan.dihapus");
-    // Route::patch('kegiatan/{id}/restore', [KegiatanController::class, 'restore'])->name('kegiatan.restore');
-    // Route::delete('kegiatan/force-delete/{id}', [KegiatanController::class, 'forceDelete'])->name('kegiatan.forceDelete');
-
+    // Kegiatan
     Route::get('kegiatan/dihapus', [KegiatanController::class, 'dihapus'])
         ->name('kegiatan.dihapus'); // harus SEBELUM resource, kalau tidak "dihapus" dianggap {kegiatan}
-
     Route::patch('kegiatan/{kegiatan}/restore', [KegiatanController::class, 'restore'])
         ->withTrashed()
         ->name('kegiatan.restore');
-
     Route::delete('kegiatan/{kegiatan}/force', [KegiatanController::class, 'forceDelete'])
         ->withTrashed()
         ->name('kegiatan.force-delete');
-
     Route::resource('kegiatan', KegiatanController::class)->except('destroy')->withTrashed(['show']);
     Route::delete('kegiatan/{kegiatan}', [KegiatanController::class, 'destroy'])->name('kegiatan.destroy');
+
+    // pkm
+    Route::get('pkm/dihapus', [PkmController::class, 'dihapus'])
+        ->name('pkm.dihapus'); // harus SEBELUM resource, kalau tidak "dihapus" dianggap {pkm}
+    Route::patch('pkm/{pkm}/restore', [PkmController::class, 'restore'])
+        ->withTrashed()
+        ->name('pkm.restore');
+    Route::delete('pkm/{pkm}/force', [PkmController::class, 'forceDelete'])
+        ->withTrashed()
+        ->name('pkm.force-delete');
+    Route::resource('pkm', PkmController::class)->except('destroy')->withTrashed(['show']);
+    Route::delete('pkm/{kegiatan}', [KegiatanController::class, 'destroy'])->name('kegiatan.destroy');
+
 
     Route::get("pkm/dihapus", [PkmController::class, "pkmDihapus"])->name("pkm.dihapus");
     Route::patch('pkm/{id}/restore', [PkmController::class, 'restore'])->name('pkm.restore');
@@ -115,22 +121,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::put('berita/{berita}', [BeritaController::class, 'update'])->name('berita.update');
         Route::delete('berita/{berita}', [BeritaController::class, 'destroy'])->name('berita.destroy');
         Route::put('berita/archived/{berita}', [BeritaController::class, 'archivedBerita'])->name('berita.archivedBerita');
-
-        Route::get('kegiatan', [KegiatanController::class, 'indexAdmin'])->name('kegiatan.index');
-        Route::get('kegiatan/create', [KegiatanController::class, 'create'])->name('kegiatan.create');
-        Route::post('kegiatan/create', [KegiatanController::class, 'store'])->name('kegiatan.store');
-        Route::get('kegiatan/show/{kegiatan}', [KegiatanController::class, 'show'])->name('kegiatan.show')->withTrashed();
-        Route::get('kegiatan/{id}', [KegiatanController::class, 'edit'])->name('kegiatan.edit');
-        Route::put('kegiatan/{id}', [KegiatanController::class, 'update'])->name('kegiatan.update');
-        Route::delete('kegiatan/{id}', [KegiatanController::class, 'destroy'])->name('kegiatan.destroy');
-
-        Route::get('pkm', [PkmController::class, 'indexAdmin'])->name('pkm.index');
-        Route::get('pkm/create', [PkmController::class, 'create'])->name('pkm.create');
-        Route::post('pkm/create', [PkmController::class, 'store'])->name('pkm.store');
-        Route::get('pkm//detail/{pkm}', [PkmController::class, 'show'])->name('pkm.show')->withTrashed();
-        Route::get('pkm/{id}', [PkmController::class, 'edit'])->name('pkm.edit');
-        Route::put('pkm/{id}', [PkmController::class, 'update'])->name('pkm.update');
-        Route::delete('pkm/{id}', [PkmController::class, 'destroy'])->name('pkm.destroy');
 
         Route::get('luaran_prosiding', [LuaranProsidingController::class, 'indexAdmin'])->name('luaran_prosiding.index');
         Route::get('luaran_prosiding/create', [LuaranProsidingController::class, 'create'])->name('luaran_prosiding.create');

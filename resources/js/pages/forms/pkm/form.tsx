@@ -71,29 +71,10 @@ export default function FormPkm({ fakultas, pkm, role }: Props) {
         pkm?.jumlah_dana ? String(pkm?.jumlah_dana) : "",
     );
 
-    const actionAdmin = isEdit
-        ? route("admin.pkm.update", pkm!.id)
-        : route("admin.pkm.store");
-
-    const actionDosen = isEdit
-        ? route("dosen.pkm.update", pkm!.id)
-        : route("dosen.pkm.store");
-
-    const actionUppm = isEdit
-        ? route("uppm.pkm.update", pkm!.id)
-        : route("uppm.pkm.store");
+    const action = isEdit ? route("pkm.update", pkm.id) : route("pkm.store");
 
     return (
-        <Form
-            action={
-                role === "dosen"
-                    ? actionDosen
-                    : role === "uppm"
-                      ? actionUppm
-                      : actionAdmin
-            }
-            method={isEdit ? "put" : "post"}
-        >
+        <Form action={action} method={isEdit ? "put" : "post"}>
             {({ errors, processing }) => (
                 <Card className="w-full shadow-sm">
                     <CardContent className="grid grid-cols-1 gap-8 pt-6 lg:grid-cols-3 lg:gap-10">
@@ -446,13 +427,7 @@ export default function FormPkm({ fakultas, pkm, role }: Props) {
 
                     <CardFooter className="flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-end">
                         <Link
-                            href={
-                                role === "dosen"
-                                    ? route("dosen.pkm.index")
-                                    : role === "uppm"
-                                      ? route("uppm.pkm.index")
-                                      : route("admin.pkm.index")
-                            }
+                            href={route("pkm.index")}
                             viewTransition
                             className="w-full sm:w-auto"
                         >

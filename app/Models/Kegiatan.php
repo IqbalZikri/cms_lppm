@@ -35,7 +35,7 @@ class Kegiatan extends Model
         'user_id',
     ];
 
-    public function scopeVisibleTo(Builder $query, User $user, Dosen $dosen = null): Builder
+    public function scopeVisibleTo(Builder $query, User $user): Builder
     {
         return match ($user->role) {
             'admin' => $query,
