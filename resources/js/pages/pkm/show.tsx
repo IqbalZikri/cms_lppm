@@ -81,7 +81,7 @@ export default function Show({ data, role, backUrl }: Props) {
 
                     {!data.deleted_at && (
                         <Link
-                            href={route(role + ".pkm.edit", data.id)}
+                            href={route("pkm.edit", data.id)}
                             viewTransition
                         >
                             <Button size="sm">

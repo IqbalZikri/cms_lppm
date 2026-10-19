@@ -36,15 +36,15 @@ class DatabaseSeeder extends Seeder
 
 
         $this->call([
-            FakultasSeeder::class,
+            // FakultasSeeder::class,
             // ProdiSeeder::class,
             // DosenSeeder::class,
             // KegiatanSeeder::class,
             // PkmSeeder::class,
-            // HkiSeeder::class,
+            LuaranProsidingSeeder::class,
             // LuaranJurnalSeeder::class,
-            // LuaranProsidingSeeder::class,
             // LuaranBukuSeeder::class
+            // HkiSeeder::class,
         ]);
 
     }

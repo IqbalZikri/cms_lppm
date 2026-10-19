@@ -33,7 +33,7 @@ class PkmRequest extends FormRequest
             'judul' => ['required', 'string', 'max:255'],
             'gambar' => ['nullable', 'image', 'mimes:png,jpg,jpeg', 'max:2048'],
             'abstrak' => ['required', 'string'],
-            'semester' => ['required', Rule::in(['ganjil', 'genap'])], // sesuaikan nilainya
+            'semester' => ['required'], 
             'tahun' => ['required', 'digits:4'],
             'link_berkas' => ['required', 'url', 'max:2048'],
             'sumber_dana' => ['required', Rule::in(['internal', 'eksternal'])],

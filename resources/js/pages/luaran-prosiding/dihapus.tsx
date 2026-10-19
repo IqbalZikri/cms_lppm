@@ -1,5 +1,6 @@
 import { DialogDelete, DialogRestore } from "@/components/dialog-form";
 import Header from "@/components/header";
+import StatisticsCard from "@/components/statistic-card";
 import TablePage from "@/components/table-page";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,45 +15,38 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Kegiatan } from "@/interface/kegiatan";
+import { LuaranProsiding } from "@/interface/luaran-prosiding";
 import { PaginatedData } from "@/interface/pagination";
-import { Auth, User } from "@/types";
 import { Fakultas } from "@/types/fakultas";
 import { Head, Link, router } from "@inertiajs/react";
-import { Activity, ArrowLeft, FileText } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ArrowLeft, FileText, HandHeart, Plus } from "lucide-react";
+import { FormEvent, useEffect, useState } from "react";
 import { route } from "ziggy-js";
 
 interface Props {
-    data: PaginatedData<Kegiatan>;
+    data: PaginatedData<LuaranProsiding>;
     fakultas: Fakultas[];
     filters: {
         search?: string;
-        cari_fakultas: string;
+        cari_fakultas?: string;
     };
-    auth: Auth;
 }
 
-export default function KegiatanDihapus({
-    data,
-    fakultas,
-    filters,
-    auth,
-}: Props) {
+export default function Dihapus({ data, fakultas, filters }: Props) {
     const [search, setSearch] = useState(filters.search ?? "");
     const [fakultasId, setFakultasId] = useState(filters.cari_fakultas ?? "");
-    
 
     useEffect(() => {
         const sama =
             search === (filters.search ?? "") &&
             fakultasId === (filters.cari_fakultas ?? "");
 
+        // tidak ada perubahan, jangan request (ini yang menjaga page tetap)
         if (sama) return;
 
         const timeout = setTimeout(() => {
             router.get(
-                route("kegiatan.dihapus"),
+                route("luaran_prosiding.dihapus"),
                 {
                     ...(search && { search }),
                     ...(fakultasId && { cari_fakultas: fakultasId }),
@@ -70,20 +64,20 @@ export default function KegiatanDihapus({
 
     return (
         <>
-            <Head title="Kegiatan Dihapus" />
+            <Head title="Pengabdian Kepaga Masyarakat yang Dihapus" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <Link href={route(auth.user.role + ".kegiatan.index")} viewTransition>
+                <Link href={route("luaran_prosiding.index")} viewTransition>
                     <Button>
                         <ArrowLeft />
                         Kembali
                     </Button>
                 </Link>
                 <Header
-                    page="Penelitian Kegiatan yang Dihapus"
+                    page="Luaran Prosiding yang Dihapus"
                     breadcrumb={[
                         {
-                            label: "Penelitian Kegiatan yang Dihapus",
-                            href: "kegiatan.dihapus",
+                            label: "Dihapus",
+                            href: "luaran_prosiding.index",
                         },
                     ]}
                 />
@@ -92,16 +86,16 @@ export default function KegiatanDihapus({
                     <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-3">
                             <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-                                <Activity className="h-5 w-5" />
+                                <HandHeart className="h-5 w-5" />
                             </div>
 
                             <div>
                                 <CardTitle>
-                                    Daftar Penelitian Kegiatan yang Dihapus
+                                    Daftar Luaran Prosiding yang Dihapus
                                 </CardTitle>
 
                                 <p className="text-muted-foreground mt-1 text-sm">
-                                    Informasi penelitian kegiatan yang dihapus
+                                    Informasi Luaran Prosiding yang dihapus
                                     dalam sistem.
                                 </p>
                             </div>
@@ -137,75 +131,45 @@ export default function KegiatanDihapus({
                             <Field orientation="horizontal">
                                 <Input
                                     type="search"
-                                    placeholder="Cari Disini..."
+                                    placeholder="Search..."
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                 />
                             </Field>
-
-                            {/* <Link
-                                href={route("admin.kegiatan.create")}
-                                viewTransition
-                                className=""
-                            >
-                                <Button>
-                                    <Plus />
-                                    Tambah Penelitian Kegiatan
-                                </Button>
-                            </Link> */}
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <TablePage<Kegiatan>
+                        <TablePage<LuaranProsiding>
                             data={data}
                             columns={[
                                 {
                                     key: "judul",
-                                    label: "Judul Kegiatan",
+                                    label: "Judul",
                                 },
                                 {
-                                    id: "fakuktas",
+                                    id: "fakultas",
                                     key: "penulis",
                                     label: "Fakultas",
-                                    render: (_, item) => (
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {item.penulis.map((penulis, i) => (
-                                                <div
-                                                    key={i}
-                                                    className="flex flex-wrap items-center gap-1.5"
-                                                >
-                                                    <Badge className="whitespace-nowrap text-[13px]">
-                                                        {
-                                                            penulis.fakultas
-                                                                .nama_fakultas
-                                                        }
-                                                    </Badge>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ),
+                                    render: (_, item) =>
+                                        item.penulis.map((penulis, i) => (
+                                            <Badge key={i} className="mr-2">
+                                                {penulis.fakultas.nama_fakultas}
+                                            </Badge>
+                                        )),
                                 },
                                 {
                                     id: "dosen",
                                     key: "penulis",
                                     label: "Dosen",
-                                    render: (_, item) => (
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {item.penulis.map((penulis, i) => (
-                                                <div
-                                                    key={i}
-                                                    className="flex flex-wrap items-center gap-1.5"
-                                                >
-                                                    <Badge className="whitespace-nowrap text-[13px]">
-                                                        {
-                                                            penulis.dosen
-                                                                .nama_dosen
-                                                        }
-                                                    </Badge>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ),
+                                    render: (_, item) =>
+                                        item.penulis.map((penulis, i) => (
+                                            <Badge
+                                                key={i}
+                                                className="mr-2 rounded-md px-2 py-1 text-xs"
+                                            >
+                                                {penulis.dosen.nama_dosen}
+                                            </Badge>
+                                        )),
                                 },
                                 {
                                     id: "penulis_luar",
@@ -276,8 +240,8 @@ export default function KegiatanDihapus({
                             renderActions={(item) => (
                                 <>
                                     <Link
-                                        href={route(`${auth.user.role}.kegiatan.show`, {
-                                            kegiatan: item.id,
+                                        href={route("luaran_prosiding.show", {
+                                            luaran_prosiding: item.id,
                                             from: "dihapus",
                                         })}
                                         viewTransition
@@ -285,9 +249,9 @@ export default function KegiatanDihapus({
                                         <Button variant="default">Show</Button>
                                     </Link>
                                     <DialogRestore
-                                        page="Penelitian Kegiatan"
+                                        page="Luaran Prosiding"
                                         actionUrl={route(
-                                            "kegiatan.restore",
+                                            "luaran_prosiding.restore",
                                             item.id,
                                         )}
                                         label={item.judul}
@@ -296,10 +260,10 @@ export default function KegiatanDihapus({
                                     <DialogDelete
                                         label={item.judul}
                                         actionUrl={route(
-                                            "kegiatan.forceDelete",
+                                            "luaran_prosiding.force-delete",
                                             item.id,
                                         )}
-                                        page="Penelitian Kegiatan"
+                                        page="Luaran Prosiding"
                                         item={item}
                                     />
                                 </>
@@ -312,13 +276,10 @@ export default function KegiatanDihapus({
     );
 }
 
-KegiatanDihapus.layout = {
+Dihapus.layout = {
     breadcrumbs: [
         {
-            title: "Kegiatan",
-        },
-        {
-            title: "Kegiatan Dihapus",
+            title: "Pengabdian Kepada Masyarakat yang Dihapus",
         },
     ],
 };

@@ -84,7 +84,7 @@ export default function Pkm({ data, fakultas, filters, stats }: Props) {
                 {stats && (
                     <StatisticsCard
                         dataCard={[
-                            { label: "Kegiatan", count: stats.total },
+                            { label: "Pengabdian Kepada Masyarakat", count: stats.total },
                             ...stats.perFakultas,
                         ]}
                     />

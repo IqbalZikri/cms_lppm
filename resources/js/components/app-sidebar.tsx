@@ -130,7 +130,7 @@ const mainNavItems: NavItem[] = [
         items: [
             {
                 title: "Luaran Prosiding",
-                href: route("admin.luaran_prosiding.index"),
+                href: route("luaran_prosiding.index"),
                 icon: ScrollText,
             },
             {

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\Searchable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -29,6 +30,26 @@ class LuaranProsiding extends Model
         'link_berkas',
         'user_id',
     ];
+
+    public function scopeVisibleTo(Builder $query, User $user): Builder
+    {
+        return match ($user->role) {
+            'admin' => $query,
+            'dosen' => $query->where(fn($q) => $q->where('user_id', $user->id)),
+            'uppm' => $query->where(fn($q) => $q
+                ->where('user_id', $user->id)
+                ->orWhereHas('penulis', fn($p) => $p->where('fakultas_id', $user->fakultas_id))),
+            default => $query->whereRaw('1 = 0'), // role tak dikenal: tidak lihat apa pun
+        };
+    }
+
+    public function scopeFilter(Builder $query, array $filters): Builder
+    {
+        return $query
+            ->when($filters['cari_fakultas'] ?? null, fn($q, $fakultasId) =>
+                $q->whereHas('penulis', fn($p) => $p->withTrashed()->where('fakultas_id', $fakultasId)))
+            ->search($filters['search'] ?? null);
+    }
 
     public function penulis(): MorphMany
     {

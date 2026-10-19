@@ -52,14 +52,13 @@ import FormPenulis from "@/components/form-penulis";
 interface Props {
     fakultas: Fakultas[];
     kegiatan?: Kegiatan;
-    role?: string;
 }
 
 function RequiredMark() {
     return <span className="ml-0.5 text-red-500">*</span>;
 }
 
-export default function FormKegiatan({ fakultas, kegiatan, role }: Props) {
+export default function FormKegiatan({ fakultas, kegiatan }: Props) {
     const isEdit = !!kegiatan;
     const [semester, setSemester] = useState(kegiatan?.semester ?? "");
     const [sumberDana, setSumberDana] = useState(kegiatan?.sumber_dana ?? "");

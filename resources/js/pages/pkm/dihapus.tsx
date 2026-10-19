@@ -67,7 +67,7 @@ export default function Pkm({ data, fakultas, filters, role }: Props) {
         <>
             <Head title="Pengabdian Kepaga Masyarakat yang Dihapus" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <Link href={route(role + ".pkm.index")} viewTransition>
+                <Link href={route("pkm.index")} viewTransition>
                     <Button>
                         <ArrowLeft />
                         Kembali
@@ -78,7 +78,7 @@ export default function Pkm({ data, fakultas, filters, role }: Props) {
                     breadcrumb={[
                         {
                             label: "PKM",
-                            href: "admin.pkm.index",
+                            href: "pkm.index",
                         },
                     ]}
                 />
@@ -242,7 +242,7 @@ export default function Pkm({ data, fakultas, filters, role }: Props) {
                             renderActions={(item) => (
                                 <>
                                     <Link
-                                        href={route("admin.pkm.show", {
+                                        href={route("pkm.show", {
                                             pkm: item.id,
                                             from: "dihapus",
                                         })}
@@ -262,7 +262,7 @@ export default function Pkm({ data, fakultas, filters, role }: Props) {
                                     <DialogDelete
                                         label={item.judul}
                                         actionUrl={route(
-                                            "pkm.forceDelete",
+                                            "pkm.force-delete",
                                             item.id,
                                         )}
                                         page="Pengabdian Kepada Masyarakat"

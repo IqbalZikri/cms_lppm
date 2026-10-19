@@ -12,10 +12,9 @@ import FormLuaranProsiding from "../forms/luaran-prosiding/form";
 
 interface Props {
     fakultas: Fakultas[];
-    role: string;
 }
 
-export default function CreateLuaranProsiding({ fakultas, role }: Props) {
+export default function CreateLuaranProsiding({ fakultas }: Props) {
     return (
         <>
             <Head title="Tambah Luaran Prosiding" />
@@ -37,7 +36,7 @@ export default function CreateLuaranProsiding({ fakultas, role }: Props) {
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
                                         href={route(
-                                            role + ".luaran_prosiding.index",
+                                            "luaran_prosiding.index",
                                         )}
                                     >
                                         Luaran Prosiding
@@ -47,7 +46,7 @@ export default function CreateLuaranProsiding({ fakultas, role }: Props) {
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
                                         href={route(
-                                            role + ".luaran_prosiding.create",
+                                            "luaran_prosiding.create",
                                         )}
                                     >
                                         Tambah Luaran Prosiding
@@ -57,7 +56,7 @@ export default function CreateLuaranProsiding({ fakultas, role }: Props) {
                         </Breadcrumb>
                     </div>
                 </div>
-                <FormLuaranProsiding fakultas={fakultas} role={role} />
+                <FormLuaranProsiding fakultas={fakultas} />
             </div>
         </>
     );

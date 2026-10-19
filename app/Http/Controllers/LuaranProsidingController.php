@@ -2,331 +2,202 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\SyncAuthors;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LuaranProsidingRequest;
 use App\Models\Dosen;
 use App\Models\Fakultas;
 use App\Models\LuaranProsiding;
 use App\Models\Penulis;
 use DB;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Log;
 
 class LuaranProsidingController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function indexAdmin(Request $request)
+    use AuthorizesRequests;
+
+    private const PER_PAGE = 10;
+
+
+    public function index(Request $request)
     {
-        $queryLuaranProsiding = LuaranProsiding::query()->with("penulis.fakultas", "penulis.dosen", "penulisLuar");
-        if ($request->filled('cari_fakultas')) {
-            $queryLuaranProsiding->whereHas('penulis', function ($q) use ($request) {
-                $q->where('fakultas_id', $request->cari_fakultas);
-            });
-        }
-        $data = $queryLuaranProsiding->clone()->search($request->query("search"))->latest()->paginate(10)->withQueryString();
+        $this->authorize('viewAny', LuaranProsiding::class);
+
+        $user = $request->user();
+        $filters = $request->only('search', 'cari_fakultas');
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
 
-        $totalLuaranProsiding = LuaranProsiding::count();
-        $counts = Penulis::where('penulisable_type', LuaranProsiding::class)
-            ->selectRaw('fakultas_id, count(*) as total')
-            ->groupBy('fakultas_id')
-            ->pluck('total', 'fakultas_id');
+        $luaranProsiding = LuaranProsiding::visibleTo($user)
+            ->with($this->authorRelations())
+            ->filter($filters)
+            ->latest()
+            ->paginate(self::PER_PAGE)
+            ->withQueryString();
 
-        $totalLuaranProsidingPerFakultas = $fakultas->map(fn($f) => [
-            'label' => $f->nama_fakultas,
-            'count' => $counts[$f->id] ?? 0,
-        ])->values();
-
-        return Inertia::render('admin/luaran-prosiding/index', [
-            'data' => $data,
-            "fakultas" => $fakultas,
-            "filters" => $request->only("search", "cari_fakultas"),
-            "totalLuaranProsidingPerFakultas" => $totalLuaranProsidingPerFakultas,
-            "totalLuaranProsiding" => $totalLuaranProsiding,
+        return Inertia::render('luaran-prosiding/index', [
+            'data' => $luaranProsiding,
+            'filters' => $filters,
+            'fakultas' => $fakultas,
+            'stats' => $user->role === 'admin' ? $this->stats($fakultas) : null,
         ]);
     }
 
-    public function indexRoleDosen(Request $request)
+    public function dihapus(Request $request)
     {
-        $dosen = Dosen::where('user_id', auth()->user()->id)->with('penulis', 'fakultas')->first();
-        $data = LuaranProsiding::where(function ($q) use ($dosen) {
-            $q->where('user_id', $dosen->user_id)
-                ->orWhereHas('penulis', fn($p) => $p->where('dosen_id', $dosen->user_id));
-        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen', 'penulisLuar')->latest()->paginate(10);
-        return Inertia::render('dosen/luaran-prosiding/index', [
-            'data' => $data,
-            'filters' => $request->only("search"),
-        ]);
-    }
+        $this->authorize('viewTrashed', LuaranProsiding::class);
 
-    public function indexRoleUppm(Request $request)
-    {
-        $user = auth()->user();
-        $data = LuaranProsiding::where(function ($q) use ($user) {
-            $q->where('user_id', $user->id)
-                ->orWhereHas('penulis', fn($p) => $p->where('fakultas_id', $user->fakultas_id));
-        })->search($request->query("search"))->with('penulis.fakultas', 'penulis.dosen', 'penulisLuar')->latest()->paginate(10)->withQueryString();
-        return Inertia::render('uppm/luaran-prosiding/index', [
-            'data' => $data,
-            'filters' => $request->only("search"),
+        $filters = $request->only('search', 'cari_fakultas');
+
+        $luaranProsiding = LuaranProsiding::onlyTrashed()
+            ->visibleTo($request->user())
+            ->with($this->authorRelations(withTrashed: true))
+            ->filter($filters)
+            ->latest()
+            ->paginate(self::PER_PAGE)
+            ->withQueryString();
+
+        return Inertia::render('luaran-prosiding/dihapus', [
+            'data' => $luaranProsiding,
+            'filters' => $filters,
+            'fakultas' => Fakultas::select('id', 'nama_fakultas')->get(),
         ]);
     }
 
     public function create()
     {
-        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
-        $role = auth()->user()->role;
+        $this->authorize('create', LuaranProsiding::class);
+
         return Inertia::render('luaran-prosiding/create', [
-            'fakultas' => $fakultas,
-            'role' => $role,
+            'fakultas' => Fakultas::get(),
         ]);
     }
 
-    public function createRoleDosen()
+    public function show(LuaranProsiding $LuaranProsiding, Request $request)
     {
-        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
-        $role = auth()->user()->role;
-        return Inertia::render('dosen/luaran-prosiding/create', [
-            'fakultas' => $fakultas,
-            'role' => $role,
-        ]);
-    }
+        $this->authorize('view', $LuaranProsiding);
 
-    public function createRoleUppm()
-    {
-        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
-        $role = auth()->user()->role;
-        return Inertia::render('uppm/luaran-prosiding/create', [
-            'fakultas' => $fakultas,
-            'role' => $role,
-        ]);
-    }
+        $backUrl = $request->query('from') === 'dihapus'
+            ? route('luaran_prosiding.dihapus')
+            : route('luaran_prosiding.index');
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'judul' => 'required',
-            'abstrak' => 'required',
-            'semester' => 'required',
-            'tahun' => 'required',
-            'link_berkas' => 'required',
-            'authors' => 'required|array|min:1',
-            'authors.*.tipe' => 'required|in:internal,luar',
-            'authors.*.fakultas_id' => 'required_if:authors.*.tipe,internal|nullable|exists:fakultas,id',
-            'authors.*.dosen_id' => 'required_if:authors.*.tipe,internal|nullable|exists:dosens,id',
-            'authors.*.nama_universitas' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
-            'authors.*.nama_dosen' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
-        ], [
-            'judul.required' => 'Silahkan isi judul',
-            'abstrak.required' => 'Silahkan isi abstrak',
-            'semester.required' => 'Silahkan isi semester',
-            'tahun.required' => 'Silahkan isi tahun',
-            'link_berkas.required' => 'Silahkan isi link berkas',
-            'authors.required' => 'Silahkan tambahkan minimal satu penulis',
-            'authors.*.fakultas_id.required_if' => 'Silahkan pilih fakultas',
-            'authors.*.dosen_id.required_if' => 'Silahkan pilih dosen',
-            'authors.*.nama_universitas.required_if' => 'Silahkan isi nama universitas',
-            'authors.*.nama_dosen.required_if' => 'Silahkan isi nama dosen',
-        ]);
-
-        DB::beginTransaction();
-
-        try {
-            $data = LuaranProsiding::create([
-                'judul' => $validated['judul'],
-                'abstrak' => $validated['abstrak'],
-                'semester' => $validated['semester'],
-                'tahun' => $validated['tahun'],
-                'link_berkas' => $validated['link_berkas'],
-                'user_id' => auth()->user()->id,
-            ]);
-
-            foreach ($validated['authors'] as $i => $author) {
-                if ($author['tipe'] === 'internal') {
-                    $data->penulis()->create([
-                        'fakultas_id' => $author['fakultas_id'],
-                        'dosen_id' => $author['dosen_id'],
-                        'urutan' => $i + 1,
-                    ]);
-                } else {
-                    $data->penulisLuar()->create([
-                        'nama_universitas' => $author['nama_universitas'],
-                        'nama_dosen' => $author['nama_dosen'],
-                        'urutan' => $i + 1,
-                    ]);
-                }
-            }
-
-            DB::commit();
-
-            return redirect()->route(auth()->user()->role . '.luaran_prosiding.index')->with('success', 'Berhasil menambahkan luaran prosiding');
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
-            return back()->with('error', 'Terjadi Kesalahan');
-        }
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(LuaranProsiding $luaranProsiding)
-    {
-        $luaranProsiding->load('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
-        $role = auth()->user()->role;
         return Inertia::render('luaran-prosiding/show', [
-            'data' => $luaranProsiding,
-            'role' => $role,
+            'data' => $LuaranProsiding->load($this->authorRelations(withTrashed: true)),
+            'backUrl' => $backUrl
         ]);
     }
 
-    public function showRoleDosen(LuaranProsiding $luaranProsiding)
+    public function edit(LuaranProsiding $LuaranProsiding)
     {
-        $luaranProsiding->load('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
-        $role = auth()->user()->role;
-        return Inertia::render('dosen/luaran-prosiding/show', [
-            'data' => $luaranProsiding,
-            'role' => $role,
-        ]);
-    }
+        $this->authorize('update', $LuaranProsiding);
 
-    public function showRoleUppm(LuaranProsiding $luaranProsiding)
-    {
-        $luaranProsiding->load('penulis.fakultas', 'penulis.dosen', 'penulisLuar');
-        $role = auth()->user()->role;
-        return Inertia::render('uppm/luaran-prosiding/show', [
-            'data' => $luaranProsiding,
-            'role' => $role,
-        ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(LuaranProsiding $luaranProsiding)
-    {
-        $luaranProsiding->load('penulis', 'penulisLuar');
-        $role = auth()->user()->role;
-        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
         return Inertia::render('luaran-prosiding/edit', [
-            'data' => $luaranProsiding,
-            'fakultas' => $fakultas,
-            'role' => $role,
+            'data' => $LuaranProsiding->load('penulis', 'penulisLuar'),
+            'fakultas' => Fakultas::get(),
         ]);
     }
 
-    public function editRoleDosen(LuaranProsiding $luaranProsiding)
+    public function store(LuaranProsidingRequest $request, SyncAuthors $syncAuthors)
     {
-        $luaranProsiding->load('penulis', 'penulisLuar');
-        $role = auth()->user()->role;
-        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
-        return Inertia::render('dosen/luaran-prosiding/edit', [
-            'data' => $luaranProsiding,
-            'fakultas' => $fakultas,
-            'role' => $role,
-        ]);
-    }
-
-    public function editRoleUppm(LuaranProsiding $luaranProsiding)
-    {
-        $luaranProsiding->load('penulis', 'penulisLuar');
-        $role = auth()->user()->role;
-        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
-        return Inertia::render('uppm/luaran-prosiding/edit', [
-            'data' => $luaranProsiding,
-            'fakultas' => $fakultas,
-            'role' => $role,
-        ]);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, LuaranProsiding $luaranProsiding)
-    {
-        $validated = $request->validate([
-            'judul' => 'required',
-            'abstrak' => 'required',
-            'semester' => 'required',
-            'tahun' => 'required',
-            'link_berkas' => 'required',
-            'authors' => 'required|array|min:1',
-            'authors.*.tipe' => 'required|in:internal,luar',
-            'authors.*.fakultas_id' => 'required_if:authors.*.tipe,internal|nullable|exists:fakultas,id',
-            'authors.*.dosen_id' => 'required_if:authors.*.tipe,internal|nullable|exists:dosens,id',
-            'authors.*.nama_universitas' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
-            'authors.*.nama_dosen' => 'required_if:authors.*.tipe,luar|nullable|string|max:255',
-        ], [
-            'judul.required' => 'Silahkan isi judul',
-            'abstrak.required' => 'Silahkan isi abstrak',
-            'semester.required' => 'Silahkan isi semester',
-            'tahun.required' => 'Silahkan isi tahun',
-            'link_berkas.required' => 'Silahkan isi link berkas',
-            'authors.required' => 'Silahkan tambahkan minimal satu penulis',
-            'authors.*.fakultas_id.required_if' => 'Silahkan pilih fakultas',
-            'authors.*.dosen_id.required_if' => 'Silahkan pilih dosen',
-            'authors.*.nama_universitas.required_if' => 'Silahkan isi nama universitas',
-            'authors.*.nama_dosen.required_if' => 'Silahkan isi nama dosen',
-        ]);
-
-        DB::beginTransaction();
-
-        try {
-            $luaranProsiding->update([
-                'judul' => $validated['judul'],
-                'abstrak' => $validated['abstrak'],
-                'semester' => $validated['semester'],
-                'tahun' => $validated['tahun'],
-                'link_berkas' => $validated['link_berkas'],
+        DB::transaction(function () use ($request, $syncAuthors) {
+            $LuaranProsiding = LuaranProsiding::create([
+                ...$request->safe()->except('authors'),
+                'user_id' => $request->user()->id,
             ]);
 
-            $luaranProsiding->penulis()->delete();
-            $luaranProsiding->penulisLuar()->delete();
-            foreach ($validated['authors'] as $i => $author) {
-                if ($author['tipe'] === 'internal') {
-                    $luaranProsiding->penulis()->create([
-                        'fakultas_id' => $author['fakultas_id'],
-                        'dosen_id' => $author['dosen_id'],
-                        'urutan' => $i + 1,
-                    ]);
-                } else {
-                    $luaranProsiding->penulisLuar()->create([
-                        'nama_universitas' => $author['nama_universitas'],
-                        'nama_dosen' => $author['nama_dosen'],
-                        'urutan' => $i + 1,
-                    ]);
-                }
-            }
+            $syncAuthors->handle($LuaranProsiding, $request->validated('authors'));
+        });
 
-            DB::commit();
+        return to_route('luaran_prosiding.index')->with('success', 'Berhasil menambahkan luaran prosiding');
+    }
 
-            return redirect()->route(auth()->user()->role . '.luaran_prosiding.index')->with('success', 'Berhasil mengedit luaran prosiding');
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
-            return back()->with('error', 'Terjadi Kesalahan');
-        }
+    public function update(LuaranProsidingRequest $request, LuaranProsiding $LuaranProsiding, SyncAuthors $syncAuthors)
+    {
+        DB::transaction(function () use ($request, $LuaranProsiding, $syncAuthors) {
+            $LuaranProsiding->update($request->safe()->except('authors'));
+            $syncAuthors->handle($LuaranProsiding, $request->validated('authors'));
+        });
+
+        return to_route('luaran_prosiding.index')->with('success', 'Berhasil memperbarui luaran prosiding');
+    }
+
+    public function destroy(LuaranProsiding $LuaranProsiding)
+    {
+        $this->authorize('delete', $LuaranProsiding);
+
+        DB::transaction(function () use ($LuaranProsiding) {
+            $LuaranProsiding->penulis()->delete();
+            $LuaranProsiding->penulisLuar()->delete();
+            $LuaranProsiding->delete();
+        });
+
+        return back()->with('success', 'Berhasil menghapus luaran prosiding');
+    }
+
+    public function restore(LuaranProsiding $LuaranProsiding)
+    {
+        $this->authorize('restore', $LuaranProsiding);
+
+        DB::transaction(function () use ($LuaranProsiding) {
+            $LuaranProsiding->penulis()->restore();
+            $LuaranProsiding->penulisLuar()->restore();
+            $LuaranProsiding->restore();
+        });
+
+        return back()->with('success', 'Berhasil memulihkan luaran prosiding');
+    }
+
+    public function forceDelete(LuaranProsiding $LuaranProsiding)
+    {
+        $this->authorize('forceDelete', $LuaranProsiding);
+
+        DB::transaction(function () use ($LuaranProsiding) {
+            $LuaranProsiding->penulis()->forceDelete();
+            $LuaranProsiding->penulisLuar()->forceDelete();
+            $LuaranProsiding->forceDelete();
+        });
+
+        return back()->with('success', 'Berhasil menghapus permanen luaran prosiding');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Statistik LuaranProsiding (khusus admin).
      */
-    public function destroy(LuaranProsiding $luaranProsiding)
+    private function stats(Collection $fakultas): array
     {
-        try {
-            $luaranProsiding->penulis()->delete();
-            $luaranProsiding->penulisLuar()->delete();
-            $luaranProsiding->delete();
-            return back()->with('success', 'Berhasil menghapus luaran prosiding');
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            Log::error($th->getMessage(), ['trace' => $th->getTraceAsString()]);
-            return back()->with('error', 'Terjadi Kesalahan');
-        }
+        $counts = Penulis::where('penulisable_type', LuaranProsiding::class)
+            ->selectRaw('fakultas_id, count(*) as total')
+            ->groupBy('fakultas_id')
+            ->pluck('total', 'fakultas_id');
+
+        return [
+            'total' => LuaranProsiding::count(),
+            'perFakultas' => $fakultas->map(fn($f) => [
+                'label' => $f->nama_fakultas,
+                'count' => $counts[$f->id] ?? 0,
+            ])->values(),
+        ];
     }
+
+    /**
+     * Relasi penulis yang di-load. Untuk data terhapus, penulisnya
+     * ikut di-soft-delete sehingga harus pakai withTrashed().
+     */
+    private function authorRelations(bool $withTrashed = false): array
+    {
+        if (!$withTrashed) {
+            return ['penulis.fakultas', 'penulis.dosen', 'penulisLuar'];
+        }
+
+        return [
+            'penulis' => fn($q) => $q->withTrashed(),
+            'penulis.dosen',
+            'penulis.fakultas',
+            'penulisLuar' => fn($q) => $q->withTrashed(),
+        ];
+    }
+
 }

@@ -16,36 +16,34 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Fakultas } from "@/interface/fakultas";
-import { Kegiatan as KegiatanInterface } from "@/interface/kegiatan";
+import { LuaranProsiding as LuaranProsidingInterface } from "@/interface/luaran-prosiding";
 import { PaginatedData } from "@/interface/pagination";
 import { Head, Link, router } from "@inertiajs/react";
-import { Activity, FileText, Plus } from "lucide-react";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { Eye, FileText, Pencil, Plus, ScrollText } from "lucide-react";
+import { FormEvent, useEffect, useState } from "react";
 import { route } from "ziggy-js";
 
+interface Stats {
+    total: number;
+    perFakultas: { label: string; count: number }[];
+}
+
 interface Props {
-    data: PaginatedData<KegiatanInterface>;
+    data: PaginatedData<LuaranProsidingInterface>;
     fakultas: Fakultas[];
     filters: {
         search?: string;
         cari_fakultas?: string;
     };
-    totalKegiatanPerFakultas: string[];
-    totalKegiatan: number;
+    stats: Stats | null;
 }
 
-export default function Kegiatan({
+export default function LuaranProsiding({
     data,
     fakultas,
     filters,
-    totalKegiatanPerFakultas,
-    totalKegiatan,
+    stats,
 }: Props) {
-    const statistikFakultas = totalKegiatanPerFakultas.map((item: any) => ({
-        label: item.label,
-        count: item.count,
-    }));
-
     const [search, setSearch] = useState(filters.search ?? "");
     const [fakultasId, setFakultasId] = useState(filters.cari_fakultas ?? "");
 
@@ -54,11 +52,12 @@ export default function Kegiatan({
             search === (filters.search ?? "") &&
             fakultasId === (filters.cari_fakultas ?? "");
 
+        // tidak ada perubahan, jangan request (ini yang menjaga page tetap)
         if (sama) return;
 
         const timeout = setTimeout(() => {
             router.get(
-                route("admin.kegiatan.index"),
+                route("luaran_prosiding.index"),
                 {
                     ...(search && { search }),
                     ...(fakultasId && { cari_fakultas: fakultasId }),
@@ -76,42 +75,39 @@ export default function Kegiatan({
 
     return (
         <>
-            <Head title="Penelitian Kegiatan" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <Head title="Luaran Prosiding" />
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 sm:p-6">
                 <Header
-                    page="Penelitian Kegiatan"
+                    page="Luaran Prosiding"
                     breadcrumb={[
                         {
-                            label: "Penelitian Kegiatan",
-                            href: "admin.kegiatan.index",
+                            label: "Luaran Prosiding",
+                            href: "luaran_prosiding.index",
                         },
                     ]}
                 />
 
-                <StatisticsCard
-                    dataCard={[
-                        {
-                            label: "Kegiatan",
-                            count: totalKegiatan,
-                        },
-                        ...statistikFakultas,
-                    ]}
-                />
+                {stats && (
+                    <StatisticsCard
+                        dataCard={[
+                            { label: "Luaran Prosiding", count: stats.total },
+                            ...stats.perFakultas,
+                        ]}
+                    />
+                )}
 
-                <Card>
+                <Card className="shadow-sm">
                     <CardHeader className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-3">
                             <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-                                <Activity className="h-5 w-5" />
+                                <ScrollText className="h-5 w-5" />
                             </div>
 
                             <div>
-                                <CardTitle>
-                                    Daftar Penelitian Kegiatan
-                                </CardTitle>
+                                <CardTitle>Daftar Luaran Prosiding</CardTitle>
 
                                 <p className="text-muted-foreground mt-1 text-sm">
-                                    Informasi penelitian kegiatan yang terdaftar
+                                    Informasi luaran prosiding yang terdaftar
                                     dalam sistem.
                                 </p>
                             </div>
@@ -147,42 +143,56 @@ export default function Kegiatan({
                             <Field orientation="horizontal">
                                 <Input
                                     type="search"
-                                    placeholder="Cari Disini..."
+                                    placeholder="Search..."
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                 />
                             </Field>
 
                             <Link
-                                href={route("kegiatan.dihapus")}
+                                href={route("luaran_prosiding.dihapus")}
                                 viewTransition
+                                className="w-full sm:w-auto"
                             >
-                                <Button variant={"destructive"}>
-                                    Kegiatan Dihapus
+                                <Button
+                                    className="w-full sm:w-auto"
+                                    variant={"destructive"}
+                                >
+                                    Luaran Prosiding Dihapus
                                 </Button>
                             </Link>
 
                             <Link
-                                href={route("admin.kegiatan.create")}
+                                href={route("luaran_prosiding.create")}
                                 viewTransition
+                                className="w-full sm:w-auto"
                             >
-                                <Button>
+                                <Button className="w-full sm:w-auto">
                                     <Plus />
-                                    Tambah Penelitian Kegiatan
+                                    Tambah Luaran Prosiding
                                 </Button>
                             </Link>
                         </div>
                     </CardHeader>
-                    <CardContent>
-                        <TablePage<KegiatanInterface>
+                    <CardContent className="pt-6">
+                        <TablePage<LuaranProsidingInterface>
                             data={data}
                             columns={[
                                 {
+                                    id: "judul",
                                     key: "judul",
-                                    label: "Judul Kegiatan",
+                                    label: "Judul",
+                                    render: (_, item) => (
+                                        <span
+                                            className="line-clamp-2 max-w-xs font-medium"
+                                            title={item.judul}
+                                        >
+                                            {item.judul}
+                                        </span>
+                                    ),
                                 },
                                 {
-                                    id: "fakuktas",
+                                    id: "fakultas",
                                     key: "penulis",
                                     label: "Fakultas",
                                     render: (_, item) => (
@@ -206,7 +216,7 @@ export default function Kegiatan({
                                 {
                                     id: "dosen",
                                     key: "penulis",
-                                    label: "Dosen",
+                                    label: "Penulis",
                                     render: (_, item) => (
                                         <div className="flex flex-wrap gap-1.5">
                                             {item.penulis.map((penulis, i) => (
@@ -292,35 +302,40 @@ export default function Kegiatan({
                                 },
                             ]}
                             renderActions={(item) => (
-                                <>
+                                <div className="flex items-center gap-3">
                                     <Link
-                                        href={route(
-                                            "admin.kegiatan.edit",
-                                            item.id,
-                                        )}
-                                        viewTransition
-                                    >
-                                        <Button variant="outline">Edit</Button>
-                                    </Link>
-                                    <Link
-                                        href={route("admin.kegiatan.show", {
-                                            kegiatan: item.id,
+                                        href={route("luaran_prosiding.show", {
+                                            luaran_prosiding: item.id,
                                             from: "index",
                                         })}
                                         viewTransition
                                     >
-                                        <Button variant="default">Show</Button>
+                                        <Button
+                                            variant="outline"
+                                            title="Lihat detail"
+                                        >
+                                            Show
+                                        </Button>
+                                    </Link>
+                                    <Link
+                                        href={route(
+                                            "luaran_prosiding.edit",
+                                            item.id,
+                                        )}
+                                        viewTransition
+                                    >
+                                        <Button title="Edit">Edit</Button>
                                     </Link>
                                     <DialogDelete
                                         label={item.judul}
                                         actionUrl={route(
-                                            "admin.kegiatan.destroy",
+                                            "luaran_prosiding.destroy",
                                             item.id,
                                         )}
                                         page="Penelitian Kegiatan"
                                         item={item}
                                     />
-                                </>
+                                </div>
                             )}
                         />
                     </CardContent>
@@ -330,11 +345,10 @@ export default function Kegiatan({
     );
 }
 
-Kegiatan.layout = {
+LuaranProsiding.layout = {
     breadcrumbs: [
         {
-            title: "Penelitian Kegiatan",
-            href: route("admin.kegiatan.index"),
+            title: "Luaran Prosiding",
         },
     ],
 };

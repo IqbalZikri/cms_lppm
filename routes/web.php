@@ -36,46 +36,37 @@ Route::post('login', [SesiController::class, 'authenticate'])->name('authenticat
 
 Route::get('get-prodi/{id}', [ProdiController::class, 'getProdi'])->name('prodi.getProdi');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('get-dosen/{id}', [DosenController::class, 'getDosen'])->name('dosen.getDosen');
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('profile/{id}', [ProfileController::class, 'updateProfileDosen'])->name('dosen.profile.updateProfileDosen');
 
     // Kegiatan
-    Route::get('kegiatan/dihapus', [KegiatanController::class, 'dihapus'])
-        ->name('kegiatan.dihapus'); // harus SEBELUM resource, kalau tidak "dihapus" dianggap {kegiatan}
-    Route::patch('kegiatan/{kegiatan}/restore', [KegiatanController::class, 'restore'])
-        ->withTrashed()
-        ->name('kegiatan.restore');
-    Route::delete('kegiatan/{kegiatan}/force', [KegiatanController::class, 'forceDelete'])
-        ->withTrashed()
-        ->name('kegiatan.force-delete');
+    Route::get('kegiatan/dihapus', [KegiatanController::class, 'dihapus'])->name('kegiatan.dihapus');
+    Route::patch('kegiatan/{kegiatan}/restore', [KegiatanController::class, 'restore'])->withTrashed()->name('kegiatan.restore');
+    Route::delete('kegiatan/{kegiatan}/force', [KegiatanController::class, 'forceDelete'])->withTrashed()->name('kegiatan.force-delete');
     Route::resource('kegiatan', KegiatanController::class)->except('destroy')->withTrashed(['show']);
     Route::delete('kegiatan/{kegiatan}', [KegiatanController::class, 'destroy'])->name('kegiatan.destroy');
 
     // pkm
-    Route::get('pkm/dihapus', [PkmController::class, 'dihapus'])
-        ->name('pkm.dihapus'); // harus SEBELUM resource, kalau tidak "dihapus" dianggap {pkm}
-    Route::patch('pkm/{pkm}/restore', [PkmController::class, 'restore'])
-        ->withTrashed()
-        ->name('pkm.restore');
-    Route::delete('pkm/{pkm}/force', [PkmController::class, 'forceDelete'])
-        ->withTrashed()
-        ->name('pkm.force-delete');
+    Route::get('pkm/dihapus', [PkmController::class, 'dihapus'])->name('pkm.dihapus');
+    Route::patch('pkm/{pkm}/restore', [PkmController::class, 'restore'])->withTrashed()->name('pkm.restore');
+    Route::delete('pkm/{pkm}/force', [PkmController::class, 'forceDelete'])->withTrashed()->name('pkm.force-delete');
     Route::resource('pkm', PkmController::class)->except('destroy')->withTrashed(['show']);
-    Route::delete('pkm/{kegiatan}', [KegiatanController::class, 'destroy'])->name('kegiatan.destroy');
+    Route::delete('pkm/{pkm}', [PkmController::class, 'destroy'])->name('pkm.destroy');
+
+    // Luaran Prosiding
+    Route::get('luaran_prosiding/dihapus', [LuaranProsidingController::class, 'dihapus'])->name('luaran_prosiding.dihapus');
+    Route::patch('luaran_prosiding/{luaran_prosiding}/restore', [LuaranProsidingController::class, 'restore'])->withTrashed()->name('luaran_prosiding.restore');
+    Route::delete('luaran_prosiding/{luaran_prosiding}/force', [LuaranProsidingController::class, 'forceDelete'])->withTrashed()->name('luaran_prosiding.force-delete');
+    Route::resource('luaran_prosiding', LuaranProsidingController::class)->except('destroy')->withTrashed(['show']);
+    Route::delete('luaran_prosiding/{luaran_prosiding}', [LuaranProsidingController::class, 'destroy'])->name('luaran_prosiding.destroy');
 
 
-    Route::get("pkm/dihapus", [PkmController::class, "pkmDihapus"])->name("pkm.dihapus");
-    Route::patch('pkm/{id}/restore', [PkmController::class, 'restore'])->name('pkm.restore');
-    Route::delete('pkm/{id}/force-delete', [PkmController::class, 'forceDelete'])->name('pkm.forceDelete');
-});
 
-Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('site_setting', [SiteSettingsController::class, 'index'])->name('site_setting.index');
     Route::put('site_setting', [SiteSettingsController::class, 'update'])->name('site_setting.update');
 });
-
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
@@ -121,14 +112,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::put('berita/{berita}', [BeritaController::class, 'update'])->name('berita.update');
         Route::delete('berita/{berita}', [BeritaController::class, 'destroy'])->name('berita.destroy');
         Route::put('berita/archived/{berita}', [BeritaController::class, 'archivedBerita'])->name('berita.archivedBerita');
-
-        Route::get('luaran_prosiding', [LuaranProsidingController::class, 'indexAdmin'])->name('luaran_prosiding.index');
-        Route::get('luaran_prosiding/create', [LuaranProsidingController::class, 'create'])->name('luaran_prosiding.create');
-        Route::post('luaran_prosiding/create', [LuaranProsidingController::class, 'store'])->name('luaran_prosiding.store');
-        Route::get('luaran_prosiding//detail/{luaran_prosiding}', [LuaranProsidingController::class, 'show'])->name('luaran_prosiding.show');
-        Route::get('luaran_prosiding/{luaran_prosiding}', [LuaranProsidingController::class, 'edit'])->name('luaran_prosiding.edit');
-        Route::put('luaran_prosiding/{luaran_prosiding}', [LuaranProsidingController::class, 'update'])->name('luaran_prosiding.update');
-        Route::delete('luaran_prosiding/{luaran_prosiding}', [LuaranProsidingController::class, 'destroy'])->name('luaran_prosiding.destroy');
 
         Route::get('hki', [HkiController::class, 'indexAdmin'])->name('hki.index');
         Route::get('hki/create', [HkiController::class, 'create'])->name('hki.create');

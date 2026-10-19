@@ -38,7 +38,7 @@ export default function EditLuaranProsiding({ fakultas, data }: Props) {
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
                                         href={route(
-                                            "admin.luaran_prosiding.index",
+                                            "luaran_prosiding.index",
                                         )}
                                     >
                                         Luaran Prosiding
@@ -48,7 +48,7 @@ export default function EditLuaranProsiding({ fakultas, data }: Props) {
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
                                         href={route(
-                                            "admin.luaran_prosiding.edit",
+                                            "luaran_prosiding.edit",
                                             data.id,
                                         )}
                                     >

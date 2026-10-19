@@ -51,7 +51,6 @@ import FormPenulis from "@/components/form-penulis";
 interface Props {
     fakultas: Fakultas[];
     pkm?: Pkm;
-    role?: string;
 }
 
 export function formatRupiah(inputAngka: number) {
@@ -62,8 +61,9 @@ function RequiredMark() {
     return <span className="ml-0.5 text-red-500">*</span>;
 }
 
-export default function FormPkm({ fakultas, pkm, role }: Props) {
+export default function FormPkm({ fakultas, pkm }: Props) {
     const isEdit = !!pkm;
+
     const [jenisPkm, setJenisPkm] = useState(pkm?.jenis_pkm ?? "");
     const [semester, setSemester] = useState(pkm?.semester ?? "");
     const [sumberDana, setSumberDana] = useState(pkm?.sumber_dana ?? "");
@@ -206,6 +206,7 @@ export default function FormPkm({ fakultas, pkm, role }: Props) {
                                                     <RequiredMark />
                                                 </Label>
                                                 <Select
+                                                    name="semester"
                                                     value={semester}
                                                     onValueChange={setSemester}
                                                 >
@@ -227,11 +228,6 @@ export default function FormPkm({ fakultas, pkm, role }: Props) {
                                                         </SelectItem>
                                                     </SelectContent>
                                                 </Select>
-                                                <input
-                                                    type="hidden"
-                                                    name="semester"
-                                                    value={semester}
-                                                />
                                                 {errors.semester && (
                                                     <p className="text-sm text-red-500">
                                                         {errors.semester}

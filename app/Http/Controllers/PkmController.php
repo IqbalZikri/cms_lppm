@@ -62,7 +62,7 @@ class PkmController extends Controller
 
     public function dihapus(Request $request)
     {
-        $this->authorize('viewTrashed', Pkm::class);
+        $this->authorize('view', Pkm::class);
 
         $filters = $request->only('search', 'cari_fakultas');
 
@@ -75,7 +75,7 @@ class PkmController extends Controller
             ->withQueryString();
 
         return Inertia::render('pkm/dihapus', [
-            'pkm' => $pkm,
+            'data' => $pkm,
             'filters' => $filters,
             'fakultas' => Fakultas::select('id', 'nama_fakultas')->get(),
         ]);
@@ -99,7 +99,7 @@ class PkmController extends Controller
             : route('pkm.index');
 
         return Inertia::render('pkm/show', [
-            'pkm' => $pkm->load($this->authorRelations(withTrashed: true)),
+            'data' => $pkm->load($this->authorRelations(withTrashed: true)),
             'backUrl' => $backUrl
         ]);
     }
@@ -109,7 +109,7 @@ class PkmController extends Controller
         $this->authorize('update', $pkm);
 
         return Inertia::render('pkm/edit', [
-            'pkm' => $pkm->load('penulis', 'penulisLuar'),
+            'data' => $pkm->load('penulis', 'penulisLuar'),
             'fakultas' => Fakultas::get(),
         ]);
     }
@@ -125,7 +125,7 @@ class PkmController extends Controller
             $syncAuthors->handle($pkm, $request->validated('authors'));
         });
 
-        return to_route('pkm.index')->with('success', 'Berhasil menambahkan kegiatan');
+        return to_route('pkm.index')->with('success', 'Berhasil menambahkan pkm');
     }
 
     public function update(PkmRequest $request, Pkm $pkm, SyncAuthors $syncAuthors)
@@ -135,33 +135,33 @@ class PkmController extends Controller
             $syncAuthors->handle($pkm, $request->validated('authors'));
         });
 
-        return to_route('pkm.index')->with('success', 'Berhasil memperbarui kegiatan');
+        return to_route('pkm.index')->with('success', 'Berhasil memperbarui pkm');
     }
 
-    public function destroy(Pkm $kegiatan)
+    public function destroy(Pkm $pkm)
     {
-        $this->authorize('delete', $kegiatan);
+        $this->authorize('delete', $pkm);
 
-        DB::transaction(function () use ($kegiatan) {
-            $kegiatan->penulis()->delete();
-            $kegiatan->penulisLuar()->delete();
-            $kegiatan->delete();
+        DB::transaction(function () use ($pkm) {
+            $pkm->penulis()->delete();
+            $pkm->penulisLuar()->delete();
+            $pkm->delete();
         });
 
-        return back()->with('success', 'Berhasil menghapus kegiatan');
+        return back()->with('success', 'Berhasil menghapus pkm');
     }
 
-    public function restore(Pkm $kegiatan)
+    public function restore(Pkm $pkm)
     {
-        $this->authorize('restore', $kegiatan);
+        $this->authorize('restore', $pkm);
 
-        DB::transaction(function () use ($kegiatan) {
-            $kegiatan->penulis()->restore();
-            $kegiatan->penulisLuar()->restore();
-            $kegiatan->restore();
+        DB::transaction(function () use ($pkm) {
+            $pkm->penulis()->restore();
+            $pkm->penulisLuar()->restore();
+            $pkm->restore();
         });
 
-        return back()->with('success', 'Berhasil memulihkan kegiatan');
+        return back()->with('success', 'Berhasil memulihkan pkm');
     }
 
     public function forceDelete(Pkm $pkm)
@@ -174,7 +174,7 @@ class PkmController extends Controller
             $pkm->forceDelete();
         });
 
-        return back()->with('success', 'Berhasil menghapus permanen kegiatan');
+        return back()->with('success', 'Berhasil menghapus permanen pkm');
     }
 
     private function authorRelations(bool $withTrashed = false): array

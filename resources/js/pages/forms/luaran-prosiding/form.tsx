@@ -44,7 +44,6 @@ import FormPenulis from "@/components/form-penulis";
 interface Props {
     fakultas: Fakultas[];
     luaranProsiding?: LuaranProsiding;
-    role?: string;
 }
 
 function RequiredMark() {
@@ -54,34 +53,16 @@ function RequiredMark() {
 export default function FormLuaranProsiding({
     fakultas,
     luaranProsiding,
-    role,
 }: Props) {
     const isEdit = !!luaranProsiding;
     const [semester, setSemester] = useState(luaranProsiding?.semester ?? "");
 
-    const actionAdmin = isEdit
-        ? route("admin.luaran_prosiding.update", luaranProsiding!.id)
-        : route("admin.luaran_prosiding.store");
-
-    const actionDosen = isEdit
-        ? route("dosen.luaran_prosiding.update", luaranProsiding!.id)
-        : route("dosen.luaran_prosiding.store");
-
-    const actionUppm = isEdit
-        ? route("uppm.luaran_prosiding.update", luaranProsiding!.id)
-        : route("uppm.luaran_prosiding.store");
+    const action = isEdit
+        ? route("luaran_prosiding.update", luaranProsiding.id)
+        : route("luaran_prosiding.store");
 
     return (
-        <Form
-            action={
-                role === "dosen"
-                    ? actionDosen
-                    : role === "uppm"
-                      ? actionUppm
-                      : actionAdmin
-            }
-            method={isEdit ? "put" : "post"}
-        >
+        <Form action={action} method={isEdit ? "put" : "post"}>
             {({ errors, processing }) => (
                 <Card className="w-full shadow-sm">
                     <CardContent className="grid grid-cols-1 gap-8 pt-6 lg:grid-cols-3 lg:gap-10">
@@ -265,13 +246,7 @@ export default function FormLuaranProsiding({
 
                     <CardFooter className="flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-end">
                         <Link
-                            href={
-                                role === "dosen"
-                                    ? route("dosen.luaran_prosiding.index")
-                                    : role === "uppm"
-                                      ? route("uppm.luaran_prosiding.index")
-                                      : route("admin.luaran_prosiding.index")
-                            }
+                            href={route("luaran_prosiding.index")}
                             viewTransition
                             className="w-full sm:w-auto"
                         >
