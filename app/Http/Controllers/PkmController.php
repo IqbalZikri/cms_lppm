@@ -44,6 +44,7 @@ class PkmController extends Controller
         $user = $request->user();
         $filters = $request->only('search', 'cari_fakultas');
         $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
+        $role = auth()->user()->role;
 
         $pkm = Pkm::visibleTo($user)
             ->with($this->authorRelations())
@@ -57,12 +58,13 @@ class PkmController extends Controller
             'filters' => $filters,
             'fakultas' => $fakultas,
             'stats' => $user->role === 'admin' ? $this->stats($fakultas) : null,
+            'role' => $role
         ]);
     }
 
     public function dihapus(Request $request)
     {
-        $this->authorize('viewAny', Pkm::class);
+        $this->authorize('viewTrashed', Pkm::class);
 
         $filters = $request->only('search', 'cari_fakultas');
 

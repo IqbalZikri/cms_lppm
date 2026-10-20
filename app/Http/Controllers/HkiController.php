@@ -19,7 +19,6 @@ use Inertia\Inertia;
 class HkiController extends Controller
 {
     use AuthorizesRequests;
-    private const WITH = ['penulis.fakultas', 'penulis.dosen', 'penulisLuar'];
 
     public function __construct(private SyncAuthors $syncAuthors)
     {
@@ -30,37 +29,37 @@ class HkiController extends Controller
         $this->authorize('viewAny', Hki::class);
 
         $user = $request->user();
+        $filters = $request->only('search', 'cari_fakultas');
+        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
 
-        $data = Hki::visibleTo($user)
-            ->with(self::WITH)
-            ->search($request->query('search'))
-            ->when(
-                $user->role === 'admin' && $request->filled('cari_fakultas'),
-                fn($q) => $q->whereHas(
-                    'penulis',
-                    fn($p) => $p->where('fakultas_id', $request->cari_fakultas)
-                )
-            )
+        $luaranJurnal = Hki::visibleTo($user)
+            ->with($this->authorRelations())
+            ->filter($filters)
             ->latest()
             ->paginate(10)
             ->withQueryString();
 
+        $role = auth()->user()->role;
+
         return Inertia::render('hki/index', [
-            'data' => $data,
-            'filters' => $request->only('search', 'cari_fakultas'),
-            ...($user->role === 'admin' ? $this->adminStats() : []),
+            'data' => $luaranJurnal,
+            'filters' => $filters,
+            'fakultas' => $fakultas,
+            'stats' => $user->role === 'admin' ? $this->adminStats() : null,
+            'role' => $role
         ]);
     }
 
     public function dihapus(Request $request)
     {
-        $this->authorize('viewAny', Hki::class);
+        $this->authorize('viewTrashed', Hki::class);
 
         $user = $request->user();
 
         $data = Hki::visibleTo($user)
             ->onlyTrashed()
-            ->with(self::WITH)
+            
+            ->with($this->authorRelations(withTrashed: true))
             ->search($request->query('search'))
             ->when(
                 $user->role === 'admin' && $request->filled('cari_fakultas'),
@@ -73,10 +72,12 @@ class HkiController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return Inertia::render($this->page('dihapus'), [
+        $fakultas = Fakultas::select('id', 'nama_fakultas')->get();
+
+        return Inertia::render('hki/dihapus', [
             'data' => $data,
             'filters' => $request->only('search', 'cari_fakultas'),
-            ...($user->role === 'admin' ? $this->adminStats() : []),
+            'fakultas' => $fakultas
         ]);
     }
 
@@ -129,11 +130,15 @@ class HkiController extends Controller
         $this->authorize('view', $hki);
 
         $backUrl = $request->query('from') === 'dihapus'
-            ? route('luaran_jurnal.dihapus')
-            : route('luaran_jurnal.index');
+            ? route('hki.dihapus')
+            : route('hki.index');
 
-        return Inertia::render($this->page('show'), [
-            'data' => $hki->load(self::WITH),
+        $role = auth()->user()->role;
+
+        return Inertia::render('hki/show', [
+            'data' => $hki->load($this->authorRelations(withTrashed: true)),
+            'backUrl' => $backUrl,
+            'role' => $role
         ]);
     }
 
@@ -141,7 +146,7 @@ class HkiController extends Controller
     {
         $this->authorize('update', $hki);
 
-        return Inertia::render($this->page('edit'), [
+        return Inertia::render('hki/edit', [
             'data' => $hki->load('penulis', 'penulisLuar'),
             ...$this->formProps(),
         ]);
@@ -190,12 +195,20 @@ class HkiController extends Controller
         return back()->with('success', 'Berhasil memulihkan hki');
     }
 
-    /* ---------- helpers ---------- */
-
-    private function page(string $name): string
+    public function forceDelete(Hki $hki)
     {
-        return auth()->user()->role . "/hki/{$name}";
+        $this->authorize('forceDelete', $hki);
+
+        DB::transaction(function () use ($hki) {
+            $hki->penulis()->forceDelete();
+            $hki->penulisLuar()->forceDelete();
+            $hki->forceDelete();
+        });
+
+        return back()->with('success', 'Berhasil menghapus permanen hki');
     }
+
+    /* ---------- helpers ---------- */
 
     private function formProps(): array
     {
@@ -215,7 +228,6 @@ class HkiController extends Controller
             ->groupBy('fakultas_id')->pluck('total', 'fakultas_id');
 
         return [
-            'fakultas' => $fakultas,
             'totalPaten' => $perJenis['paten'] ?? 0,
             'totalHaki' => $perJenis['haki'] ?? 0,
             'totalHki' => $perJenis->sum(),
@@ -229,7 +241,7 @@ class HkiController extends Controller
     private function redirectIndex(string $message)
     {
         return redirect()
-            ->route(auth()->user()->role . '.hki.index')
+            ->route('hki.index')
             ->with('success', $message);
     }
 
@@ -238,5 +250,19 @@ class HkiController extends Controller
         Log::error($e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
         return back()->with('error', 'Terjadi Kesalahan');
+    }
+
+    private function authorRelations(bool $withTrashed = false): array
+    {
+        if (!$withTrashed) {
+            return ['penulis.fakultas', 'penulis.dosen', 'penulisLuar'];
+        }
+
+        return [
+            'penulis' => fn($q) => $q->withTrashed(),
+            'penulis.dosen',
+            'penulis.fakultas',
+            'penulisLuar' => fn($q) => $q->withTrashed(),
+        ];
     }
 }

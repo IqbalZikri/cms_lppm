@@ -17,7 +17,7 @@ trait Visible
             ->orWhere('status_pengajuan', '!=', 'draft');
 
         return match ($user->role) {
-            'admin' => $query,
+            'admin' => $query->where($notDraft),
 
             // punya sendiri ATAU yang bukan draft (tanpa kolom status: semua terlihat)
             'dosen' => $hasStatus

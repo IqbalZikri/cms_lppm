@@ -36,9 +36,10 @@ interface Props {
         cari_fakultas?: string;
     };
     stats: Stats | null;
+    role: string;
 }
 
-export default function Pkm({ data, fakultas, filters, stats }: Props) {
+export default function Pkm({ data, fakultas, filters, stats, role }: Props) {
     const [search, setSearch] = useState(filters.search ?? "");
     const [fakultasId, setFakultasId] = useState(filters.cari_fakultas ?? "");
 
@@ -84,7 +85,10 @@ export default function Pkm({ data, fakultas, filters, stats }: Props) {
                 {stats && (
                     <StatisticsCard
                         dataCard={[
-                            { label: "Pengabdian Kepada Masyarakat", count: stats.total },
+                            {
+                                label: "Pengabdian Kepada Masyarakat",
+                                count: stats.total,
+                            },
                             ...stats.perFakultas,
                         ]}
                     />
@@ -145,158 +149,276 @@ export default function Pkm({ data, fakultas, filters, stats }: Props) {
                                 />
                             </Field>
 
-                            <Link
-                                href={route("pkm.dihapus")}
-                                className="w-full sm:w-auto"
-                                viewTransition
-                            >
-                                <Button variant={"destructive"}>
-                                    PKM yang Dihapus
-                                </Button>
-                            </Link>
+                            {role === "dosen" && (
+                                <>
+                                    <Link
+                                        href={route("pkm.dihapus")}
+                                        className="w-full sm:w-auto"
+                                        viewTransition
+                                    >
+                                        <Button variant={"destructive"}>
+                                            PKM yang Dihapus
+                                        </Button>
+                                    </Link>
 
-                            <Link
-                                href={route("pkm.create")}
-                                viewTransition
-                                className="w-full sm:w-auto"
-                            >
-                                <Button className="w-full sm:w-auto">
-                                    <Plus />
-                                    Tambah PKM
-                                </Button>
-                            </Link>
+                                    <Link
+                                        href={route("pkm.create")}
+                                        viewTransition
+                                        className="w-full sm:w-auto"
+                                    >
+                                        <Button className="w-full sm:w-auto">
+                                            <Plus />
+                                            Tambah PKM
+                                        </Button>
+                                    </Link>
+                                </>
+                            )}
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <TablePage<PkmInterface>
-                            data={data}
-                            columns={[
-                                {
-                                    key: "judul",
-                                    label: "Judul",
-                                },
-                                {
-                                    id: "fakultas",
-                                    key: "penulis",
-                                    label: "Fakultas",
-                                    render: (_, item) =>
-                                        item.penulis.map((penulis, i) => (
-                                            <Badge key={i} className="mr-2">
-                                                {penulis.fakultas.nama_fakultas}
-                                            </Badge>
-                                        )),
-                                },
-                                {
-                                    id: "dosen",
-                                    key: "penulis",
-                                    label: "Dosen",
-                                    render: (_, item) =>
-                                        item.penulis.map((penulis, i) => (
-                                            <Badge
-                                                key={i}
-                                                className="mr-2 rounded-md px-2 py-1 text-xs"
-                                            >
-                                                {penulis.dosen.nama_dosen}
-                                            </Badge>
-                                        )),
-                                },
-                                {
-                                    id: "penulis_luar",
-                                    key: "penulis_luar",
-                                    label: "Penulis Luar Universitas",
-                                    render: (_, item) => (
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {item.penulis_luar.length !== 0 ? (
-                                                <>
-                                                    {item.penulis_luar.map(
-                                                        (penulis, i) => (
-                                                            <div
-                                                                key={i}
-                                                                className="flex flex-wrap items-center gap-1.5"
-                                                            >
-                                                                <Badge
-                                                                    className="whitespace-nowrap text-[13px]"
-                                                                    variant={
-                                                                        "outline"
-                                                                    }
+                        {role !== "admin" && role !== "uppm" && (
+                            <TablePage<PkmInterface>
+                                data={data}
+                                columns={[
+                                    {
+                                        key: "judul",
+                                        label: "Judul",
+                                    },
+                                    {
+                                        id: "fakultas",
+                                        key: "penulis",
+                                        label: "Fakultas",
+                                        render: (_, item) =>
+                                            item.penulis.map((penulis, i) => (
+                                                <Badge key={i} className="mr-2">
+                                                    {
+                                                        penulis.fakultas
+                                                            .nama_fakultas
+                                                    }
+                                                </Badge>
+                                            )),
+                                    },
+                                    {
+                                        id: "dosen",
+                                        key: "penulis",
+                                        label: "Dosen",
+                                        render: (_, item) =>
+                                            item.penulis.map((penulis, i) => (
+                                                <Badge
+                                                    key={i}
+                                                    className="mr-2 rounded-md px-2 py-1 text-xs"
+                                                >
+                                                    {penulis.dosen.nama_dosen}
+                                                </Badge>
+                                            )),
+                                    },
+                                    {
+                                        id: "penulis_luar",
+                                        key: "penulis_luar",
+                                        label: "Penulis Luar Universitas",
+                                        render: (_, item) => (
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {item.penulis_luar.length !==
+                                                0 ? (
+                                                    <>
+                                                        {item.penulis_luar.map(
+                                                            (penulis, i) => (
+                                                                <div
+                                                                    key={i}
+                                                                    className="flex flex-wrap items-center gap-1.5"
                                                                 >
-                                                                    {
-                                                                        penulis.nama_universitas
-                                                                    }
-                                                                </Badge>
-                                                                <Badge className="whitespace-nowrap text-[13px]">
-                                                                    {
-                                                                        penulis.nama_dosen
-                                                                    }
-                                                                </Badge>
-                                                            </div>
-                                                        ),
-                                                    )}
-                                                </>
-                                            ) : (
-                                                <>-</>
-                                            )}
-                                        </div>
-                                    ),
-                                },
-                                {
-                                    id: "periode",
-                                    key: "semester",
-                                    label: "Periode",
-                                    render: (_, item) => (
-                                        <span className="whitespace-nowrap text-sm">
-                                            {item.semester} {item.tahun}
-                                        </span>
-                                    ),
-                                },
-                                {
-                                    id: "berkas",
-                                    key: "link_berkas",
-                                    label: "Berkas",
-                                    render: (_, item) => (
-                                        <a
-                                            href={item.link_berkas}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-primary inline-flex items-center gap-1.5 text-sm hover:underline"
+                                                                    <Badge
+                                                                        className="whitespace-nowrap text-[13px]"
+                                                                        variant={
+                                                                            "outline"
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            penulis.nama_universitas
+                                                                        }
+                                                                    </Badge>
+                                                                    <Badge className="whitespace-nowrap text-[13px]">
+                                                                        {
+                                                                            penulis.nama_dosen
+                                                                        }
+                                                                    </Badge>
+                                                                </div>
+                                                            ),
+                                                        )}
+                                                    </>
+                                                ) : (
+                                                    <>-</>
+                                                )}
+                                            </div>
+                                        ),
+                                    },
+                                    {
+                                        id: "periode",
+                                        key: "semester",
+                                        label: "Periode",
+                                        render: (_, item) => (
+                                            <span className="whitespace-nowrap text-sm">
+                                                {item.semester} {item.tahun}
+                                            </span>
+                                        ),
+                                    },
+                                    {
+                                        id: "berkas",
+                                        key: "link_berkas",
+                                        label: "Berkas",
+                                        render: (_, item) => (
+                                            <a
+                                                href={item.link_berkas}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-primary inline-flex items-center gap-1.5 text-sm hover:underline"
+                                            >
+                                                <FileText className="h-3.5 w-3.5" />
+                                                Lihat
+                                            </a>
+                                        ),
+                                    },
+                                ]}
+                                renderActions={(item) => (
+                                    <>
+                                        <Link
+                                            href={route("pkm.edit", item.id)}
+                                            viewTransition
                                         >
-                                            <FileText className="h-3.5 w-3.5" />
-                                            Lihat
-                                        </a>
-                                    ),
-                                },
-                            ]}
-                            renderActions={(item) => (
-                                <>
-                                    <Link
-                                        href={route("pkm.edit", item.id)}
-                                        viewTransition
-                                    >
-                                        <Button variant={"outline"}>
-                                            Edit
-                                        </Button>
-                                    </Link>
-                                    <Link
-                                        href={route("pkm.show", {
-                                            pkm: item.id,
-                                            from: "index",
-                                        })}
-                                        viewTransition
-                                    >
-                                        <Button variant="default">Show</Button>
-                                    </Link>
-                                    <DialogDelete
-                                        label={item.judul}
-                                        actionUrl={route(
-                                            "pkm.destroy",
-                                            item.id,
-                                        )}
-                                        page="Penelitian Pengabdian Kepada Masyarakat"
-                                        item={item}
-                                    />
-                                </>
-                            )}
-                        />
+                                            <Button variant={"outline"}>
+                                                Edit
+                                            </Button>
+                                        </Link>
+                                        <Link
+                                            href={route("pkm.show", {
+                                                pkm: item.id,
+                                                from: "index",
+                                            })}
+                                            viewTransition
+                                        >
+                                            <Button variant="default">
+                                                Show
+                                            </Button>
+                                        </Link>
+                                        <DialogDelete
+                                            label={item.judul}
+                                            actionUrl={route(
+                                                "pkm.destroy",
+                                                item.id,
+                                            )}
+                                            page="Penelitian Pengabdian Kepada Masyarakat"
+                                            item={item}
+                                        />
+                                    </>
+                                )}
+                            />
+                        )}
+
+                        {role !== "dosen" && (
+                            <TablePage<PkmInterface>
+                                data={data}
+                                columns={[
+                                    {
+                                        key: "judul",
+                                        label: "Judul",
+                                    },
+                                    {
+                                        id: "fakultas",
+                                        key: "penulis",
+                                        label: "Fakultas",
+                                        render: (_, item) =>
+                                            item.penulis.map((penulis, i) => (
+                                                <Badge key={i} className="mr-2">
+                                                    {
+                                                        penulis.fakultas
+                                                            .nama_fakultas
+                                                    }
+                                                </Badge>
+                                            )),
+                                    },
+                                    {
+                                        id: "dosen",
+                                        key: "penulis",
+                                        label: "Dosen",
+                                        render: (_, item) =>
+                                            item.penulis.map((penulis, i) => (
+                                                <Badge
+                                                    key={i}
+                                                    className="mr-2 rounded-md px-2 py-1 text-xs"
+                                                >
+                                                    {penulis.dosen.nama_dosen}
+                                                </Badge>
+                                            )),
+                                    },
+                                    {
+                                        id: "penulis_luar",
+                                        key: "penulis_luar",
+                                        label: "Penulis Luar Universitas",
+                                        render: (_, item) => (
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {item.penulis_luar.length !==
+                                                0 ? (
+                                                    <>
+                                                        {item.penulis_luar.map(
+                                                            (penulis, i) => (
+                                                                <div
+                                                                    key={i}
+                                                                    className="flex flex-wrap items-center gap-1.5"
+                                                                >
+                                                                    <Badge
+                                                                        className="whitespace-nowrap text-[13px]"
+                                                                        variant={
+                                                                            "outline"
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            penulis.nama_universitas
+                                                                        }
+                                                                    </Badge>
+                                                                    <Badge className="whitespace-nowrap text-[13px]">
+                                                                        {
+                                                                            penulis.nama_dosen
+                                                                        }
+                                                                    </Badge>
+                                                                </div>
+                                                            ),
+                                                        )}
+                                                    </>
+                                                ) : (
+                                                    <>-</>
+                                                )}
+                                            </div>
+                                        ),
+                                    },
+                                    {
+                                        id: "periode",
+                                        key: "semester",
+                                        label: "Periode",
+                                        render: (_, item) => (
+                                            <span className="whitespace-nowrap text-sm">
+                                                {item.semester} {item.tahun}
+                                            </span>
+                                        ),
+                                    },
+                                    {
+                                        id: "berkas",
+                                        key: "link_berkas",
+                                        label: "Berkas",
+                                        render: (_, item) => (
+                                            <a
+                                                href={item.link_berkas}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-primary inline-flex items-center gap-1.5 text-sm hover:underline"
+                                            >
+                                                <FileText className="h-3.5 w-3.5" />
+                                                Lihat
+                                            </a>
+                                        ),
+                                    },
+                                ]}
+                            />
+                        )}
                     </CardContent>
                 </Card>
             </div>

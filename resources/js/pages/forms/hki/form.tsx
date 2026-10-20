@@ -55,30 +55,11 @@ export default function FormHki({ fakultas, hki, user }: Props) {
         hki?.jumlah_dana ? String(hki?.jumlah_dana) : "",
     );
 
-    const actionAdmin = isEdit
-        ? route("admin.hki.update", hki!.id)
-        : route("admin.hki.store");
-
-    const actionDosen = isEdit
-        ? route("dosen.hki.update", hki!.id)
-        : route("dosen.hki.store");
-
-    const actionUppm = isEdit
-        ? route("uppm.hki.update", hki!.id)
-        : route("uppm.hki.store");
+    const action = isEdit ? route("hki.update", hki!.id) : route("hki.store");
 
     const actionRef = useRef<HTMLInputElement>(null);
     return (
-        <Form
-            action={
-                user.role === "dosen"
-                    ? actionDosen
-                    : user.role === "uppm"
-                      ? actionUppm
-                      : actionAdmin
-            }
-            method={isEdit ? "put" : "post"}
-        >
+        <Form action={action} method={isEdit ? "put" : "post"}>
             {({ errors, processing }) => (
                 <Card className="w-full shadow-sm">
                     <CardContent className="grid grid-cols-1 gap-8 pt-6 lg:grid-cols-3 lg:gap-10">
@@ -456,7 +437,7 @@ export default function FormHki({ fakultas, hki, user }: Props) {
                                                     aria-invalid={
                                                         !!errors.nomer_paten
                                                     }
-                                                    value={hki?.nomer_paten}
+                                                    defaultValue={hki?.nomer_paten}
                                                 />
                                                 {errors.nomer_paten && (
                                                     <p className="text-sm text-red-500">
@@ -493,7 +474,7 @@ export default function FormHki({ fakultas, hki, user }: Props) {
                                                     aria-invalid={
                                                         !!errors.nomer_pengajuan_haki
                                                     }
-                                                    value={
+                                                    defaultValue={
                                                         hki?.nomer_pengajuan_haki
                                                     }
                                                 />
@@ -527,13 +508,7 @@ export default function FormHki({ fakultas, hki, user }: Props) {
                         />
 
                         <Link
-                            href={
-                                user.role === "dosen"
-                                    ? route("dosen.hki.index")
-                                    : user.role === "uppm"
-                                      ? route("uppm.hki.index")
-                                      : route("admin.hki.index")
-                            }
+                            href={route("hki.index")}
                             viewTransition
                             className="w-full sm:w-auto"
                         >

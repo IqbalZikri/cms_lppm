@@ -151,7 +151,7 @@ const mainNavItems: NavItem[] = [
         items: [
             {
                 title: "HKI",
-                href: route("admin.hki.index"),
+                href: route("hki.index"),
                 icon: FileBadge,
             },
         ],

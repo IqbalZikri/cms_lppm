@@ -37,6 +37,7 @@ interface Props {
         cari_fakultas?: string;
     };
     stats: Stats | null; // null untuk non-admin
+    role: string;
 }
 
 export default function Kegiatan({
@@ -44,6 +45,7 @@ export default function Kegiatan({
     fakultas,
     filters,
     stats,
+    role,
 }: Props) {
     const [search, setSearch] = useState(filters.search ?? "");
     const [fakultasId, setFakultasId] = useState(filters.cari_fakultas ?? "");
@@ -151,176 +153,321 @@ export default function Kegiatan({
                                 />
                             </Field>
 
-                            <Link
-                                href={route("kegiatan.dihapus")}
-                                viewTransition
-                            >
-                                <Button variant={"destructive"}>
-                                    Kegiatan Dihapus
-                                </Button>
-                            </Link>
+                            {role !== "admin" && role !== 'uppm' && (
+                                <>
+                                    <Link
+                                        href={route("kegiatan.dihapus")}
+                                        viewTransition
+                                    >
+                                        <Button variant={"destructive"}>
+                                            Kegiatan Dihapus
+                                        </Button>
+                                    </Link>
 
-                            <Link
-                                href={route("kegiatan.create")}
-                                viewTransition
-                            >
-                                <Button>
-                                    <Plus />
-                                    Tambah Penelitian Kegiatan
-                                </Button>
-                            </Link>
+                                    <Link
+                                        href={route("kegiatan.create")}
+                                        viewTransition
+                                    >
+                                        <Button>
+                                            <Plus />
+                                            Tambah Penelitian Kegiatan
+                                        </Button>
+                                    </Link>
+                                </>
+                            )}
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <TablePage<KegiatanInterface>
-                            data={kegiatan}
-                            columns={[
-                                {
-                                    key: "judul",
-                                    label: "Judul Kegiatan",
-                                },
-                                {
-                                    id: "fakuktas",
-                                    key: "penulis",
-                                    label: "Fakultas",
-                                    render: (_, item) => (
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {item.penulis.map((penulis, i) => (
-                                                <div
-                                                    key={i}
-                                                    className="flex flex-wrap items-center gap-1.5"
-                                                >
-                                                    <Badge className="whitespace-nowrap text-[13px]">
-                                                        {
-                                                            penulis.fakultas
-                                                                .nama_fakultas
-                                                        }
-                                                    </Badge>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ),
-                                },
-                                {
-                                    id: "dosen",
-                                    key: "penulis",
-                                    label: "Dosen",
-                                    render: (_, item) => (
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {item.penulis.map((penulis, i) => (
-                                                <div
-                                                    key={i}
-                                                    className="flex flex-wrap items-center gap-1.5"
-                                                >
-                                                    <Badge className="whitespace-nowrap text-[13px]">
-                                                        {
-                                                            penulis.dosen
-                                                                .nama_dosen
-                                                        }
-                                                    </Badge>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ),
-                                },
-                                {
-                                    id: "penulis_luar",
-                                    key: "penulis_luar",
-                                    label: "Penulis Luar Universitas",
-                                    render: (_, item) => (
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {item.penulis_luar.length !== 0 ? (
-                                                <>
-                                                    {item.penulis_luar.map(
-                                                        (penulis, i) => (
-                                                            <div
-                                                                key={i}
-                                                                className="flex flex-wrap items-center gap-1.5"
-                                                            >
-                                                                <Badge
-                                                                    className="whitespace-nowrap text-[13px]"
-                                                                    variant={
-                                                                        "outline"
-                                                                    }
+                        {role === "dosen" && (
+                            <TablePage<KegiatanInterface>
+                                data={kegiatan}
+                                columns={[
+                                    {
+                                        key: "judul",
+                                        label: "Judul Kegiatan",
+                                    },
+                                    {
+                                        id: "fakuktas",
+                                        key: "penulis",
+                                        label: "Fakultas",
+                                        render: (_, item) => (
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {item.penulis.map(
+                                                    (penulis, i) => (
+                                                        <div
+                                                            key={i}
+                                                            className="flex flex-wrap items-center gap-1.5"
+                                                        >
+                                                            <Badge className="whitespace-nowrap text-[13px]">
+                                                                {
+                                                                    penulis
+                                                                        .fakultas
+                                                                        .nama_fakultas
+                                                                }
+                                                            </Badge>
+                                                        </div>
+                                                    ),
+                                                )}
+                                            </div>
+                                        ),
+                                    },
+                                    {
+                                        id: "dosen",
+                                        key: "penulis",
+                                        label: "Dosen",
+                                        render: (_, item) => (
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {item.penulis.map(
+                                                    (penulis, i) => (
+                                                        <div
+                                                            key={i}
+                                                            className="flex flex-wrap items-center gap-1.5"
+                                                        >
+                                                            <Badge className="whitespace-nowrap text-[13px]">
+                                                                {
+                                                                    penulis
+                                                                        .dosen
+                                                                        .nama_dosen
+                                                                }
+                                                            </Badge>
+                                                        </div>
+                                                    ),
+                                                )}
+                                            </div>
+                                        ),
+                                    },
+                                    {
+                                        id: "penulis_luar",
+                                        key: "penulis_luar",
+                                        label: "Penulis Luar Universitas",
+                                        render: (_, item) => (
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {item.penulis_luar.length !==
+                                                0 ? (
+                                                    <>
+                                                        {item.penulis_luar.map(
+                                                            (penulis, i) => (
+                                                                <div
+                                                                    key={i}
+                                                                    className="flex flex-wrap items-center gap-1.5"
                                                                 >
-                                                                    {
-                                                                        penulis.nama_universitas
-                                                                    }
-                                                                </Badge>
-                                                                <Badge className="whitespace-nowrap text-[13px]">
-                                                                    {
-                                                                        penulis.nama_dosen
-                                                                    }
-                                                                </Badge>
-                                                            </div>
-                                                        ),
-                                                    )}
-                                                </>
-                                            ) : (
-                                                <>-</>
+                                                                    <Badge
+                                                                        className="whitespace-nowrap text-[13px]"
+                                                                        variant={
+                                                                            "outline"
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            penulis.nama_universitas
+                                                                        }
+                                                                    </Badge>
+                                                                    <Badge className="whitespace-nowrap text-[13px]">
+                                                                        {
+                                                                            penulis.nama_dosen
+                                                                        }
+                                                                    </Badge>
+                                                                </div>
+                                                            ),
+                                                        )}
+                                                    </>
+                                                ) : (
+                                                    <>-</>
+                                                )}
+                                            </div>
+                                        ),
+                                    },
+                                    {
+                                        id: "periode",
+                                        key: "semester",
+                                        label: "Periode",
+                                        render: (_, item) => (
+                                            <span className="whitespace-nowrap text-sm">
+                                                {item.semester} {item.tahun}
+                                            </span>
+                                        ),
+                                    },
+                                    {
+                                        id: "berkas",
+                                        key: "link_berkas",
+                                        label: "Berkas",
+                                        render: (_, item) => (
+                                            <a
+                                                href={item.link_berkas}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-primary inline-flex items-center gap-1.5 text-sm hover:underline"
+                                            >
+                                                <FileText className="h-3.5 w-3.5" />
+                                                Lihat
+                                            </a>
+                                        ),
+                                    },
+                                ]}
+                                renderActions={(item) => (
+                                    <>
+                                        <Link
+                                            href={route(
+                                                "kegiatan.edit",
+                                                item.id,
                                             )}
-                                        </div>
-                                    ),
-                                },
-                                {
-                                    id: "periode",
-                                    key: "semester",
-                                    label: "Periode",
-                                    render: (_, item) => (
-                                        <span className="whitespace-nowrap text-sm">
-                                            {item.semester} {item.tahun}
-                                        </span>
-                                    ),
-                                },
-                                {
-                                    id: "berkas",
-                                    key: "link_berkas",
-                                    label: "Berkas",
-                                    render: (_, item) => (
-                                        <a
-                                            href={item.link_berkas}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-primary inline-flex items-center gap-1.5 text-sm hover:underline"
+                                            viewTransition
                                         >
-                                            <FileText className="h-3.5 w-3.5" />
-                                            Lihat
-                                        </a>
-                                    ),
-                                },
-                            ]}
-                            renderActions={(item) => (
-                                <>
-                                    <Link
-                                        href={route(
-                                            "kegiatan.edit",
-                                            item.id,
-                                        )}
-                                        viewTransition
-                                    >
-                                        <Button variant="outline">Edit</Button>
-                                    </Link>
-                                    <Link
-                                        href={route("kegiatan.show", {
-                                            kegiatan: item.id,
-                                            from: "index",
-                                        })}
-                                        viewTransition
-                                    >
-                                        <Button variant="default">Show</Button>
-                                    </Link>
-                                    <DialogDelete
-                                        label={item.judul}
-                                        actionUrl={route(
-                                            "kegiatan.destroy",
-                                            item.id,
-                                        )}
-                                        page="Penelitian Kegiatan"
-                                        item={item}
-                                    />
-                                </>
-                            )}
-                        />
+                                            <Button variant="outline">
+                                                Edit
+                                            </Button>
+                                        </Link>
+                                        <Link
+                                            href={route("kegiatan.show", {
+                                                kegiatan: item.id,
+                                                from: "index",
+                                            })}
+                                            viewTransition
+                                        >
+                                            <Button variant="default">
+                                                Show
+                                            </Button>
+                                        </Link>
+                                        <DialogDelete
+                                            label={item.judul}
+                                            actionUrl={route(
+                                                "kegiatan.destroy",
+                                                item.id,
+                                            )}
+                                            page="Penelitian Kegiatan"
+                                            item={item}
+                                        />
+                                    </>
+                                )}
+                            />
+                        )}
+
+                        {role !== "dosen" && (
+                            <TablePage<KegiatanInterface>
+                                data={kegiatan}
+                                columns={[
+                                    {
+                                        key: "judul",
+                                        label: "Judul Kegiatan",
+                                    },
+                                    {
+                                        id: "fakuktas",
+                                        key: "penulis",
+                                        label: "Fakultas",
+                                        render: (_, item) => (
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {item.penulis.map(
+                                                    (penulis, i) => (
+                                                        <div
+                                                            key={i}
+                                                            className="flex flex-wrap items-center gap-1.5"
+                                                        >
+                                                            <Badge className="whitespace-nowrap text-[13px]">
+                                                                {
+                                                                    penulis
+                                                                        .fakultas
+                                                                        .nama_fakultas
+                                                                }
+                                                            </Badge>
+                                                        </div>
+                                                    ),
+                                                )}
+                                            </div>
+                                        ),
+                                    },
+                                    {
+                                        id: "dosen",
+                                        key: "penulis",
+                                        label: "Dosen",
+                                        render: (_, item) => (
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {item.penulis.map(
+                                                    (penulis, i) => (
+                                                        <div
+                                                            key={i}
+                                                            className="flex flex-wrap items-center gap-1.5"
+                                                        >
+                                                            <Badge className="whitespace-nowrap text-[13px]">
+                                                                {
+                                                                    penulis
+                                                                        .dosen
+                                                                        .nama_dosen
+                                                                }
+                                                            </Badge>
+                                                        </div>
+                                                    ),
+                                                )}
+                                            </div>
+                                        ),
+                                    },
+                                    {
+                                        id: "penulis_luar",
+                                        key: "penulis_luar",
+                                        label: "Penulis Luar Universitas",
+                                        render: (_, item) => (
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {item.penulis_luar.length !==
+                                                0 ? (
+                                                    <>
+                                                        {item.penulis_luar.map(
+                                                            (penulis, i) => (
+                                                                <div
+                                                                    key={i}
+                                                                    className="flex flex-wrap items-center gap-1.5"
+                                                                >
+                                                                    <Badge
+                                                                        className="whitespace-nowrap text-[13px]"
+                                                                        variant={
+                                                                            "outline"
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            penulis.nama_universitas
+                                                                        }
+                                                                    </Badge>
+                                                                    <Badge className="whitespace-nowrap text-[13px]">
+                                                                        {
+                                                                            penulis.nama_dosen
+                                                                        }
+                                                                    </Badge>
+                                                                </div>
+                                                            ),
+                                                        )}
+                                                    </>
+                                                ) : (
+                                                    <>-</>
+                                                )}
+                                            </div>
+                                        ),
+                                    },
+                                    {
+                                        id: "periode",
+                                        key: "semester",
+                                        label: "Periode",
+                                        render: (_, item) => (
+                                            <span className="whitespace-nowrap text-sm">
+                                                {item.semester} {item.tahun}
+                                            </span>
+                                        ),
+                                    },
+                                    {
+                                        id: "berkas",
+                                        key: "link_berkas",
+                                        label: "Berkas",
+                                        render: (_, item) => (
+                                            <a
+                                                href={item.link_berkas}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-primary inline-flex items-center gap-1.5 text-sm hover:underline"
+                                            >
+                                                <FileText className="h-3.5 w-3.5" />
+                                                Lihat
+                                            </a>
+                                        ),
+                                    },
+                                ]}
+                            />
+                        )}
                     </CardContent>
                 </Card>
             </div>
@@ -330,7 +477,9 @@ export default function Kegiatan({
 
 Kegiatan.layout = (page: React.ReactNode) => (
     <RoleLayout
-        breadcrumbs={[{ title: "Penelitian Kegiatan", href: route("kegiatan.index") }]}
+        breadcrumbs={[
+            { title: "Penelitian Kegiatan", href: route("kegiatan.index") },
+        ]}
     >
         {page}
     </RoleLayout>

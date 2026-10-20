@@ -38,11 +38,14 @@ class LuaranProsidingController extends Controller
             ->paginate(self::PER_PAGE)
             ->withQueryString();
 
+        $role = auth()->user()->role;
+
         return Inertia::render('luaran-prosiding/index', [
             'data' => $luaranProsiding,
             'filters' => $filters,
             'fakultas' => $fakultas,
             'stats' => $user->role === 'admin' ? $this->stats($fakultas) : null,
+            'role' => $role
         ]);
     }
 

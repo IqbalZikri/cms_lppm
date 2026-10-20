@@ -35,11 +35,14 @@ class LuaranBukuController extends Controller
             ->paginate(self::PER_PAGE)
             ->withQueryString();
 
+        $role = auth()->user()->role;
+
         return Inertia::render('luaran-buku/index', [
             'data' => $luaranBuku,
             'filters' => $filters,
             'fakultas' => $fakultas,
             'stats' => $user->role === 'admin' ? $this->stats($fakultas) : null,
+            'role' => $role
         ]);
     }
 

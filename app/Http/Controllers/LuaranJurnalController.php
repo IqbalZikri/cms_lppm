@@ -34,11 +34,14 @@ class LuaranJurnalController extends Controller
             ->paginate(self::PER_PAGE)
             ->withQueryString();
 
+        $role = auth()->user()->role;
+
         return Inertia::render('luaran-jurnal/index', [
             'data' => $luaranJurnal,
             'filters' => $filters,
             'fakultas' => $fakultas,
             'stats' => $user->role === 'admin' ? $this->stats($fakultas) : null,
+            'role' => $role
         ]);
     }
 
@@ -107,7 +110,7 @@ class LuaranJurnalController extends Controller
             $syncAuthors->handle($luaranJurnal, $request->validated('authors'));
         });
 
-        return to_route('luaran_jurnal.index')->with('success', 'Berhasil menambahkan LuaranJurnal');
+        return to_route('luaran_jurnal.index')->with('success', 'Berhasil menambahkan luaran jurnal');
     }
 
     public function update(LuaranJurnalRequest $request, LuaranJurnal $luaranJurnal, SyncAuthors $syncAuthors)
@@ -117,7 +120,7 @@ class LuaranJurnalController extends Controller
             $syncAuthors->handle($luaranJurnal, $request->validated('authors'));
         });
 
-        return to_route('luaran_jurnal.index')->with('success', 'Berhasil memperbarui LuaranJurnal');
+        return to_route('luaran_jurnal.index')->with('success', 'Berhasil memperbarui luaran jurnal');
     }
 
     public function destroy(LuaranJurnal $luaranJurnal)
@@ -130,7 +133,7 @@ class LuaranJurnalController extends Controller
             $luaranJurnal->delete();
         });
 
-        return back()->with('success', 'Berhasil menghapus LuaranJurnal');
+        return back()->with('success', 'Berhasil menghapus luaran jurnal');
     }
 
     public function restore(LuaranJurnal $luaranJurnal)
@@ -143,7 +146,7 @@ class LuaranJurnalController extends Controller
             $luaranJurnal->restore();
         });
 
-        return back()->with('success', 'Berhasil memulihkan LuaranJurnal');
+        return back()->with('success', 'Berhasil memulihkan luaran jurnal');
     }
 
     public function forceDelete(LuaranJurnal $luaranJurnal)
@@ -156,7 +159,7 @@ class LuaranJurnalController extends Controller
             $luaranJurnal->forceDelete();
         });
 
-        return back()->with('success', 'Berhasil menghapus permanen LuaranJurnal');
+        return back()->with('success', 'Berhasil menghapus permanen luaran jurnal');
     }
 
     /**

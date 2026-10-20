@@ -39,7 +39,7 @@ export default function EditHki({ fakultas, data, user }: Props) {
                             <BreadcrumbList>
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route(user.role + ".hki.index")}
+                                        href={route("hki.index")}
                                     >
                                         Hak Kekayaan Intelektual
                                     </BreadcrumbLink>
@@ -47,10 +47,7 @@ export default function EditHki({ fakultas, data, user }: Props) {
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
                                     <BreadcrumbLink
-                                        href={route(
-                                            user.role + ".hki.edit",
-                                            data.id,
-                                        )}
+                                        href={route("hki.edit", data.id)}
                                     >
                                         Edit Hak Kekayaan Intelektual
                                     </BreadcrumbLink>

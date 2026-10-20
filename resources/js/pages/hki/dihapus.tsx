@@ -15,7 +15,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { LuaranJurnal } from "@/interface/luaran-jurnal";
+import { Hki } from "@/interface/hki";
 import { PaginatedData } from "@/interface/pagination";
 import { Fakultas } from "@/types/fakultas";
 import { Head, Link, router } from "@inertiajs/react";
@@ -24,7 +24,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { route } from "ziggy-js";
 
 interface Props {
-    data: PaginatedData<LuaranJurnal>;
+    data: PaginatedData<Hki>;
     fakultas: Fakultas[];
     filters: {
         search?: string;
@@ -46,7 +46,7 @@ export default function Dihapus({ data, fakultas, filters }: Props) {
 
         const timeout = setTimeout(() => {
             router.get(
-                route("LuaranJurnal.dihapus"),
+                route("hki.dihapus"),
                 {
                     ...(search && { search }),
                     ...(fakultasId && { cari_fakultas: fakultasId }),
@@ -66,7 +66,7 @@ export default function Dihapus({ data, fakultas, filters }: Props) {
         <>
             <Head title="HKI yang Dihapus" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <Link href={route("admin.hki.index")} viewTransition>
+                <Link href={route("hki.index")} viewTransition>
                     <Button>
                         <ArrowLeft />
                         Kembali
@@ -77,7 +77,7 @@ export default function Dihapus({ data, fakultas, filters }: Props) {
                     breadcrumb={[
                         {
                             label: "HKI",
-                            href: "admin.hki.index",
+                            href: "hki.index",
                         },
                     ]}
                 />
@@ -139,7 +139,7 @@ export default function Dihapus({ data, fakultas, filters }: Props) {
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <TablePage<LuaranJurnal>
+                        <TablePage<Hki>
                             data={data}
                             columns={[
                                 {
@@ -240,7 +240,7 @@ export default function Dihapus({ data, fakultas, filters }: Props) {
                             renderActions={(item) => (
                                 <>
                                     <Link
-                                        href={route("admin.hki.show", {
+                                        href={route("hki.show", {
                                             hki: item.id,
                                             from: "dihapus",
                                         })}
@@ -251,7 +251,7 @@ export default function Dihapus({ data, fakultas, filters }: Props) {
                                     <DialogRestore
                                         page="HKI"
                                         actionUrl={route(
-                                            "admin.hki.restore",
+                                            "hki.restore",
                                             item.id,
                                         )}
                                         label={item.judul}
@@ -260,7 +260,7 @@ export default function Dihapus({ data, fakultas, filters }: Props) {
                                     <DialogDelete
                                         label={item.judul}
                                         actionUrl={route(
-                                            "admin.hki.force-delete",
+                                            "hki.force-delete",
                                             item.id,
                                         )}
                                         page="HKI"

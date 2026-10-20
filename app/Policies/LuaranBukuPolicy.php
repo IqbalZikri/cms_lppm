@@ -80,6 +80,6 @@ class LuaranBukuPolicy
 
     public function viewTrashed(User $user): bool
     {
-        return $this->viewAny($user);
+        return $user->role === 'dosen';
     }
 }

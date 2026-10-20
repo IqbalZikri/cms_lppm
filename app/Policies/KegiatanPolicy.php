@@ -23,6 +23,11 @@ class KegiatanPolicy
         return in_array($user->role, self::ROLES, true);
     }
 
+    public function viewTrashed(User $user): bool
+    {
+        return $user->role === 'dosen';
+    }
+
     /**
      * Determine whether the user can view the model.
      */
@@ -77,10 +82,5 @@ class KegiatanPolicy
     public function forceDelete(User $user, Kegiatan $kegiatan): bool
     {
         return $kegiatan->trashed() && $kegiatan->user()->is($user);
-    }
-
-    public function viewTrashed(User $user): bool
-    {
-        return $this->viewAny($user);
     }
 }

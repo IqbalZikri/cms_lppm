@@ -23,6 +23,11 @@ class HkiPolicy
         return in_array($user->role, self::ROLES, true);
     }
 
+    public function viewTrashed(User $user): bool
+    {
+        return $user->role === 'dosen';
+    }
+
     /**
      * Determine whether the user can view the model.
      */
@@ -52,7 +57,18 @@ class HkiPolicy
      */
     public function update(User $user, Hki $hki): bool
     {
-        return !$hki->trashed() && $hki->user_id === $user->id;
+        if ($hki->trashed()) {
+            return false;
+        }
+
+        if ($hki->user_id === $user->id) {
+            return true;
+        }
+
+        $dosenId = $user->dosen?->id;
+
+        return $dosenId !== null
+            && $hki->penulis->contains('dosen_id', $dosenId);
     }
 
     /**

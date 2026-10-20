@@ -75,6 +75,11 @@ class User extends Authenticatable implements PasskeyUser, MustVerifyEmail
         return $this->hasMany(Hki::class);
     }
 
+    public function kegiatan()
+    {
+        return $this->hasMany(Kegiatan::class);
+    }
+
     protected function avatar(): Attribute
     {
         return Attribute::make(

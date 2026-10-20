@@ -24,6 +24,7 @@ import { Hki } from "@/interface/hki";
 interface Props {
     data: Hki;
     role: string;
+    backUrl: string;
 }
 
 function formatRupiah(value: string | number) {
@@ -50,7 +51,7 @@ type PenulisRow =
           asal: string;
       };
 
-export default function Show({ data, role }: Props) {
+export default function Show({ data, backUrl, role }: Props) {
     const daftarPenulis: PenulisRow[] = [
         ...(data.penulis ?? []).map((p) => ({
             tipe: "internal" as const,
@@ -75,26 +76,30 @@ export default function Show({ data, role }: Props) {
             <Head title={`Detail - ${data.judul}`} />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
-                    <Link href={route(role + ".hki.index")} viewTransition>
+                    <Link href={backUrl} viewTransition>
                         <Button variant="outline" size="sm">
                             <ArrowLeft className="mr-1 h-4 w-4" />
                             Kembali
                         </Button>
                     </Link>
 
-                    {data.status_pengajuan === "diajukan" ||
-                    data.status_pengajuan === "disetujui" ? (
-                        ""
-                    ) : (
-                        <Link
-                            href={route(role + ".hki.edit", data.id)}
-                            viewTransition
-                        >
-                            <Button size="sm">
-                                <Pencil className="mr-1 h-4 w-4" />
-                                Edit
-                            </Button>
-                        </Link>
+                    {!data.deleted_at && role === 'dosen' && (
+                        <>
+                            {data.status_pengajuan === "diajukan" ||
+                            data.status_pengajuan === "disetujui" ? (
+                                ""
+                            ) : (
+                                <Link
+                                    href={route("hki.edit", data.id)}
+                                    viewTransition
+                                >
+                                    <Button size="sm">
+                                        <Pencil className="mr-1 h-4 w-4" />
+                                        Edit
+                                    </Button>
+                                </Link>
+                            )}
+                        </>
                     )}
                 </div>
 
@@ -258,48 +263,52 @@ export default function Show({ data, role }: Props) {
                         </div>
                     </CardContent>
                     <CardFooter className="grid justify-items-end">
-                        {data.status_pengajuan === "diajukan" && (
-                            <Form
-                                className="flex gap-3"
-                                action={route(
-                                    "admin.hki.updateStatusPengajuan",
-                                    data.id,
+                        {!data.deleted_at && role === 'admin' && (
+                            <>
+                                {data.status_pengajuan === "diajukan" && (
+                                    <Form
+                                        className="flex gap-3"
+                                        action={route(
+                                            "admin.hki.updateStatusPengajuan",
+                                            data.id,
+                                        )}
+                                        method="PUT"
+                                    >
+                                        <Button
+                                            name="status_pengajuan"
+                                            value={"ditolak"}
+                                            variant={"destructive"}
+                                        >
+                                            Tolak
+                                        </Button>
+                                        <Button
+                                            name="status_pengajuan"
+                                            value={"disetujui"}
+                                            variant={"success"}
+                                        >
+                                            Setujui
+                                        </Button>
+                                    </Form>
                                 )}
-                                method="PUT"
-                            >
-                                <Button
-                                    name="status_pengajuan"
-                                    value={"ditolak"}
-                                    variant={"destructive"}
-                                >
-                                    Tolak
-                                </Button>
-                                <Button
-                                    name="status_pengajuan"
-                                    value={"disetujui"}
-                                    variant={"success"}
-                                >
-                                    Setujui
-                                </Button>
-                            </Form>
-                        )}
-                        {data.status_pengajuan === "disetujui" && (
-                            <Form
-                                className="flex gap-3"
-                                action={route(
-                                    "admin.hki.updateStatusPengajuan",
-                                    data.id,
+                                {data.status_pengajuan === "disetujui" && (
+                                    <Form
+                                        className="flex gap-3"
+                                        action={route(
+                                            "admin.hki.updateStatusPengajuan",
+                                            data.id,
+                                        )}
+                                        method="PUT"
+                                    >
+                                        <Button
+                                            name="status_pengajuan"
+                                            value={"ditolak"}
+                                            variant={"destructive"}
+                                        >
+                                            Tolak
+                                        </Button>
+                                    </Form>
                                 )}
-                                method="PUT"
-                            >
-                                <Button
-                                    name="status_pengajuan"
-                                    value={"ditolak"}
-                                    variant={"destructive"}
-                                >
-                                    Tolak
-                                </Button>
-                            </Form>
+                            </>
                         )}
                     </CardFooter>
                 </Card>
@@ -312,7 +321,6 @@ Show.layout = {
     breadcrumbs: [
         {
             title: "Hak Kekayaan Intelektual",
-            href: route("admin.hki.index"),
         },
         {
             title: "Detail",

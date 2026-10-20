@@ -22,6 +22,11 @@ class PkmPolicy
         return in_array($user->role, self::ROLES, true);
     }
 
+    public function viewTrashed(User $user)
+    {
+        return $user->role === 'dosen';
+    }
+
     /**
      * Determine whether the user can view the model.
      */
