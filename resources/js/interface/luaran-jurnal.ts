@@ -9,6 +9,7 @@ export interface LuaranJurnal {
     semester: string;
     tahun: number;
     link_berkas: string;
+    penerbit: string;
     penulis: Penulis[];
     penulis_luar: PenulisLuar[];
     deleted_at: Date;

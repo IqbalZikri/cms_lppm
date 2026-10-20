@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->string('semester');
             $table->year('tahun');
             $table->string('link_berkas');
+            $table->string('penerbit');
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->softDeletes()->nullable();
             $table->timestamps();

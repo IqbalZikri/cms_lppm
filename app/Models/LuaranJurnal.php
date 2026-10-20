@@ -31,6 +31,7 @@ class LuaranJurnal extends Model
         'semester',
         'tahun',
         'link_berkas',
+        'penerbit',
         'user_id',
     ];
 

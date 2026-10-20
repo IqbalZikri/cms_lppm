@@ -203,6 +203,35 @@ export default function FormLuaranJurnal({ fakultas, luaranJurnal }: Props) {
                                         </Field>
                                     </FieldGroup>
                                 </div>
+
+                                <div className="space-y-2 sm:pl-12">
+                                    <FieldGroup>
+                                        <Field>
+                                            <Label
+                                                htmlFor="penerbit"
+                                                className="text-base"
+                                            >
+                                                Penerbit
+                                                <RequiredMark />
+                                            </Label>
+                                            <Input
+                                                name="penerbit"
+                                                defaultValue={
+                                                    luaranJurnal?.penerbit
+                                                }
+                                                id="penerbit"
+                                                placeholder="Penerbit"
+                                                className="h-11 text-base"
+                                                aria-invalid={!!errors.penerbit}
+                                            />
+                                            {errors.penerbit && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.penerbit}
+                                                </p>
+                                            )}
+                                        </Field>
+                                    </FieldGroup>
+                                </div>
                             </div>
 
                             <Separator />

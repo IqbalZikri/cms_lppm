@@ -4,30 +4,38 @@ namespace App\Concerns;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Schema;
 
 trait Visible
 {
     public function scopeVisibleTo(Builder $query, User $user): Builder
     {
+        $model = $query->getModel();
         $hasStatus = static::hasStatusColumn();
 
-        $notDraft = fn ($q) => $q
-            ->whereNull('status_pengajuan')
-            ->orWhere('status_pengajuan', '!=', 'draft');
+        // Nama kolom diberi prefix tabel agar tidak ambigu saat ada join.
+        $userColumn = $model->qualifyColumn('user_id');
+        $statusColumn = $model->qualifyColumn('status_pengajuan');
+
+        // Hanya dipanggil kalau $hasStatus true, jadi kolom pasti ada.
+        $notDraft = fn (Builder $q) => $q
+            ->whereNull($statusColumn)
+            ->orWhere($statusColumn, '!=', 'draft');
 
         return match ($user->role) {
-            'admin' => $query->where($notDraft),
+            'admin' => $query,
 
-            // punya sendiri ATAU yang bukan draft (tanpa kolom status: semua terlihat)
+            // Punya sendiri ATAU yang bukan draft.
+            // Tanpa kolom status: semua terlihat.
             'dosen' => $hasStatus
                 ? $query->where(fn ($q) => $q
-                    ->where('user_id', $user->id)
+                    ->where($userColumn, $user->id)
                     ->orWhere($notDraft))
                 : $query,
 
+            // Punya sendiri ATAU (bukan draft, kalau ada kolom status)
+            // dan penulisnya satu fakultas.
             'uppm' => $query->where(fn ($q) => $q
-                ->where('user_id', $user->id)
+                ->where($userColumn, $user->id)
                 ->orWhere(fn ($q) => $q
                     ->when($hasStatus, fn ($q) => $q->where($notDraft))
                     ->whereHas('penulis', fn ($p) => $p->where('fakultas_id', $user->fakultas_id)))),
@@ -40,8 +48,14 @@ trait Visible
     {
         static $cache = [];
 
-        $table = (new static)->getTable();
+        $model = new static;
+        $table = $model->getTable();
 
-        return $cache[$table] ??= Schema::hasColumn($table, 'status_pengajuan');
+        // Cache per koneksi + tabel, supaya tidak query schema berulang.
+        $key = $model->getConnectionName().'.'.$table;
+
+        return $cache[$key] ??= $model->getConnection()
+            ->getSchemaBuilder()
+            ->hasColumn($table, 'status_pengajuan');
     }
 }

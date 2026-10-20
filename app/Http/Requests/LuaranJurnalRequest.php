@@ -26,12 +26,13 @@ class LuaranJurnalRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'jenis_luaran_jurnal' => ['required'],
+            'jenis_luaran_jurnal' => ['required', 'in:scopus q1, scopus q2, scopus q3, sinta 1, sinta 2, sinta 3, sinta 4, sinta 5, non sinta, non scopus'],
             'judul' => ['required', 'string'],
             'abstrak' => ['required', 'string'],
             'semester' => ['required'],
             'tahun' => ['required', 'digits:4'],
             'link_berkas' => ['required', 'url'],
+            'penerbit' => ['required'],
 
             'authors' => ['required', 'array', 'min:1'],
             'authors.*.tipe' => ['required', 'in:internal,luar'],
@@ -52,6 +53,7 @@ class LuaranJurnalRequest extends FormRequest
             'tahun.digits' => 'Tahun harus terdiri dari 4 digit',
             'link_berkas.required' => 'Silahkan isi link berkas',
             'link_berkas.url' => 'Link berkas harus berupa URL yang valid',
+            'penerbit.required' => 'Silahkan isi penerbit',
 
             'authors.required' => 'Silahkan tambahkan minimal satu penulis',
             'authors.min' => 'Silahkan tambahkan minimal satu penulis',
