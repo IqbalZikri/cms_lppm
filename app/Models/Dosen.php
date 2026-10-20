@@ -60,5 +60,10 @@ class Dosen extends Model
         return $this->hasMany(Penulis::class);
     }
 
+    public function scorePenelitian()
+    {
+        return $this->hasOne(ScorePenelitianDosen::class);
+    }
+
     protected $casts = ['tanggal_lahir' => 'date'];
 }

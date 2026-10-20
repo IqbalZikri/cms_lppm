@@ -5,6 +5,7 @@ namespace App\Imports;
 use App\Models\Dosen;
 use App\Models\Fakultas;
 use App\Models\Prodi;
+use App\Models\ScorePenelitianDosen;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -71,7 +72,7 @@ class DosenImport implements ToCollection, WithHeadingRow, WithValidation, Skips
                     ]
                 );
 
-                Dosen::updateOrCreate(
+                $dosen = Dosen::updateOrCreate(
                     ['nidn' => (string) $row['nidn']],
                     [
                         'sintaid' => $row['sintaid'],
@@ -84,6 +85,38 @@ class DosenImport implements ToCollection, WithHeadingRow, WithValidation, Skips
                         'gelar_depan' => $row['gelar_depan'] ?? null,
                         'gelar_belakang' => $row['gelar_belakang'],
                         'user_id' => $user->id,
+                    ]
+                );
+
+                ScorePenelitianDosen::updateOrCreate(
+                    [
+                        'dosen_id' => $dosen->id,
+                    ],
+                    [
+                        'sinta_score_overall_versi_3' => $row['sinta_score_overall_versi_3'] ?? '0',
+                        'sinta_score_3yr' => $row['sinta_score_3yr'] ?? '0',
+                        'dokumen_scopus' => $row['dokumen_scopus'] ?? '0',
+                        'sitasi_scopus' => $row['sitasi_scopus'] ?? '0',
+                        'dokumen_tersitasi_scopus' => $row['dokumen_tersitasi_scopus'] ?? '0',
+                        'h-index_scopus' => $row['h-index_scopus']  ?? '0',
+                        'g-index_scopus' => $row['g-index_scopus'] ?? '0',
+                        'i10-index_scopus' => $row['i10-index_scopus'] ?? '0',
+                        'dokumen_gs' => $row['dokumen_gs'] ?? '0',
+                        'sitasi_gs' => $row['sitasi_gs'] ?? '0',
+                        'dokumen_tersitasi_gs' => $row['dokumen_tersitasi_gs'] ?? '0',
+                        'h-index_gs' => $row['h-index_gs'] ?? '0',
+                        'g-index_gs' => $row['g-index_gs'] ?? '0',
+                        'i10-index_gs' => $row['i10-index_gs'] ?? '0',
+                        'dokumen_wos' => $row['dokumen_wos'] ?? '0',
+                        'sitasi_wos' => $row['sitasi_wos'] ?? '0',
+                        'dokumen_tersitasi_wos' => $row['dokumen_tersitasi_wos'] ?? '0',
+                        'h-index_wos' => $row['h-index_wos'] ?? '0',
+                        'g-index_wos' => $row['g-index_wos'] ?? '0',
+                        'i10-index_wos' => $row['i10-index_wos'] ?? '0',
+                        'dokumen_garuda' => $row['dokumen_garuda'] ?? '0',
+                        'sitasi_garuda' => $row['sitasi_garuda'] ?? '0',
+                        'dokumen_tersitasi_garuda' => $row['dokumen_tersitasi_garuda'] ?? '0',
+                        'status_aktif' => $row['status_aktif']
                     ]
                 );
             }

@@ -35,7 +35,7 @@ class DosenController extends Controller
 
     public function show(string $id)
     {
-        $dosen = Dosen::with('fakultas', 'prodi', 'user')->findOrFail($id);
+        $dosen = Dosen::with('fakultas', 'prodi', 'user')->findOrFail($id)->load('scorePenelitian');
         $user = User::findOrFail($dosen->user_id);
 
         return Inertia::render('uppm/dosen/show', [

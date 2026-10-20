@@ -2,6 +2,7 @@ import { Fakultas } from "@/interface/fakultas";
 import { Prodi } from "@/interface/prodi";
 import { User } from "./auth";
 import { Penulis } from "@/interface/penulis";
+import { ScorePenelitian } from "./score-penelitian";
 
 export type Dosen = {
     id: number;
@@ -27,4 +28,5 @@ export type Dosen = {
     user_id: number;
     user: User;
     penulis: Penulis[];
+    score_penelitian: ScorePenelitian[];
 };

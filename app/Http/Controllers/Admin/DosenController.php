@@ -8,6 +8,7 @@ use App\Imports\DosenPreviewImport;
 use App\Models\Dosen;
 use App\Models\Fakultas;
 use App\Models\Prodi;
+use App\Models\ScorePenelitianDosen;
 use App\Models\User;
 use DB;
 use Illuminate\Http\Request;
@@ -143,8 +144,9 @@ class DosenController extends Controller
      */
     public function show(string $id)
     {
-        $dosen = Dosen::with('fakultas', 'prodi', 'user')->findOrFail($id);
+        $dosen = Dosen::with('fakultas', 'prodi', 'user')->findOrFail($id)->load('scorePenelitian');
         $user = User::findOrFail($dosen->user_id);
+        $score = ScorePenelitianDosen::get();
 
         return Inertia::render('admin/dosen/show', [
             'dosen' => [
@@ -154,6 +156,7 @@ class DosenController extends Controller
                     : null,
             ],
             'user' => $user,
+            'score' => $score
         ]);
     }
 
