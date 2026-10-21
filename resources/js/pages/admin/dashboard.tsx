@@ -254,9 +254,6 @@ export default function Dashboard({
                                             <TableHead>NUPTK</TableHead>
                                             <TableHead>Nama Dosen</TableHead>
                                             <TableHead>Email</TableHead>
-                                            <TableHead>
-                                                Status Vertifikasi Email
-                                            </TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -308,21 +305,6 @@ export default function Dashboard({
                                                                 <TableCell>
                                                                     {item.email ??
                                                                         "-"}
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    {item.user
-                                                                        .email_verified_at ? (
-                                                                        <Badge className="bg-green-500 text-white hover:bg-green-600">
-                                                                            <Check />{" "}
-                                                                            Terverifikasi
-                                                                        </Badge>
-                                                                    ) : (
-                                                                        <Badge className="bg-red-500 text-white hover:bg-red-600">
-                                                                            <X />
-                                                                            Belum
-                                                                            Terverifikasi
-                                                                        </Badge>
-                                                                    )}
                                                                 </TableCell>
                                                             </>
                                                         </TableRow>

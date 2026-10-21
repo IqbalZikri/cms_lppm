@@ -64,6 +64,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Luaran Jurnal
     Route::get('luaran_jurnal/dihapus', [LuaranJurnalController::class, 'dihapus'])->name('luaran_jurnal.dihapus');
+    Route::get('luaran_jurnal/import', [LuaranJurnalController::class, 'pageImport'])->name('luaran_jurnal.pageImport');
+    Route::post('luaran_jurnal/import/preview', [LuaranJurnalController::class, 'preview'])->name('luaran_jurnal.preview');
+    Route::post('luaran_jurnal/import', [LuaranJurnalController::class, 'import'])->name('luaran_jurnal.import');
     Route::patch('luaran_jurnal/{luaran_jurnal}/restore', [LuaranJurnalController::class, 'restore'])->withTrashed()->name('luaran_jurnal.restore');
     Route::delete('luaran_jurnal/{luaran_jurnal}/force', [LuaranJurnalController::class, 'forceDelete'])->withTrashed()->name('luaran_jurnal.force-delete');
     Route::resource('luaran_jurnal', LuaranJurnalController::class)->except('destroy')->withTrashed(['show']);

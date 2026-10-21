@@ -146,6 +146,21 @@ export default function LuaranJurnal({
                                 />
                             </Field>
 
+                            {role === "admin" && (
+                                <Link
+                                    href={route("luaran_jurnal.pageImport")}
+                                    viewTransition
+                                    className="w-full sm:w-auto"
+                                >
+                                    <Button
+                                        variant={"success"}
+                                        className="w-full sm:w-auto"
+                                    >
+                                        Import
+                                    </Button>
+                                </Link>
+                            )}
+
                             {role === "dosen" && (
                                 <>
                                     <Link
@@ -158,6 +173,19 @@ export default function LuaranJurnal({
                                             variant={"destructive"}
                                         >
                                             Luaran Jurnal Dihapus
+                                        </Button>
+                                    </Link>
+
+                                    <Link
+                                        href={route("luaran_jurnal.pageImport")}
+                                        viewTransition
+                                        className="w-full sm:w-auto"
+                                    >
+                                        <Button
+                                            variant={"success"}
+                                            className="w-full sm:w-auto"
+                                        >
+                                            Import
                                         </Button>
                                     </Link>
 
@@ -483,6 +511,22 @@ export default function LuaranJurnal({
                                         ),
                                     },
                                 ]}
+                                renderActions={(item) => (
+                                    <Link
+                                        href={route("luaran_jurnal.show", {
+                                            luaran_jurnal: item.id,
+                                            from: "index",
+                                        })}
+                                        viewTransition
+                                    >
+                                        <Button
+                                            variant="outline"
+                                            title="Lihat detail"
+                                        >
+                                            Show
+                                        </Button>
+                                    </Link>
+                                )}
                             />
                         )}
                     </CardContent>

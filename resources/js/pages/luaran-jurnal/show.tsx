@@ -22,7 +22,8 @@ import { LuaranJurnal } from "@/interface/luaran-jurnal";
 
 interface Props {
     data: LuaranJurnal;
-    backUrl: string
+    backUrl: string;
+    role: string;
 }
 
 type PenulisRow =
@@ -39,7 +40,7 @@ type PenulisRow =
           asal: string;
       };
 
-export default function Show({ data, backUrl }: Props) {
+export default function Show({ data, backUrl, role }: Props) {
     const daftarPenulis: PenulisRow[] = [
         ...(data.penulis ?? []).map((p) => ({
             tipe: "internal" as const,
@@ -67,7 +68,7 @@ export default function Show({ data, backUrl }: Props) {
                         </Button>
                     </Link>
 
-                    {!data.deleted_at && (
+                    {!data.deleted_at && role === 'dosen' && (
                         <Link
                             href={route("luaran_jurnal.edit", data.id)}
                             viewTransition

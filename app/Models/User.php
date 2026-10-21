@@ -88,4 +88,9 @@ class User extends Authenticatable implements PasskeyUser, MustVerifyEmail
                 : null,
         );
     }
+
+    public function diimport()
+    {
+        return $this->hasOne(LuaranJurnal::class, 'diimport_oleh');
+    }
 }

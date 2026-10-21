@@ -116,7 +116,7 @@ class DosenImport implements ToCollection, WithHeadingRow, WithValidation, Skips
                         'dokumen_garuda' => $row['dokumen_garuda'] ?? '0',
                         'sitasi_garuda' => $row['sitasi_garuda'] ?? '0',
                         'dokumen_tersitasi_garuda' => $row['dokumen_tersitasi_garuda'] ?? '0',
-                        'status_aktif' => $row['status_aktif']
+                        'status_aktif' => $row['status_aktif'] ?? '-'
                     ]
                 );
             }

@@ -21,6 +21,7 @@ return new class extends Migration {
             $table->string('penerbit');
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->softDeletes()->nullable();
+            $table->foreignId('diimport_oleh')->nullable()->constrained('users');
             $table->timestamps();
         });
     }

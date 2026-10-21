@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Actions\SyncAuthors;
 use App\Http\Requests\LuaranJurnalRequest;
+use App\Imports\JurnalImport;
+use App\Imports\JurnalPreviewImport;
 use App\Models\Dosen;
 use App\Models\Fakultas;
 use App\Models\LuaranJurnal;
@@ -13,6 +15,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
+use Throwable;
 
 class LuaranJurnalController extends Controller
 {
@@ -83,9 +87,12 @@ class LuaranJurnalController extends Controller
             ? route('luaran_jurnal.dihapus')
             : route('luaran_jurnal.index');
 
+        $role = auth()->user()->role;
+
         return Inertia::render('luaran-jurnal/show', [
             'data' => $luaranJurnal->load($this->authorRelations(withTrashed: true)),
-            'backUrl' => $backUrl
+            'backUrl' => $backUrl,
+            'role' => $role
         ]);
     }
 
@@ -149,6 +156,11 @@ class LuaranJurnalController extends Controller
         return back()->with('success', 'Berhasil memulihkan luaran jurnal');
     }
 
+    public function pageImport()
+    {
+        return Inertia::render('luaran-jurnal/import');
+    }
+
     public function forceDelete(LuaranJurnal $luaranJurnal)
     {
         $this->authorize('forceDelete', $luaranJurnal);
@@ -160,6 +172,64 @@ class LuaranJurnalController extends Controller
         });
 
         return back()->with('success', 'Berhasil menghapus permanen luaran jurnal');
+    }
+
+    public function preview(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:5120'],
+        ]);
+
+
+        $import = new JurnalPreviewImport();
+        Excel::import($import, $request->file('file'));
+
+        $rows = collect($import->rows);
+
+        return response()->json([
+            'total' => $rows->count(),
+            'invalid' => $rows->filter(fn($r) => count($r['errors']) > 0)->count(),
+            'valid' => $rows->filter(fn($r) => count($r['errors']) === 0)->count(),
+            'rows' => $rows->take(500)->values(), // batasi agar respons tidak terlalu besar
+        ]);
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:5120'],
+        ], [
+            'file.required' => 'Pilih file Excel terlebih dahulu',
+            'file.mimes' => 'File harus berformat xlsx, xls, atau csv',
+            'file.max' => 'Ukuran file maksimal 5 MB',
+        ]);
+
+        $import = new JurnalImport();
+
+        try {
+            Excel::import($import, $request->file('file'));
+        } catch (Throwable $e) {
+            report($e);
+
+            return back()->withErrors(['file' => 'Import gagal, silakan periksa file dan coba lagi.']);
+        }
+
+        // Satu baris bisa gagal di beberapa kolom, jadi dikelompokkan per baris
+        $dilewati = $import->failures()
+            ->groupBy(fn($f) => $f->row())
+            ->map(fn($items, $row) => "Baris {$row}: " . $items->flatMap->errors()->implode(', '))
+            ->values()
+            ->take(50)
+            ->all();
+
+        $jumlahDilewati = $import->failures()->groupBy(fn($f) => $f->row())->count();
+
+        return redirect()
+            ->route('luaran_jurnal.index')
+            ->with('success', $jumlahDilewati > 0
+                ? "Import selesai. {$jumlahDilewati} baris dilewati karena data tidak valid."
+                : 'Data jurnal berhasil diimport')
+            ->with('import_skipped', $dilewati);
     }
 
     /**

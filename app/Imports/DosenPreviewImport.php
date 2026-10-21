@@ -23,8 +23,8 @@ class DosenPreviewImport implements ToCollection, WithHeadingRow
             $validator = Validator::make($data, $rules, $messages);
 
             $this->rows[] = [
-                'row'    => $i + 2, // baris 1 = heading
-                'data'   => $data,
+                'row' => $i + 2, // baris 1 = heading
+                'data' => $data,
                 'errors' => $validator->errors()->all(),
             ];
         }

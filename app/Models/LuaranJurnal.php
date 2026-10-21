@@ -33,9 +33,13 @@ class LuaranJurnal extends Model
         'link_berkas',
         'penerbit',
         'user_id',
+        'diimport_oleh'
     ];
 
-
+    public function diimport()
+    {
+        return $this->belongsTo(User::class, 'diimport_oleh');
+    }
 
     public function penulis(): MorphMany
     {
