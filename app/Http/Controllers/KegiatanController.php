@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Actions\SyncKegiatanAuthors;
 use App\Http\Requests\KegiatanRequest;
+use App\Imports\KegiatanImport;
+use App\Imports\KegiatanPreviewImport;
 use App\Models\Fakultas;
 use App\Models\Kegiatan;
 use App\Models\Penulis;
@@ -13,6 +15,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Log;
+use Maatwebsite\Excel\Facades\Excel;
+use Throwable;
 
 class KegiatanController extends Controller
 {
@@ -160,6 +164,69 @@ class KegiatanController extends Controller
         });
 
         return back()->with('success', 'Berhasil menghapus permanen kegiatan');
+    }
+
+    public function pageImport()
+    {
+        return Inertia::render('kegiatan/import');
+    }
+
+    public function preview(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:5120'],
+        ]);
+
+
+        $import = new KegiatanPreviewImport();
+        Excel::import($import, $request->file('file'));
+
+        $rows = collect($import->rows);
+
+        return response()->json([
+            'total' => $rows->count(),
+            'invalid' => $rows->filter(fn($r) => count($r['errors']) > 0)->count(),
+            'valid' => $rows->filter(fn($r) => count($r['errors']) === 0)->count(),
+            'rows' => $rows->take(500)->values(), // batasi agar respons tidak terlalu besar
+        ]);
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:5120'],
+        ], [
+            'file.required' => 'Pilih file Excel terlebih dahulu',
+            'file.mimes' => 'File harus berformat xlsx, xls, atau csv',
+            'file.max' => 'Ukuran file maksimal 5 MB',
+        ]);
+
+        $import = new KegiatanImport();
+
+        try {
+            Excel::import($import, $request->file('file'));
+        } catch (Throwable $e) {
+            report($e);
+
+            return back()->withErrors(['file' => 'Import gagal, silakan periksa file dan coba lagi.']);
+        }
+
+        // Satu baris bisa gagal di beberapa kolom, jadi dikelompokkan per baris
+        $dilewati = $import->failures()
+            ->groupBy(fn($f) => $f->row())
+            ->map(fn($items, $row) => "Baris {$row}: " . $items->flatMap->errors()->implode(', '))
+            ->values()
+            ->take(50)
+            ->all();
+
+        $jumlahDilewati = $import->failures()->groupBy(fn($f) => $f->row())->count();
+
+        return redirect()
+            ->route('kegiatan.index')
+            ->with('success', $jumlahDilewati > 0
+                ? "Import selesai. {$jumlahDilewati} baris dilewati karena data tidak valid."
+                : 'Data kegiatan berhasil diimport')
+            ->with('import_skipped', $dilewati);
     }
 
     /**

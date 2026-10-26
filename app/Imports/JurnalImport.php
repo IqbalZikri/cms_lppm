@@ -4,7 +4,6 @@ namespace App\Imports;
 
 use App\Models\Dosen;
 use App\Models\LuaranJurnal;
-use App\Models\Penulis;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -147,6 +146,9 @@ class JurnalImport implements ToCollection, WithHeadingRow, SkipsOnFailure
                         ]
                     );
 
+                    $luaranJurnal->penulis()->delete();
+                    $luaranJurnal->penulisLuar()->delete();
+
                     // semua penulis sesuai urutan di Excel
                     foreach ($data['nidn'] as $nidn) {
                         $dosen = $dosens[$nidn];
@@ -161,7 +163,7 @@ class JurnalImport implements ToCollection, WithHeadingRow, SkipsOnFailure
                     }
                 }
             });
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Transaksi gagal: ' . $e->getMessage(), [
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),

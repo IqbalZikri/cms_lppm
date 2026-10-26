@@ -151,9 +151,16 @@ export default function Kegiatan({
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                 />
+
+                                <Link
+                                    href={route("kegiatan.pageImport")}
+                                    viewTransition
+                                >
+                                    <Button variant={"success"}>Import</Button>
+                                </Link>
                             </Field>
 
-                            {role !== "admin" && role !== 'uppm' && (
+                            {role !== "admin" && role !== "uppm" && (
                                 <>
                                     <Link
                                         href={route("kegiatan.dihapus")}

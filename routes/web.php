@@ -42,6 +42,9 @@ Route::middleware(['auth'])->group(function () {
     Route::put('profile/{id}', [ProfileController::class, 'updateProfileDosen'])->name('dosen.profile.updateProfileDosen');
 
     // Kegiatan
+    Route::get('kegiatan/import', [KegiatanController::class, 'pageImport'])->name('kegiatan.pageImport');
+    Route::post('kegiatan/import/preview', [KegiatanController::class, 'preview'])->name('kegiatan.preview');
+    Route::post('kegiatan/import', [KegiatanController::class, 'import'])->name('kegiatan.import');
     Route::get('kegiatan/dihapus', [KegiatanController::class, 'dihapus'])->name('kegiatan.dihapus');
     Route::patch('kegiatan/{kegiatan}/restore', [KegiatanController::class, 'restore'])->withTrashed()->name('kegiatan.restore');
     Route::delete('kegiatan/{kegiatan}/force', [KegiatanController::class, 'forceDelete'])->withTrashed()->name('kegiatan.force-delete');
