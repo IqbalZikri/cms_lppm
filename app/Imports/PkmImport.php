@@ -112,6 +112,7 @@ class PkmImport implements ToCollection, WithHeadingRow, SkipsOnFailure
             'nidn.min' => 'NIDN tidak boleh kosong',
             'nidn.*.exists' => 'Dosen dengan NIDN :input tidak ditemukan',
             'jenis_pkm.required' => 'Jenis PKM tidak boleh kosong',
+            'jenis_pkm.in' => 'Jenis PKM tidak sesuai dengan format',
             'judul.required' => 'Judul tidak boleh kosong',
             'semester.required' => 'Semester tidak boleh kosong',
             'tahun.digits' => 'Tahun harus 4 digit',
