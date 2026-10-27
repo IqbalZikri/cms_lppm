@@ -24,6 +24,7 @@ import { formatTanggal } from "@/lib/format-tanggal";
 interface Props {
     kegiatan: Kegiatan;
     backUrl: string;
+    role: string;
 }
 
 function formatRupiah(value: string | number) {
@@ -50,7 +51,7 @@ export type PenulisRow =
           asal: string;
       };
 
-export default function Show({ kegiatan, backUrl }: Props) {
+export default function Show({ kegiatan, backUrl, role }: Props) {
     const daftarPenulis: PenulisRow[] = [
         ...(kegiatan.penulis ?? []).map((p) => ({
             tipe: "internal" as const,
@@ -78,7 +79,7 @@ export default function Show({ kegiatan, backUrl }: Props) {
                         </Button>
                     </Link>
 
-                    {!kegiatan.deleted_at && (
+                    {!kegiatan.deleted_at && role === "doseen" && (
                         <Link
                             href={route("kegiatan.edit", kegiatan.id)}
                             viewTransition

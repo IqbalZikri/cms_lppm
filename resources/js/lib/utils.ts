@@ -27,3 +27,10 @@ export function formatNamaDosen(dosen: Dosen) {
         .filter(Boolean)
         .join(" ");
 }
+
+export function formatCell(value: string | number | string[] | null | undefined) {
+    if (Array.isArray(value)) {
+        return value.length ? value.join(", ") : "-";
+    }
+    return value ?? "-";
+}

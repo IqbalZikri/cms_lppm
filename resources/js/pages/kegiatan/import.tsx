@@ -32,7 +32,7 @@ import {
 
 type PreviewRow = {
     row: number;
-    data: Record<string, string | number | null>;
+    data: Record<string, string | number | string[] | null>;
     errors: string[];
 };
 
@@ -49,6 +49,11 @@ const COLUMNS: { key: string; label: string }[] = [
     { key: "semester", label: "Semester" },
     { key: "tahun", label: "Tahun" },
     { key: "link_berkas", label: "Link berkas" },
+    { key: "sumber_dana", label: "Sumber Dana" },
+    { key: "jumlah_dana", label: "Jumlah Dana" },
+    { key: "penulis_luar_universitas", label: "Penulis Luar Universitas" },
+    { key: "nama_universitas", label: "Nama Universitas" },
+    { key: "nama_dosen", label: "Nama Dosen" },
 ];
 
 function getXsrfToken(): string {
@@ -115,7 +120,7 @@ export default function Import() {
         if (!file) return;
 
         router.post(
-            route("luaran_jurnal.import"),
+            route("kegiatan.import"),
             { file },
             {
                 forceFormData: true,
@@ -136,7 +141,7 @@ export default function Import() {
         <>
             <Head title="Import Page Dosen" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <Link href={route("luaran_jurnal.index")} viewTransition>
+                <Link href={route("kegiatan.index")} viewTransition>
                     <Button>
                         <ArrowLeft />
                         Kembali
@@ -176,7 +181,10 @@ export default function Import() {
                         </Button>
 
                         <Button variant={"success"}>
-                            <a href="/format_import_jurnal.xlsx" className="">
+                            <a
+                                href="/format_import_excel_kegiatan.xlsx"
+                                className=""
+                            >
                                 Contoh Format Import Jurnal
                             </a>
                         </Button>
@@ -301,12 +309,41 @@ export default function Import() {
                                                             <CheckCircle2 className="size-4 text-green-600" />
                                                         )}
                                                     </TableCell>
-                                                    {COLUMNS.map((c) => (
-                                                        <TableCell key={c.key}>
-                                                            {r.data[c.key] ??
-                                                                "-"}
-                                                        </TableCell>
-                                                    ))}
+                                                    {COLUMNS.map((c) => {
+                                                        const value =
+                                                            r.data[c.key];
+                                                        return (
+                                                            <TableCell
+                                                                key={c.key}
+                                                            >
+                                                                {Array.isArray(
+                                                                    value,
+                                                                ) ? (
+                                                                    <div className="flex flex-wrap gap-1">
+                                                                        {value.map(
+                                                                            (
+                                                                                v,
+                                                                            ) => (
+                                                                                <Badge
+                                                                                    key={
+                                                                                        v
+                                                                                    }
+                                                                                    variant="secondary"
+                                                                                >
+                                                                                    {
+                                                                                        v
+                                                                                    }
+                                                                                </Badge>
+                                                                            ),
+                                                                        )}
+                                                                    </div>
+                                                                ) : (
+                                                                    (value ??
+                                                                    "-")
+                                                                )}
+                                                            </TableCell>
+                                                        );
+                                                    })}
                                                 </TableRow>
                                             );
                                         })}

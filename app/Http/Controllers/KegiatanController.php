@@ -87,9 +87,12 @@ class KegiatanController extends Controller
             ? route('kegiatan.dihapus')
             : route('kegiatan.index');
 
+        $role = auth()->user()->role;
+
         return Inertia::render('kegiatan/show', [
             'kegiatan' => $kegiatan->load($this->authorRelations(withTrashed: true)),
-            'backUrl' => $backUrl
+            'backUrl' => $backUrl,
+            'role' => $role,
         ]);
     }
 
@@ -182,6 +185,8 @@ class KegiatanController extends Controller
         Excel::import($import, $request->file('file'));
 
         $rows = collect($import->rows);
+
+        Log::info($rows);
 
         return response()->json([
             'total' => $rows->count(),

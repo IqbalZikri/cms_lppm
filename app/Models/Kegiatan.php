@@ -33,6 +33,7 @@ class Kegiatan extends Model
         'sumber_dana',
         'jumlah_dana',
         'user_id',
+        'diimport_oleh',
     ];
 
     public function scopeVisibleTo(Builder $query, User $user): Builder
@@ -68,5 +69,10 @@ class Kegiatan extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function diimport()
+    {
+        return $this->belongsTo(User::class, 'diimport_oleh', 'id');
     }
 }

@@ -4,19 +4,21 @@ namespace App\Imports;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
+use Log;
 use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class KegiatanPreviewImport implements ToCollection
+class KegiatanPreviewImport implements ToCollection, WithHeadingRow
 {
     public array $rows = [];
 
     public function collection(Collection $collection): void
     {
-        $import = new JurnalImport();
+        $import = new KegiatanImport();
         $rules = $import->rules();
         $messages = $import->customValidationMessages();
 
-        $kolomData = ['nidn', 'judul', 'tahun', 'link_berkas', 'nama_universitas', 'nama_dosen'];
+        $kolomData = ['nidn', 'judul', 'tahun', 'link_berkas', 'sumber_dana', 'jumlah_dana', 'penulis_luar_universitas', 'nama_universitas', 'nama_dosen'];
 
         $rows = $collection->filter(function ($row) use ($kolomData) {
             return collect($kolomData)->contains(fn($k) => filled($row[$k] ?? null));
@@ -24,6 +26,8 @@ class KegiatanPreviewImport implements ToCollection
 
         foreach ($rows as $i => $row) {
             $data = $import->prepareForValidation($row->toArray(), $i);
+
+            Log::info($rows);
 
             $validator = Validator::make($data, $rules, $messages);
 

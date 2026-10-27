@@ -473,6 +473,21 @@ export default function Kegiatan({
                                         ),
                                     },
                                 ]}
+                                renderActions={(item) => (
+                                    <>
+                                        <Link
+                                            href={route("kegiatan.show", {
+                                                kegiatan: item.id,
+                                                from: "index",
+                                            })}
+                                            viewTransition
+                                        >
+                                            <Button variant="default">
+                                                Show
+                                            </Button>
+                                        </Link>
+                                    </>
+                                )}
                             />
                         )}
                     </CardContent>
