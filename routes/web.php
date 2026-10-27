@@ -52,6 +52,9 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('kegiatan/{kegiatan}', [KegiatanController::class, 'destroy'])->name('kegiatan.destroy');
 
     // pkm
+    Route::get('pkm/import', [PkmController::class, 'pageImport'])->name('pkm.pageImport');
+    Route::post('pkm/import/preview', [PkmController::class, 'preview'])->name('pkm.preview');
+    Route::post('pkm/import', [PkmController::class, 'import'])->name('pkm.import');
     Route::get('pkm/dihapus', [PkmController::class, 'dihapus'])->name('pkm.dihapus');
     Route::patch('pkm/{pkm}/restore', [PkmController::class, 'restore'])->withTrashed()->name('pkm.restore');
     Route::delete('pkm/{pkm}/force', [PkmController::class, 'forceDelete'])->withTrashed()->name('pkm.force-delete');

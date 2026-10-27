@@ -79,7 +79,7 @@ export default function Show({ data, role, backUrl }: Props) {
                         </Button>
                     </Link>
 
-                    {!data.deleted_at && (
+                    {!data.deleted_at && role === 'dosen' && (
                         <Link
                             href={route("pkm.edit", data.id)}
                             viewTransition
@@ -224,7 +224,7 @@ export default function Show({ data, role, backUrl }: Props) {
 Show.layout = {
     breadcrumbs: [
         {
-            title: "Penelitian Kepada Masyarakat",
+            title: "Pengabdian Kepada Masyarakat",
         },
         {
             title: "Detail",

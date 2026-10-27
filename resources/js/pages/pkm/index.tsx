@@ -19,7 +19,7 @@ import { PaginatedData } from "@/interface/pagination";
 import { Pkm as PkmInterface } from "@/interface/pkm";
 import { Fakultas } from "@/types/fakultas";
 import { Head, Link, router } from "@inertiajs/react";
-import { FileText, HandHeart, Plus } from "lucide-react";
+import { FileSpreadsheet, FileText, HandHeart, Plus } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import { route } from "ziggy-js";
 
@@ -148,6 +148,13 @@ export default function Pkm({ data, fakultas, filters, stats, role }: Props) {
                                     onChange={(e) => setSearch(e.target.value)}
                                 />
                             </Field>
+
+                            <Link href={route("pkm.pageImport")} viewTransition>
+                                <Button variant="success">
+                                    <FileSpreadsheet />
+                                    Import
+                                </Button>
+                            </Link>
 
                             {role === "dosen" && (
                                 <>
@@ -417,6 +424,21 @@ export default function Pkm({ data, fakultas, filters, stats, role }: Props) {
                                         ),
                                     },
                                 ]}
+                                renderActions={(item) => (
+                                    <>
+                                        <Link
+                                            href={route("pkm.show", {
+                                                pkm: item.id,
+                                                from: "index",
+                                            })}
+                                            viewTransition
+                                        >
+                                            <Button variant="default">
+                                                Show
+                                            </Button>
+                                        </Link>
+                                    </>
+                                )}
                             />
                         )}
                     </CardContent>

@@ -30,6 +30,7 @@ class Pkm extends Model
         'jumlah_dana',
         'link_berkas',
         'user_id',
+        'diimport_oleh',
     ];
 
     public function scopeVisibleTo(Builder $query, User $user): Builder
@@ -65,5 +66,10 @@ class Pkm extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function diimport()
+    {
+        return $this->belongsTo(User::class, 'diimport_oleh', 'id');
     }
 }

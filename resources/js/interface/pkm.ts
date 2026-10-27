@@ -14,4 +14,5 @@ export interface Pkm {
     penulis: Penulis[];
     penulis_luar: PenulisLuar[];
     deleted_at: string | null;
+    diimport_oleh: number | null;
 }
